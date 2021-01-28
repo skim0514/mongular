@@ -2,6 +2,8 @@ package mas.bezkoder.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import java.time.LocalDateTime; // import the LocalDateTime class
+
 
 @Document(collection = "tutorials")
 public class Tutorial {
@@ -11,18 +13,18 @@ public class Tutorial {
     private String description;
     private String domain;
     private String filetype;
-    private boolean published;
+    private LocalDateTime dateTime;
 
     public Tutorial() {
 
     }
 
-    public Tutorial(String title, String description, String domain, String filetype, boolean published) {
+    public Tutorial(String title, String description, String domain, String filetype) {
         this.title = title;
         this.description = description;
         this.filetype = filetype;
-        this.published = published;
         this.domain = domain;
+        this.dateTime = LocalDateTime.now();
     }
 
     public String getId() {
@@ -52,18 +54,10 @@ public class Tutorial {
       public void setDomain(String domain) {
           this.domain = domain;
       }
-    
-      public boolean isPublished() {
-        return published;
-      }
-    
-      public void setPublished(boolean isPublished) {
-        this.published = isPublished;
-      }
-    
+
       @Override
       public String toString() {
-        return "Tutorial [id=" + id + ", title=" + title + ", desc=" + description + ", published=" + published + "]";
+        return "Tutorial [id=" + id + ", title=" + title + ", desc=" + description + "]";
       }
 
     public String getFiletype() {
@@ -72,5 +66,13 @@ public class Tutorial {
 
     public void setFiletype(String filetype) {
         this.filetype = filetype;
+    }
+
+    public LocalDateTime getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
     }
 }

@@ -6,5 +6,8 @@ import mas.bezkoder.model.Tutorial;
 
 public interface TutorialRepository extends MongoRepository<Tutorial, String> {
     List<Tutorial> findByTitleContaining(String title);
-    List<Tutorial> findByPublished(boolean published);
+    List<Tutorial> findByDomain(String domain);
+//    List<Tutorial> findByUrl(String title);
+
+//    List<Tutorial> findByPublished(boolean published);
 }

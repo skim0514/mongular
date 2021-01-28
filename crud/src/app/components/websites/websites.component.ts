@@ -131,7 +131,7 @@ export class WebsitesComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.http.get('http://localhost:8080/api/websites/www.s2wlab.com', {responseType: 'text'})
+    this.http.get('http://localhost:8080/api' + this.currpage, {responseType: 'text'})
       .subscribe(res => {
         // var image = this.image_parser(res);
         // var scripts = this.script_parser(image);

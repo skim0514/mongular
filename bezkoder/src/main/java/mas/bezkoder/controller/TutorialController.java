@@ -1,11 +1,12 @@
 package mas.bezkoder.controller;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +27,9 @@ import mas.bezkoder.repository.TutorialRepository;
 @RequestMapping("/api")
 public class TutorialController {
 
+
   @Autowired
+  static
   TutorialRepository tutorialRepository;
 
   @GetMapping("/tutorials")
@@ -49,7 +52,7 @@ public class TutorialController {
     }
   }
 
-  @GetMapping("/tutorials/{id}")
+  @GetMapping("/tutorials/id/{id}")
   public ResponseEntity<Tutorial> getTutorialById(@PathVariable("id") String id) {
     Optional<Tutorial> tutorialData = tutorialRepository.findById(id);
 
@@ -60,10 +63,45 @@ public class TutorialController {
     }
   }
 
+  @GetMapping("/tutorials/domain/{domain}")
+  public ResponseEntity<List<Tutorial>> getTutorialByDomain(@PathVariable("domain") String domain) {
+    try {
+      List<Tutorial> tutorials = new ArrayList<Tutorial>();
+
+      if (domain != null)
+        tutorialRepository.findByDomain(domain).forEach(tutorials::add);
+
+      if (tutorials.isEmpty()) {
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+      }
+      return new ResponseEntity<>(tutorials, HttpStatus.OK);
+    } catch (Exception e) {
+      return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+//
+//  @GetMapping("/tutorials/website/{domain}")
+//  public ResponseEntity<List<Tutorial>> getTutorialByWebsite(@PathVariable("website") String website) {
+//    try {
+//      List<Tutorial> tutorials = new ArrayList<Tutorial>();
+//
+//      if (domain != null)
+//        tutorialRepository.findByDomain(domain).forEach(tutorials::add);
+//
+//      if (tutorials.isEmpty()) {
+//        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+//      }
+//      return new ResponseEntity<>(tutorials, HttpStatus.OK);
+//    } catch (Exception e) {
+//      return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+//    }
+//  }
+
   @PostMapping("/tutorials")
   public ResponseEntity<Tutorial> createTutorial(@RequestBody Tutorial tutorial) {
     try {
-      Tutorial _tutorial = tutorialRepository.save(new Tutorial(tutorial.getTitle(), tutorial.getDescription(), tutorial.getDomain(), tutorial.getFiletype(), false));
+      Tutorial _tutorial = tutorialRepository.save(new Tutorial(tutorial.getTitle(), tutorial.getDescription(),
+              tutorial.getDomain(), tutorial.getFiletype()));
       return new ResponseEntity<>(_tutorial, HttpStatus.CREATED);
     } catch (Exception e) {
       return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -78,7 +116,6 @@ public class TutorialController {
       Tutorial _tutorial = tutorialData.get();
       _tutorial.setTitle(tutorial.getTitle());
       _tutorial.setDescription(tutorial.getDescription());
-      _tutorial.setPublished(tutorial.isPublished());
       return new ResponseEntity<>(tutorialRepository.save(_tutorial), HttpStatus.OK);
     } else {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -105,25 +142,53 @@ public class TutorialController {
     }
   }
 
-  @GetMapping("/tutorials/published")
-  public ResponseEntity<List<Tutorial>> findByPublished() {
-    try {
-      List<Tutorial> tutorials = tutorialRepository.findByPublished(true);
-
-      if (tutorials.isEmpty()) {
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-      }
-      return new ResponseEntity<>(tutorials, HttpStatus.OK);
-    } catch (Exception e) {
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-
   //
 
   @GetMapping("/websites/{website}")
-  public ResponseEntity<String> getFileFromTutorial(@PathVariable("website") String website) throws IOException {
-    URL url = new URL("http://localhost:8082/proxy_" + website + ".html");
+  public ResponseEntity<String> getFileFromWebsite(@PathVariable("website") String website) throws IOException {
+    String url = "";
+    try {
+      url = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
+    } catch (UnsupportedEncodingException e) {
+      // not going to happen - value came from JDK's own StandardCharsets
+    }
+    Tutorial tutorial;
+    try {
+      tutorial = getTutorial(url);
+
+      if (tutorial == null) {
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+      }
+    } catch (Exception e) {
+      return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    //getting file
+    String file = getFile(tutorial);
+    try {
+      file = Parser.parseFile(file, tutorial);
+    } catch (URISyntaxException e) {
+      e.printStackTrace();
+    }
+    return new ResponseEntity<>(file, HttpStatus.OK);
+  }
+
+  public static Tutorial getTutorial(String website) {
+    Tutorial tutorial;
+
+    List<Tutorial> tutorials = new ArrayList<Tutorial>();
+
+    if (website != null)
+      tutorialRepository.findByTitleContaining(website).forEach(tutorials::add);
+    return tutorials.get(-1);
+  }
+
+  public String getFile(Tutorial tutorial) throws IOException {
+    URL url = null;
+    try {
+      url = new URL("http://localhost:8082/" + tutorial.getId() + "." + tutorial.getFiletype());
+    } catch (MalformedURLException e) {
+      e.printStackTrace();
+    }
     HttpURLConnection con = (HttpURLConnection) url.openConnection();
     con.setRequestMethod("GET");
     int status = con.getResponseCode();
@@ -137,8 +202,7 @@ public class TutorialController {
     in.close();
     con.disconnect();
     String rv = content.toString();
-    rv = Parser.parseFile(rv, "html");
-    return new ResponseEntity<>(rv, HttpStatus.OK);
+    return rv;
   }
 
 //  @GetMapping(
