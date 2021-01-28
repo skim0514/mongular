@@ -79,23 +79,6 @@ public class TutorialController {
       return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-//
-//  @GetMapping("/tutorials/website/{domain}")
-//  public ResponseEntity<List<Tutorial>> getTutorialByWebsite(@PathVariable("website") String website) {
-//    try {
-//      List<Tutorial> tutorials = new ArrayList<Tutorial>();
-//
-//      if (domain != null)
-//        tutorialRepository.findByDomain(domain).forEach(tutorials::add);
-//
-//      if (tutorials.isEmpty()) {
-//        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//      }
-//      return new ResponseEntity<>(tutorials, HttpStatus.OK);
-//    } catch (Exception e) {
-//      return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-//    }
-//  }
 
   @PostMapping("/tutorials")
   public ResponseEntity<Tutorial> createTutorial(@RequestBody Tutorial tutorial) {
