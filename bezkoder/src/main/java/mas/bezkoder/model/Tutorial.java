@@ -27,6 +27,15 @@ public class Tutorial {
         this.dateTime = LocalDateTime.now();
     }
 
+    public Tutorial(String title, String description, String domain, String filetype, String id) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.filetype = filetype;
+        this.domain = domain;
+        this.dateTime = LocalDateTime.now();
+    }
+
     public String getId() {
         return id;
       }
