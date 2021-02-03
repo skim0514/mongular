@@ -14,7 +14,7 @@ public class Parser {
     private static final String client = "http://localhost:8080/api/websites?web=";
     private static final String href = "href=\"([^\"]*)\"";
     private static final String src = "src=\"([^\"]*)\"";
-    private static final String CSSRegex = "url\\(\"(.+?)\"\\);";
+    private static final String CSSRegex = "url\\((.*?)\\)";
 
     public static String parseHtml(String input, Tutorial tutorial) throws URISyntaxException, IOException {
         Pattern pattern;
@@ -44,11 +44,13 @@ public class Parser {
         Matcher matcher = pattern.matcher(input);
         while (matcher.find()) {
             String group = matcher.group(1);
-            String newUrl = replaceUrl(matcher.group(1), tutorial);
+            group = group.replace("\"", "");
+            String newUrl = replaceUrl(group, tutorial);
             System.out.println(group + " " + newUrl);
-            input = input.replaceAll( group, newUrl);
+            input = input.replaceAll(group, newUrl);
         }
         return input;
+
     }
 
     public static String parseJs(String input, Tutorial tutorial) {

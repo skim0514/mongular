@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/bezkoder/bezkoder.iml" filepath="$PROJECT_DIR$/bezkoder/bezkoder.iml" />
+      <module fileurl="file://$PROJECT_DIR$/crawler/crawl.iml" filepath="$PROJECT_DIR$/crawler/crawl.iml" />
+      <module fileurl="file://$PROJECT_DIR$/crawler/crawler.iml" filepath="$PROJECT_DIR$/crawler/crawler.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/mongular.iml" filepath="$PROJECT_DIR$/.idea/mongular.iml" />
     </modules>
   </component>
