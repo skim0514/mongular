@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 import mas.bezkoder.model.Tutorial;
 import mas.bezkoder.repository.TutorialRepository;
 
-//http://localhost:8080/api/websites?web=https%253A%252F%252Fwww.s2wlab.com%252Fproducts.html
+//http://118.67.133.84:8085/api/websites?web=https%253A%252F%252Fwww.s2wlab.com%252Fproducts.html
 
 @CrossOrigin(origins = "http://localhost:8081")
 @RestController
@@ -35,7 +35,7 @@ public class TutorialController {
   @Autowired
   TutorialRepository tutorialRepository;
   private static String files = "http://localhost:8082/";
-  private static String client = "http://localhost:8080/api/websites?web=";
+  private static String client = "http://localhost:8085/api/websites?web=";
   private static String href = "href=\"([^\"]*)\"";
   private static String src = "src=\"([^\"]*)\"";
   private static String scriptsrc = "<script.*?src=\"(.*?)\"";
