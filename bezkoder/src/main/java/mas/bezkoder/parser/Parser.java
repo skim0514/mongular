@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 public class Parser {
 
-    private static final String client = "http://localhost:8080/api/websites?web=";
+    private static final String client = "http://118.67.133.84:8085/api/websites?web=";
     private static final String href = "href=\"([^\"]*)\"";
     private static final String src = "src=\"([^\"]*)\"";
     private static final String CSSRegex = "url\\((.*?)\\)";
