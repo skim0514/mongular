@@ -66,7 +66,7 @@ public class Crawler {
     }
 
     public static String addTutorial(String link, String filetype, String description) throws IOException, JSONException {
-        URL url = new URL("http://localhost:8085/api/tutorials");
+        URL url = new URL("http://118.67.133.84:8085/api/tutorials");
         URLConnection con = url.openConnection();
         HttpURLConnection http = (HttpURLConnection)con;
         http.setRequestMethod("POST"); // PUT is another valid option
@@ -108,7 +108,7 @@ public class Crawler {
         HashSet<String> hs = crawler.getLinks();
         for (String string: hs) {
             String id = addTutorial(string, "html", "html");
-            downloadFile(string, id + ".html");
+            downloadFile(string, "files/" + id + ".html");
         }
     }
 }

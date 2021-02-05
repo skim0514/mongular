@@ -35,8 +35,8 @@ public class TutorialController {
   @Autowired
   TutorialRepository tutorialRepository;
   private static String files = "http://localhost:8082/";
-//  private static String client = "http://118.67.133.84:8085/api/websites?web=";
-  private static String client = "http://localhost:8085/api/websites?web=";
+  private static String client = "http://118.67.133.84:8085/api/websites?web=";
+//  private static String client = "http://localhost:8085/api/websites?web=";
 //  private static String client = "http://localhost:8085/api/tutorials";
   private static String href = "href=\"([^\"]*)\"";
   private static String src = "src=\"([^\"]*)\"";
