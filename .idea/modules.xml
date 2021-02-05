@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/crawler/crawl.iml" filepath="$PROJECT_DIR$/crawler/crawl.iml" />
       <module fileurl="file://$PROJECT_DIR$/crawler/crawler.iml" filepath="$PROJECT_DIR$/crawler/crawler.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/mongular.iml" filepath="$PROJECT_DIR$/.idea/mongular.iml" />
+      <module fileurl="file://$PROJECT_DIR$/crawler/scrape.iml" filepath="$PROJECT_DIR$/crawler/scrape.iml" />
     </modules>
   </component>
 </project>
