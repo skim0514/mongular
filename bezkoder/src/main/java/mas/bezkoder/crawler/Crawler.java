@@ -1,14 +1,6 @@
 package mas.bezkoder.crawler;
-import mas.bezkoder.controller.TutorialController;
 
-import mas.bezkoder.model.Tutorial;
-import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -17,8 +9,6 @@ import org.jsoup.select.Elements;
 
 import java.io.*;
 import java.net.*;
-import java.net.http.HttpClient;
-import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -75,7 +65,7 @@ public class Crawler {
         });
     }
 
-    public static void addTutorial(String link) throws IOException {
+    public static String addTutorial(String link, String filetype, String description) throws IOException, JSONException {
         URL url = new URL("http://localhost:8085/api/tutorials");
         URLConnection con = url.openConnection();
         HttpURLConnection http = (HttpURLConnection)con;
@@ -84,8 +74,8 @@ public class Crawler {
         Map<String,String> arguments = new HashMap<>();
         arguments.put("title", link);
         arguments.put("domain", new URL(link).getHost().replace("www.", ""));
-        arguments.put("filetype", "html");
-        arguments.put("description", "html");
+        arguments.put("filetype", filetype);
+        arguments.put("description", description);
         JSONObject js = new JSONObject(arguments);
         byte[] out = js.toString().getBytes(StandardCharsets.UTF_8);
         int length = out.length;
@@ -96,16 +86,30 @@ public class Crawler {
         try(OutputStream os = http.getOutputStream()) {
             os.write(out);
         }
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(http.getInputStream()));
+        String inputLine;
+        StringBuffer content = new StringBuffer();
+        while ((inputLine = in.readLine()) != null) {
+            content.append(inputLine);
+        }
+        in.close();
+        String rv = content.toString();
+        JSONObject json = new JSONObject(rv);
+        String id = json.getString("id");
+        http.disconnect();
 
-
-
+        return id;
     }
 
-    public static void main(String[] args) throws IOException {
-//        Crawler crawler = new Crawler();
-//        crawler.getPageLinks("https://mkyong.com/java/jsoup-basic-web-crawler-example/", 0);
-        String string = "https://stackoverflow.com/questions/3324717/sending-http-post-request-in-java";
-        addTutorial(string);
+    public static void main(String[] args) throws IOException, JSONException {
+        Crawler crawler = new Crawler();
+        crawler.getPageLinks("https://mkyong.com/java/jsoup-basic-web-crawler-example/", 0);
+        HashSet<String> hs = crawler.getLinks();
+        for (String string: hs) {
+            String id = addTutorial(string, "html", "html");
+            downloadFile(string, id + ".html");
+        }
     }
 }
 
