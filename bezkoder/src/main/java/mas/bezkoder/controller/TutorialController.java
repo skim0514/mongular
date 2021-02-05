@@ -8,8 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import mas.bezkoder.crawler.Crawler;
 import mas.bezkoder.parser.Parser;
 import org.apache.commons.io.IOUtils;
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -140,7 +142,6 @@ public class TutorialController {
 
     String fileUrl = "http://localhost:8082/" + tutorial.getId() + "." + tutorial.getFiletype();
 
-
     if (Filetype.getDescription(tutorial.getFiletype()) == "string") {
       String file = getTextFile(tutorial);
       file = Parser.parseFile(file, tutorial);
@@ -154,7 +155,16 @@ public class TutorialController {
       String file = getTextFile(tutorial);
       return new ResponseEntity<>(file, HttpStatus.OK);
     }
+  }
 
+  @PostMapping("/websites")
+  public ResponseEntity<?> postFileFromWebsite(@RequestParam("web") String website) throws IOException, JSONException {
+    try {
+      Crawler.main(website);
+    } catch (Exception e) {
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
   private byte[] getImageFile(Tutorial tutorial) throws IOException {

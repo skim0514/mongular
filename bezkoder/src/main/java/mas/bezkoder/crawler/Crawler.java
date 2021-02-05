@@ -102,9 +102,9 @@ public class Crawler {
         return id;
     }
 
-    public static void main(String[] args) throws IOException, JSONException {
+    public static void main(String args) throws IOException, JSONException {
         Crawler crawler = new Crawler();
-        crawler.getPageLinks("https://mkyong.com/java/jsoup-basic-web-crawler-example/", 0);
+        crawler.getPageLinks(args, 0);
         HashSet<String> hs = crawler.getLinks();
         for (String string: hs) {
             String id = addTutorial(string, "html", "html");
