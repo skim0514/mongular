@@ -1,0 +1,137 @@
+/*
+ * Placeholder
+ *
+ */
+var Placeholder = Class.create({
+    initialize: function (element, args) {
+        if (!Object.isElement(element)) { return; }
+        this._element     = $(element);
+
+        var options       = args || {};
+        this._placeholder = options.placeholder || this._element.title || 'input here';
+        this._className   = options.className   || 'defaultText';
+
+        if (options.cssRule) {
+            this._cachedCSS      = this._element.readAttribute('style');
+            this._placeholderCSS = options.cssRule;
+        }
+
+        /*
+         * Add event handlers
+         */
+        this._element.observe('focus', this._focus.bindAsEventListener(this));
+        this._element.observe('blur',  this._blur.bindAsEventListener(this));
+
+        Event.observe(window, 'unload', this._destrcutor.bindAsEventListener(this));
+        if (this._element.form) {
+            $(this._element.form).observe('submit', this._destrcutor.bindAsEventListener(this));
+        }
+
+        /*
+         *  Initialize value
+         */
+        // if this element has already focused, don't show initial value.
+        if (document.activeElement !== null && this._element.id === document.activeElement.id) {
+            return;
+        }
+
+        if (options.clear
+           || this.shown()
+           || this._element.getValue().blank()
+        ) {
+            this._showPlaceholder();
+        } 
+    },
+    shown: function () {
+        return this._element.getValue() === this._placeholder;
+    },
+    setPlaceholder: function (text) {
+        if (this.shown()) {
+            this._hidePlaceholder();
+        }
+        this._placeholder = text;
+        if (!this._element.focused && this._element.getValue().blank()) {
+            this._showPlaceholder();
+        }
+    },
+    _focus: function () {
+        if (this.shown()) {
+            this._hidePlaceholder();
+        }
+    },
+    _blur: function () {
+        if (this._element.getValue().blank() || this.shown()) {
+            this._showPlaceholder();
+        }
+    },
+    _destrcutor: function () {
+        if (this.shown()) {
+            this._element.setValue('');
+        }
+    },
+    _hidePlaceholder: function () {
+        this._element.setValue('');
+        if (this._className) {
+            this._element.removeClassName(this._className);
+        }
+        if (this._placeholderCSS) {
+            this._element.writeAttribute('style', this._cachedCSS);
+        }
+        this._element.fire('placeholder:hide');
+    },
+    _showPlaceholder: function () {
+        this._element.setValue(this._placeholder);
+        if (this._className) {
+            this._element.addClassName(this._className);
+        }
+        if (this._placeholderCSS) {
+            this._element.writeAttribute('style', '');
+            this._element.setStyle(this._placeholderCSS);
+        }
+        this._element.fire('placeholder:show');
+    }
+});
+
+
+(function () {
+    var cache  = {};
+
+    Placeholder.create = function (element, options) {
+        var elementId = $(element).identify();
+        if (!cache[elementId]) {
+            cache[elementId] = new Placeholder(element, options);
+        }
+        return cache[elementId];
+    };
+
+    Placeholder.get = function (element) {
+        var elementId = $(element).identify();
+        return cache[elementId];
+    };
+
+    Placeholder.destroy = function (element) {
+        var elementId = $(element).identify();
+        if (cache[elementId]) {
+            delete cache[elementId];
+        }
+    };
+
+    function setPlaceholder (element, options) {
+        if (Object.isString(options)) {
+            options = { placeholder: options.toString() };
+        }
+
+        if (element.placeholder) {
+            element.placeholder = options.placeholder;
+        } else {
+            Placeholder.create(element, options);
+        }
+    }
+    Element.addMethods(['input', 'textarea'], {
+        setPlaceholder: setPlaceholder
+    });
+
+    document.observe('dom:loaded', function () {
+        $$('.PLACEHOLDER').invoke('setPlaceholder');
+    });
+})();

@@ -1,0 +1,52 @@
+/* 좌측 햄버거 메뉴 fixed 먹이면 dim 꼬임 */
+header {position:fixed; height:60px; }
+header .left > div {float:none;} /* 상단 좌측 메뉴 (about, products, contact) 제거 */
+header .left {float:none; padding:10px 0 0 0;} /*상단 좌측 래퍼 패딩 0*/
+header .left h1 {position:absolute; left:50%; transform:translateX(-50%) scale(0.9); } /* 로고 중앙 정렬 */
+
+header > ul {display:none;} /* 상단 우측 메뉴 (facebook, mail) 제거 */
+
+header .all {display:block;} /* 모바일용 메뉴 보이기*/
+header .all {display:block; position: relative; width:50px; height:30px; border-top:2px solid #000000; border-bottom:2px solid #000000; color:transparent; transform:scale(0.5)} /*좌측 상단 햄버거 메뉴*/
+header .all:before { content: ""; position: absolute; left: 0; top: 50%; width: 100%; height: 2px; background: #000000; margin-top: -1px;} /*좌측 상단 햄버거 메뉴*/
+
+/* 모바일 메뉴 */
+header .close, .all, .left > div > div, header h2 {display:block;}
+
+/* 햄버거 메뉴 내부 */
+header .nav {z-index:101; position:fixed; left:-120%; top:0; transition: left 0.5s; padding:15px 24px 15px 22px; width:80%; height:100%; background:#fff; box-sizing: border-box;} 
+header .nav.on {left: 0;}
+header .nav.on nav {border-top: 1px solid#000; padding: 0 0 24px 0; }
+
+/* 햄버거 메뉴 안의 로고 */
+header h2 {background: url("https://cdn.imweb.me/thumbnail/20201102/37a825bb173f0.png"); background-size: 70.906px 46.938px; width:70.906px; height:46.938px; color:transparent; margin:0 0 25px 0;}
+header h2 a {display:block; width:70.996px; height:46.938px;}
+
+/* 햄버거 메뉴 클릭시 */
+header .nav.on nav a {color:#111;height: 40px; line-height:40px;}
+header .nav.on nav a:before {display:none;}
+header .nav.on nav li {float:none; border-bottom: 1px solid #c0c0c0;}
+
+/* 햄버거 메뉴 하단 Facebook | Mail */
+header .nav.on div {display:flex; border:1px solid rgb(192, 192, 192);}
+header .nav.on div a:first-child {border:none;}
+header .nav.on div a {flex:1; height: 38px; border-left: 1px solid #c0c0c0; line-height: 38px; text-align: center; color:#666; font-size: 13px; font-weight: bold;} 
+
+header .nav.on .close {position: absolute; right:24px; top:24px; width:12px; height:12px; color:transparent;}
+header .nav.on .close:before {content:""; position:absolute; left:46.5%; top:0; width: 1px; height: 100%; background: #5a5a5a; transform:rotate(45deg);}
+header .nav.on .close:after {content:""; position:absolute; right:46.5%; top:0; width: 1px; height: 100%; background: #5a5a5a; transform:rotate(-45deg);}
+
+.dim {display:none; z-index:100; position:fixed; left:0; top:0; width:100%; height:100%; background: rgba(0,0,0,0.5);}
+
+/* 메인 컨텐츠 */
+/* br{display:none;} */
+.contents{flex-direction:column;}
+.contents .right-side{padding-top:3%; padding-bottom:3%; }
+.contents .left-side{padding-top:3%;}
+.text_wrapper hr{width:100%; height:1px; border-top:1px solid #000;}
+/* .text_wrapper br{display:none} */
+.main_contents{padding-top:60px;}
+
+/* 
+.products_content_wrapper .right-side .text_wrapper{display:flex;}
+.products_content_wrapper .right-side .text_wrapper .left-side {display:flex;} */

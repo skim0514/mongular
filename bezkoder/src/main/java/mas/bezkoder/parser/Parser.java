@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 public class Parser {
 
-    private static final String client = "http://118.67.133.84:8085/api/websites?web=";
+    private static final String client = "http://localhost:8085/api/websites?web=";
     private static final String href = "href=\"([^\"]*)\"";
     private static final String src = "src=\"([^\"]*)\"";
     private static final String CSSRegex = "url\\((.*?)\\)";
@@ -44,13 +44,13 @@ public class Parser {
         Matcher matcher = pattern.matcher(input);
         while (matcher.find()) {
             String group = matcher.group(1);
-            group = group.replace("\"", "");
+            group = group.replaceAll("\"", "");
+            group = group.replaceAll("\'", "");
             String newUrl = replaceUrl(group, tutorial);
             System.out.println(group + " " + newUrl);
             input = input.replaceAll(group, newUrl);
         }
         return input;
-
     }
 
     public static String parseJs(String input, Tutorial tutorial) {
@@ -59,6 +59,7 @@ public class Parser {
 
     public static String parseFile(String input, Tutorial tutorial) throws URISyntaxException, IOException {
         System.out.println(tutorial.getFiletype());
+        System.out.println(input);
         if (tutorial.getFiletype().equals("html")) return parseHtml(input, tutorial);
         else if (tutorial.getFiletype().equals("css")) return parseCss(input, tutorial);
         else if (tutorial.getFiletype().equals("js")) return parseJs(input, tutorial);
@@ -78,11 +79,11 @@ public class Parser {
         String newUrl;
 
         //fixing paths
-        newUrl = getUrlFromPath(url, tutorial, uri, count);
+        newUrl = getUrlFromPath(url, tutorial, count);
         return client + newUrl;
     }
 
-    private static String getUrlFromPath(String url, Tutorial tutorial, URI uri, int count) throws URISyntaxException {
+    private static String getUrlFromPath(String url, Tutorial tutorial, int count) throws URISyntaxException {
         String newUrl;
         if (url.startsWith("http")) {
             newUrl = url;

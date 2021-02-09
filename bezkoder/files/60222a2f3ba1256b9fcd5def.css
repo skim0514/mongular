@@ -1,0 +1,42 @@
+html{font-size:10px;}
+
+ul,ol,li{list-style:none;}
+h1,h2,h3,h4,h5,h6{margin:0; padding:0; font-size:10px;}
+body{margin:0; padding:0;}
+/* div,p,blockquote,pre,code,address,ul,ol,li,menu,nav,section,article,aside,dl,dt,dd,table,thead,tbody,tfoot,label,caption,th,td,form,fieldset,legend,hr,input,button,textarea,object,figure,figcaption {margin:0;padding:0;} */
+body{width:100%; background:#fff; min-width:320px; -webkit-text-size-adjust:none;word-wrap:break-word;word-break:break-all;}
+/* body,input,select,textarea,button {font-size:12px; color:#727272;} */
+/* table{width:100%;border-spacing:0;border-collapse:collapse;} */
+img,fieldset{border:0;}
+address,cite,code,em{font-style:normal;font-weight:normal;}
+/* label,img,input,select,textarea,button{vertical-align:middle;} */
+.hide,caption,legend{line-height:0;font-size:0;overflow:hidden;}
+main,header,section,nav,footer,aside,article,figure{display:block;}
+a{color:#000;text-decoration:none;}
+p{margin:0;padding:0;}
+hr{margin:0;border:0;}
+
+
+@font-face {
+    font-family:Graphik-Medium;
+    src: url(../font/Graphik-Medium-Web.woff2) format('woff2'),
+    url(../font/Graphik-Medium-Web.woff) format('woff');
+}
+
+@font-face {
+    font-family:Graphik-Light;
+    src: url(../font/Graphik-Light-Web.woff2) format('woff2'),
+    url(../font/Graphik-Light-Web.woff) format('woff');
+}
+
+@font-face {
+    font-family:Graphik-Semibold;
+    src: url(../font/Graphik-Semibold-Web.woff2) format('woff2'),
+    url(../font/Graphik-Semibold-Web.woff) format('woff');
+}
+
+@font-face {
+    font-family:Graphik-Regular;
+    src: url(../font/Graphik-Regular-Web.woff2) format('woff2'),
+    url(../font/Graphik-Regular-Web.woff) format('woff');
+}

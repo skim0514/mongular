@@ -1,0 +1,470 @@
+
+<!DOCTYPE html>
+<html lang="ja" class="osUndefined browserUndefined serviceDefault pageViewNewsJpMixiNews domainJpMixiNews">
+<head>
+<title>ソーシャル・ネットワーキング サービス [mixi(ミクシィ)]</title>
+<!-- header meta values -->
+<meta http-equiv="Content-Type" content="text/html; charset=euc-jp"  />
+<meta name="application-name" content="mixi"  />
+<meta name="msapplication-starturl" content="/home.pl?from=pin"  />
+<meta name="msapplication-navbutton-color" content="#E0C074"  />
+<meta name="msapplication-window" content="width=100%;height=100%"  />
+<meta name="msapplication-tooltip" content="友人とコミュニケーションを楽しもう！"  />
+<meta name="description" lang="ja" content="mixi(ミクシィ)は、日記、写真共有、ゲームや便利ツール満載のアプリなど、さまざまなサービスで友人・知人とのコミュニケーションをさらに便利に楽しくする、日本最大規模のソーシャル・ネットワーキングサービスです。"  />
+
+<!-- / header meta values -->
+
+<script type="text/javascript" charset="UTF-8" src="https://script.mixi.net/static/polyfill/core-js/core-js-3.6.4.js?1514732400" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="UTF-8" src="https://script.mixi.net/static/polyfill/dialog-polyfill/dialog-polyfill-0.5.0.js?1514732400" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="UTF-8" src="https://script.mixi.net/static/polyfill/datalist-polyfill/datalist-polyfill-1.24.3.js?1514732400" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="UTF-8" src="https://script.mixi.net/static/polyfill/details-element-polyfill/details-element-polyfill-2.4.0.js?1514732400" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="UTF-8" src="https://script.mixi.net/static/polyfill/relative-time-format/relative-time-format-1.0.5.js?1514732400" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="UTF-8" src="https://script.mixi.net/static/polyfill/fetch/fetch-3.0.0.js?1514732400" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="UTF-8" src="https://script.mixi.net/static/polyfill/classList/classList.js?1514732400" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="UTF-8" src="https://script.mixi.net/static/polyfill/svg4everybody/svg4everybody-2.1.9.js?1514732400" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="UTF-8" src="https://script.mixi.net/static/polyfill/svg4everybody/run.js?1514732400" crossorigin="anonymous"></script>
+<link rel="stylesheet" type="text/css" href="https://img.mixi.net/static/polyfill/dialog-polyfill/dialog-polyfill-0.5.0.css?1514732400" />
+<!-- header css and links -->
+<link rel="stylesheet" type="text/css" href="https://img.mixi.net/static/css/basic/skin/gray/mixicollection.css?1514732400" />
+<link rel="stylesheet" type="text/css" href="https://img.mixi.net/static/css/build/pc/skin/common/basic_set_gray.production.css?1611898197" />
+<link href="https://img.mixi.net/img/basic/favicon.ico"  type="image/vnd.microsoft.icon"  rel="icon"         /><link href="https://img.mixi.net/img/basic/favicon.ico"  type="image/vnd.microsoft.icon"  rel="shortcut icon"         /><link href="https://img.mixi.net/img/smartphone/touch/favicon/x001_prec.png"    rel="apple-touch-icon-precomposed"         />
+<!-- / header css and links -->
+
+
+<!-- header javascript --><script type="text/javascript" charset="UTF-8" src="https://script.mixi.net/static/js/build/mixi-qa-error-report.production.js?1612851442" crossorigin="anonymous"></script><script id="js-gateway" type="application/x.mixi.js-gateway"><!--{"recaptcha_v3_sitekey":"6LcHT30UAAAAAPVbk-2NO8dLZqhPLsFDPXbT_6cZ","url_mixi_prefix":"http://mixi.jp/","url_mixi_plugin_prefix":"https://plugins.mixi.jp/","url_fan_page_redirector_prefix":"http://p.mixi.jp/","url_open_prefix":"https://open.mixi.jp/","CONFIG_IMG_BASE":"https://img.mixi.net","url_mobile_game_prefix":"http://m.mixi.jp/","url_mobile_fan_apps_runtime":"http://mpa.mixi.net","url_mixi_static_prefix":"http://static.mixi.jp/","page_encoding":"euc-jp","url_external_script_prefix":"https://external-script.mixi.net/","login_member_display_name":"","url_mixi_prefix_ssl":"https://mixi.jp/","error_report_sampling_rate":0.006,"is_premium_login_member":0,"url_auth_prefix_ssl":"https://auth.in.mixi.co.jp/","url_fan_prefix":"http://page.mixi.jp/","url_pic_logo_base":"http://logo-imagecluster.img.mixi.jp/photo/comm","STATIC_FILE_BASE":"https://img.mixi.net","recaptcha_v2_sitekey":"6LcB2F8UAAAAANn_RjvAr3Zy0ljUAuyFskGUvSiZ","can_verify_recaptcha_v2":1,"url_mixi_plugin_prefix_ssl":"https://plugins.mixi.jp/","url_photo_prefix":"https://photo.mixi.jp/","url_fan_prefix_ssl":"https://page.mixi.jp/","url_application_sap_prefix":"https://sap.mixi.jp/","url_photo_prefix_ssl":"https://photo.mixi.jp/","url_news_prefix_ssl":"https://news.mixi.jp/","url_payment_prefix_ssl":"https://payment.mixi.jp/","url_news_prefix":"http://news.mixi.jp/","rpc_post_key":"054ed742486f2cf0f03c7b9028a57fbee6f1bab7","url_mixi_static_prefix_ssl":"https://static.mixi.jp/","is_adult_login_member":0,"RUN_MODE":"production","url_pic_logo_base_ssl":"https://logo-imagecluster.img.mixi.jp/photo/comm","url_mobile_pr_prefix":"http://pr.m.mixi.jp/","url_corp_develop_prefix":"http://developer.mixi.co.jp/","url_pr_prefix":"http://pr.mixi.jp/","url_partner_ads_prefix_ssl":"https://partner.ads.mixi.jp/","url_corp_prefix":"http://mixi.co.jp/","url_seller_prefix_ssl":"https://seller.mixi.jp/","can_verify_recaptcha_v3":1,"url_ad_impact_prefix":"http://n2.ads.mreco0.jp/","url_mobile_prefix":"http://m.mixi.jp/","news_prefix":"http://news.mixi.jp/","url_fan_apps_prefix":"http://pageapps.mixi.jp/","url_smartphone_game_prefix":"http://sp.game.mixi.net/","url_corp_pr_prefix":"http://pr.mixi.co.jp/","url_img_ads_prefix":"http://img.ads.mreco0.jp/img/","login_member_id":null,"url_gear_prefix_ssl":"https://gear.in.mixi.co.jp/","url_game_prefix":"http://mixi.jp/","login_member_thumbnail_url":""}--></script>
+
+<script type="text/javascript"><!--
+(function(){
+    if( !window['Mixi'] ){
+        window.Mixi = {};
+    }
+
+    var value;
+    window.Mixi.Gateway = {
+        getParam:function(key){
+            if( !value ) {
+                value = JSON.parse(document.getElementById('js-gateway').text.replace(/^<!--(.*)-->$/, '$1'));
+            }
+            if( !key ){
+                return value;
+            }
+            return value[key];
+        }
+    };
+})();
+--></script>
+
+<script type="text/javascript" charset="UTF-8" src="https://script.mixi.net/static/js/lib/prototype-effects-1.6.0.2-1.8.1-compress.js?1609995091" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="UTF-8" src="https://script.mixi.net/static/js/lib/underscore-string-1.3.3-2.0.0-compress.js?1514732400" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="UTF-8" src="https://script.mixi.net/static/js/lib/namespace-1.0.1-brook-compress.js?1514732400" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="UTF-8" src="https://script.mixi.net/static/js/mixi.js?1514732400" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="UTF-8" src="https://script.mixi.net/static/js/mixi/common/namespace.js?1514732400" crossorigin="anonymous"></script><!-- / header javascript -->
+
+
+<script type="text/javascript">
+  // universal analytics (analytics.js)
+  
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+
+
+
+
+
+
+  var _mixiGaEnabledTrackerList = ["global_raw_url","global"];
+  var _mixiGaTimingInfo = { startTime: (new Date()).getTime() };
+</script>
+
+
+
+</head>
+
+
+
+<body>
+<div id="page" class="FRAME2016_page">
+
+
+
+
+<script type="text/javascript">//<![CDATA[
+// Disable iframe encapsulation
+if (window != top) top.location.href = location.href;
+//]]></script>
+
+
+
+<div class="COMMONDOC_header2017_headerArea widget"
+  data-widget-namespace="jp.mixi.menu.widget.pc.header"
+  data-global-navi=".JS_globalNavi"
+  data-drawer=".JS_drawer"
+  data-drawer-toggle-button=".JS_drawerToggleButton"
+  data-drawer-toggle-button-toggle-class="STATE_closeNav"
+  data-drawer-header-area=".JS_drawerHeaderArea"
+  data-drawer-menu-area=".JS_drawerMenuArea"
+  data-drawer-bottom-margin="30"
+  >
+
+<div class="COMMONDOC_header2017_globalNavArea JS_globalNavi">
+  <div class="COMMONDOC_header2017_globalNav MXARIA2018_header01" role="banner">
+    <div class="COMMONDOC_header2017_globalNav__toggleNav"><div class="COMMONDOC_header2017_toggleNav"><a href="#mainNav" onclick="return false;" class="COMMONDOC_header2017_navTrigger JS_drawerToggleButton"><span class="COMMONDOC_header2017_hamburgerNavBar"></span></a><div class="COMMONDOC_header2017_mainNav JS_drawer" style="display:none;" id="mainNav"><div class="COMMONDOC_header2017_mainNavHeader JS_drawerHeaderArea"><a href="https://mixi.jp/login.pl?next_url=https%3A%2F%2Fnews.mixi.jp%2Fview_news.pl%3Fid%3D6406348&from=drawer_menu" class="COMMONDOC_header2017_mainNavAccountLabel"><span class="COMMONDOC_header2017_mainNavAccountLabel__thumbnail" style="background-image:url(https://img.mixi.net/img/basic/common/noimage_member180.gif);"></span><span class="COMMONDOC_header2017_mainNavAccountLabel__userName">ログイン</span></a></div><dl class="COMMONDOC_header2017_mainNavList JS_drawerMenuArea"><dt class="COMMONDOC_header2017_mainNavListTitle">サービス</dt><dd><a href="https://mixi.jp/search_community.pl?from=drawer_menu&search_mode=title" class="COMMONDOC_header2017_mainNavLink COMMONDOC_header2017_mainNavLink--community">コミュニティ</a></dd><dd><a href="https://news.mixi.jp/?from=drawer_menu" class="COMMONDOC_header2017_mainNavLink COMMONDOC_header2017_mainNavLink--news">ニュース</a></dd><dd><a href="http://mixi.jp/redirector.pl?id=4950&from=drawer_menu" class="COMMONDOC_header2017_mainNavLink COMMONDOC_header2017_mainNavLink--game">ゲーム</a></dd><dd><a href="https://open.mixi.jp/diary?from=drawer_menu" class="COMMONDOC_header2017_mainNavLink COMMONDOC_header2017_mainNavLink--openDiary">みんなの日記</a></dd><dd><a href="https://mixi.jp/search_item.pl?from=drawer_menu" class="COMMONDOC_header2017_mainNavLink COMMONDOC_header2017_mainNavLink--review">レビュー</a></dd><dt class="COMMONDOC_header2017_mainNavListTitle">その他</dt><dd><a href="http://mixi.jp/release_info.pl?from=drawer_menu" class="COMMONDOC_header2017_mainNavLink COMMONDOC_header2017_mainNavLink--releaseInfo">運営者からのお知らせ</a></dd><dd><a href="http://mixi.jp/premium.pl?from=drawer_menu" class="COMMONDOC_header2017_mainNavLink COMMONDOC_header2017_mainNavLink--premium">mixiプレミアム</a></dd></dl></div></div></div>
+
+    <div class="COMMONDOC_header2017_globalNav__logo"><a href="http://mixi.jp/home.pl?from=g_navi" class="COMMONDOC_header2017_mainLogo"><img class="COMMONDOC_header2017_mainLogoImg" src="https://img.mixi.net/img/basic/icon/logo_mixi001.svg" alt="mixi" width="42" height="18" /></a></div>
+
+    
+
+    
+    
+<div class="COMMONDOC_header2017_globalNav__account"><ul class="COMMONDOC_header2017_loginArea"><li class="COMMONDOC_header2017_loginArea__item"><a class="COMMONDOC_header2017_loginButton login" href="https://mixi.jp/login.pl?next_url=https%3A%2F%2Fnews.mixi.jp%2Fview_news.pl%3Fid%3D6406348&from=g_navi">ログイン</a></li><li class="COMMONDOC_header2017_loginArea__item"><a class="COMMONDOC_header2017_registerButton register" href="https://mixi.jp/register.pl?next_url=https%3A%2F%2Fnews.mixi.jp%2Fview_news.pl%3Fid%3D6406348&from=g_navi">新規会員登録</a></li></ul></div>
+
+
+    
+  </div>
+</div>
+
+
+<div class="COMMONDOC_header2017_localNavArea"><ul class="COMMONDOC_header2017_localNav"><li class="COMMONDOC_header2017_localNav__item"><a class="COMMONDOC_header2017_localNavLink" href="http://mixi.jp/?from=l_navi" title="ホーム">ホーム</a></li><li class="COMMONDOC_header2017_localNav__item"><a class="COMMONDOC_header2017_localNavLink" href="https://sns.mixi.co.jp/service.html" title="ミクシィについて">ミクシィについて</a></li><li class="COMMONDOC_header2017_localNav__item"><a class="COMMONDOC_header2017_localNavLink" href="http://mixi.co.jp/csr/kenzen/mixi/safety01/" title="より健全なSNSを目指して">より健全なSNSを目指して</a></li><li class="COMMONDOC_header2017_localNav__item"><a class="COMMONDOC_header2017_localNavLink" href="https://mixi.jp/help.pl?from=l_navi" title="ヘルプ">ヘルプ</a></li></ul></div>
+
+
+</div>
+
+
+
+
+
+
+<!--[BodyArea]-->
+<div id="bodyArea" class="FRAME2016_bodyArea">
+
+<!--[BodyMainArea]-->
+<div id="bodyMainArea" class="FRAME2016_bodyMainArea">
+
+<!--[MessageArea]-->
+<div class="messageArea">
+
+<div class="heading02">
+<h3>内容確認</h3>
+</div>
+
+<!--[Contents]-->
+<div class="contents">
+<div>
+<p class="messageAlert">データがありません<br /></p>
+</div>
+<!--/contents--></div>
+<!--/[Contents]-->
+
+<!--/messageArea--></div>
+<!--/[MessageArea]-->
+
+<ul class="utilityLinks03">
+
+<script type="text/javascript"><!--//<![CDATA[
+(function() {if(history && history.length > 1){document.write('<li><a href="javascript:history.back()">前の画面へ');document.write('</a></li>');}})();
+//]]>--></script>
+
+</ul>
+
+
+<!--/bodyMainArea--></div>
+<!--/[BodyMainArea]-->
+
+
+<!--[BodySub]-->
+<div id="bodySub" class="FRAME2016_bodySub">
+<a href="https://mixi.jp/search_mykeyword.pl">
+<img height="300" width="300" alt="mixiキーワード" src="https://img.mixi.net/img/basic/common/bn_mixi_keyword003.gif" />
+</a>
+<!--/bodySub--></div>
+<!--/[BodySub]-->
+
+
+<!--/bodyArea--></div>
+<!--/[BodyArea]-->
+
+
+<!--[FooterArea]-->
+<div id="footerArea" class="FRAME2016_footerArea">
+<div class="LEGACY_UI2016_footer_pagetopLink pagetopLink"><p><a class="LEGACY_UI2016_footer_pagetopLink$$$p$$$a" href="#page">このページの上部へ</a></p></div>
+
+
+<div class="footerMain MXARIA2018_footer01" role="contentinfo">
+
+
+
+
+
+
+
+
+<div class="COMMONDOC_footerNav COMMONDOC_footerNav--typeLogout"><!--
+
+--><ul class="COMMONDOC_footerNavGroup COMMONDOC_footerNavGroup--isLinkToMixiImportant"><!--
+
+
+
+
+
+
+
+
+
+--><li class="COMMONDOC_footerNavItem"><a href="https://sns.mixi.co.jp/service.html">mixiについて</a></li><!--
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--><li class="COMMONDOC_footerNavItem"><a href="https://mixi.jp/rules.pl">利用規約</a></li><!--
+--><li class="COMMONDOC_footerNavItem"><a href="https://mixi.jp/inquiry.pl">お問い合わせ</a></li><!--
+
+
+
+
+
+
+--></ul>
+<!--
+
+--><ul class="COMMONDOC_footerNavGroup COMMONDOC_footerNavGroup--isLinkToMixiProducts"><!--
+
+
+
+
+
+
+
+
+
+
+--><li class="COMMONDOC_footerNavItem"><a href="https://mixi.jp/search_game.pl" target="_blank">mixiゲーム</a></li><!--
+--><li class="COMMONDOC_footerNavItem"><a href="https://mixi.jp/search_community.pl" target="_blank">mixiコミュニティ</a></li><!--
+--><li class="COMMONDOC_footerNavItem"><a href="https://mixi.jp/event/" target="_blank">イベント</a></li><!--
+--><li class="COMMONDOC_footerNavItem"><a href="https://news.mixi.jp/" target="_blank">mixiニュース</a></li><!--
+--><li class="COMMONDOC_footerNavItem"><a href="http://mixi.jp/word/" target="_blank">mixiワード</a></li><!--
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--></ul>
+<!--
+
+--><ul class="COMMONDOC_footerNavGroup COMMONDOC_footerNavGroup--isLinkToCommunities"><!--
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--></ul>
+<!--
+
+--><ul class="COMMONDOC_footerNavGroup COMMONDOC_footerNavGroup--isLinkToOurProducts"><!--
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--><li class="COMMONDOC_footerNavItem"><a href="http://www.monster-strike.com/" target="_blank">モンスト</a></li><!--
+--><li class="COMMONDOC_footerNavItem"><a href="https://mitene.us/" target="_blank">子供の写真・動画を共有</a></li><!--
+--><li class="COMMONDOC_footerNavItem"><a href="http://minimodel.jp/" target="_blank">美容室予約</a></li><!--
+
+
+
+
+
+
+--></ul><!--
+
+--><ul class="COMMONDOC_footerNavGroup COMMONDOC_footerNavGroup--isLinkToMixiEfforts"><!--
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--><li class="COMMONDOC_footerNavItem"><a href="http://mixi.co.jp/" target="_blank">運営会社</a></li><!--
+--><li class="COMMONDOC_footerNavItem"><a href="http://mixi.co.jp/privacy/" target="_blank">プライバシーポリシー</a></li><!--
+--><li class="COMMONDOC_footerNavItem"><a href="http://mixi.co.jp/csr/kenzen/mixi/safety01/" target="_blank">健全化の取り組み</a></li><!--
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--></ul><!--
+
+--><ul class="COMMONDOC_footerNavGroup COMMONDOC_footerNavGroup--isLinkToMixiOthers"><!--
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--><li class="COMMONDOC_footerNavItem"><a href="http://developer.mixi.co.jp/?from=footer" target="_blank">開発者向け情報</a></li><!--
+--><li class="COMMONDOC_footerNavItem"><a href="http://mixi.co.jp/recruit/" target="_blank">人材募集</a></li><!--
+--><li class="COMMONDOC_footerNavItem"><a href="http://www.find-job.net/" target="_blank">転職サイト</a></li><!--
+
+
+
+
+
+
+--></ul><!--
+
+--><!-- /COMMONDOC_footerNav --></div>
+
+
+
+
+
+
+<p id="copyright" class="LEGACY_UI2016_copyright">Copyright (C) 1999-2021 mixi, Inc. All rights reserved.</p>
+</div>
+
+<!--/footerArea--></div>
+<!--/[FooterArea]-->
+
+</div><!--/page-->
+
+
+
+
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+
+
+
+
+
+});
+</script>
+
+<script type="text/javascript" charset="UTF-8" src="https://script.mixi.net/static/js/lib/jquery-1.12.4.min-migrate-plugin-noconflict-compress.js?1611102515" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="UTF-8" src="https://script.mixi.net/static/js/build/co-mixi.production.js?1612851475" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="UTF-8" src="https://script.mixi.net/static/js/build/mixi-model.production.js?1612851467" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="UTF-8" src="https://script.mixi.net/static/js/build/mixi-ui.production.js?1612851463" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="UTF-8" src="https://script.mixi.net/static/js/build/mixi-analysis.production.js?1612851467" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="UTF-8" src="https://script.mixi.net/static/js/build/mixi-menu.pc.production.js?1612851481" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="UTF-8" src="https://script.mixi.net/static/js/lib/prototype/replacer_for_array_prototype.js?1514732400" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="UTF-8" src="https://script.mixi.net/static/js/build/mixi-adnetwork.production.js?1612851467" crossorigin="anonymous"></script>
+
+<script type="text/javascript">
+<!--//<![CDATA[
+if( this.IS_STARTED_ENTRY_POINT ){
+    alert("already loaded");
+}
+this.IS_STARTED_ENTRY_POINT = true;
+Namespace.use('brook.widget bindAllWidget').apply(function (ns) {
+    ns.bindAllWidget.run();
+});
+//]]>--></script>
+
+
+
+</body>
+</html>
+
+
+
+
+

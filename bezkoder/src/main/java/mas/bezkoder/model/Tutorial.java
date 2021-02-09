@@ -13,27 +13,24 @@ public class Tutorial {
     private String description;
     private String domain;
     private String filetype;
+    private String contentType;
     private LocalDateTime dateTime;
 
     public Tutorial() {
 
     }
 
-    public Tutorial(String title, String description, String domain, String filetype) {
+    public Tutorial(String title, String description, String domain, String filetype, String contentType) {
         this.title = title;
         this.description = description;
         this.filetype = filetype;
         this.domain = domain;
         this.dateTime = LocalDateTime.now();
+        this.contentType = contentType;
     }
 
-    public Tutorial(String title, String description, String domain, String filetype, String id) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.filetype = filetype;
-        this.domain = domain;
-        this.dateTime = LocalDateTime.now();
+    public Tutorial(String title, String description, String domain, String filetype) {
+        this(title, description, domain, filetype, "utf-8");
     }
 
     public String getId() {
@@ -83,5 +80,13 @@ public class Tutorial {
 
     public void setDateTime(LocalDateTime dateTime) {
         this.dateTime = dateTime;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
     }
 }

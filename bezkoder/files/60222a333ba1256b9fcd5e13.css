@@ -1,0 +1,34 @@
+/* 상단 바 시작 */
+header {position:fixed; width:100%; background-color:white; z-index:10000;}/* 상단 바 고정, (z-index:10000 != slick carousel overlap) */
+header .left{float: left; padding: 10px 0 0px 55px;} /*(좌측 상단 래퍼)로고, about, products, contact div 왼쪽 정렬 */
+
+header h1 {float:left;} /* 로고 위치 왼쪽 정렬*/
+header h1 a {display:block; background: url("https://cdn.imweb.me/thumbnail/20201102/37a825bb173f0.png"); background-size: 70.906px 46.938px; width:70.906px; height:46.938px; color:transparent; margin-top:0px; margin-bottom:0px;} /* 로고 이미지 */
+
+header h2 {display:none;}  /*모바일 메뉴 텍스트 none*/
+
+header .all, /*모바일 메뉴 none*/
+.close, /*모바일 메뉴 닫기 버튼 none*/
+.left > div > div {display:none;} /*PC용으로 사용하기 위해 모바일 메뉴 제거*/
+
+
+header nav a {display:block; position:relative; font-size: 17px; } /*좌측 about, products, contact*/
+header nav a:hover {transition: width 0.3s; color:gray;} /*좌측 about, products, contact*/
+
+/* header nav a:before{content:""; position:absolute; left: 0; bottom: 0; width:0%; height: 1px; background: #000000; transition: width 0.3s;} */
+/* header nav a:hover:before{content:""; position:absolute; left: 0; bottom: 0; width:100%; height: 1px; background: #000000;} */
+
+header .left > div {float:left;} /*about, products, contact 위치 수정*/
+header .left > div nav li {float:left; padding: 0 55px 0 0; } /*ul 태그 밑 about products contact 정렬*/
+header .left > div nav li a {font-family: "Graphik-Regular";} /*ul 태그 밑 about products contact 정렬*/
+
+ 
+header > ul {float:right; padding: 0px 30px 10px 0} /*우측 페이스북, 메일 로고 래퍼*/
+header > ul > li {float:left;}
+header > ul > li > a {display:block; width:96px; height:38px; line-height:38px; text-align:center;font-size:18px;}
+
+/* 상단 바 끝 */
+
+/* 메인 컨텐츠 */
+.main_contents{padding-top:110px;}
+.footer{padding-bottom:50px;}

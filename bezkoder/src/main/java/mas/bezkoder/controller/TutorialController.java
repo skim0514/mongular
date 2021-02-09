@@ -37,8 +37,8 @@ public class TutorialController {
   @Autowired
   TutorialRepository tutorialRepository;
   private static String files = "http://localhost:8082/";
-  private static String client = "http://118.67.133.84:8085/api/websites?web=";
-//  private static String client = "http://localhost:8085/api/websites?web=";
+//  private static String client = "http://118.67.133.84:8085/api/websites?web=";
+  private static String client = "http://localhost:8085/api/websites?web=";
 //  private static String client = "http://localhost:8085/api/tutorials";
   private static String href = "href=\"([^\"]*)\"";
   private static String src = "src=\"([^\"]*)\"";
@@ -77,7 +77,7 @@ public class TutorialController {
   public ResponseEntity<Tutorial> createTutorial(@RequestBody Tutorial tutorial) {
     try {
       Tutorial _tutorial = tutorialRepository.save(new Tutorial(tutorial.getTitle(), tutorial.getDescription(),
-              tutorial.getDomain(), tutorial.getFiletype()));
+              tutorial.getDomain(), tutorial.getFiletype(), tutorial.getContentType()));
       return new ResponseEntity<>(_tutorial, HttpStatus.CREATED);
     } catch (Exception e) {
       return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -141,29 +141,28 @@ public class TutorialController {
     }
 
     String fileUrl = "http://localhost:8082/" + tutorial.getId() + "." + tutorial.getFiletype();
-
-    if (Filetype.getDescription(tutorial.getFiletype()) == "string") {
+    HttpHeaders headers = new HttpHeaders();
+    if (Filetype.getDescription(tutorial.getFiletype()).equals("string")) {
       String file = getTextFile(tutorial);
       file = Parser.parseFile(file, tutorial);
+      headers.set("content-type", tutorial.getContentType());
       return new ResponseEntity<>(file, HttpStatus.OK);
-    } else if (Filetype.getDescription(tutorial.getFiletype()) == "image") {
+    } else if (Filetype.getDescription(tutorial.getFiletype()).equals("image")) {
       byte[] image;
-      HttpHeaders headers = new HttpHeaders();
+      headers.set("content-type", tutorial.getContentType());
       image = getImageFile(tutorial);
       return new ResponseEntity<>(image, headers, HttpStatus.OK);
     } else {
       String file = getTextFile(tutorial);
-      return new ResponseEntity<>(file, HttpStatus.OK);
+      headers.set("content-type", tutorial.getContentType());
+      return new ResponseEntity<>(file, headers, HttpStatus.OK);
     }
   }
 
   @PostMapping("/websites")
-  public ResponseEntity<?> postFileFromWebsite(@RequestParam("web") String website) throws IOException, JSONException {
-    try {
-      Crawler.main(website);
-    } catch (Exception e) {
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+  public ResponseEntity<?> postFileFromWebsite(@RequestParam("web") String website) throws IOException, JSONException, URISyntaxException {
+    String[] string = {website};
+    Crawler.main(string);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
@@ -176,6 +175,7 @@ public class TutorialController {
     }
     HttpURLConnection con = (HttpURLConnection) url.openConnection();
     con.setRequestMethod("GET");
+    con.setRequestProperty("content-type", tutorial.getContentType());
     InputStream in = con.getInputStream();
     return IOUtils.toByteArray(in);
   }
@@ -203,6 +203,7 @@ public class TutorialController {
     }
     HttpURLConnection con = (HttpURLConnection) url.openConnection();
     con.setRequestMethod("GET");
+    con.setRequestProperty("content-type", tutorial.getContentType());
     int status = con.getResponseCode();
     BufferedReader in = new BufferedReader(
             new InputStreamReader(con.getInputStream()));
