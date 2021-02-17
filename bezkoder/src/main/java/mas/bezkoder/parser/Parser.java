@@ -1,22 +1,30 @@
 package mas.bezkoder.parser;
 
 import mas.bezkoder.model.Tutorial;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Parser {
 
     private static final String client = "http://localhost:8085/api/websites?web=";
+    private static final String CSSRegex = "url\\((.*?)\\)";
     private static final String href = "href=\"([^\"]*)\"";
     private static final String src = "src=\"([^\"]*)\"";
-    private static final String CSSRegex = "url\\((.*?)\\)";
+    private static final String href1 = "href='([^']*)'";
+    private static final String src1 = "src='([^']*)'";
 
-    public static String parseHtml(String input, Tutorial tutorial) throws URISyntaxException, IOException {
+
+    public static String parseHtml(String input, Tutorial tutorial) throws IOException, URISyntaxException {
         Pattern pattern;
         Matcher matcher;
         //src files
@@ -27,6 +35,13 @@ public class Parser {
             String newUrl = replaceUrl(matcher.group(1), tutorial);
             input = input.replaceAll("\"" + group + "\"", "\"" + newUrl + "\"");
         }
+        pattern = Pattern.compile(src1);
+        matcher = pattern.matcher(input);
+        while (matcher.find()) {
+            String group = matcher.group(1);
+            String newUrl = replaceUrl(matcher.group(1), tutorial);
+            input = input.replaceAll("'" + group + "'", "'" + newUrl + "'");
+        }
 
         //href links
         pattern = Pattern.compile(href);
@@ -36,8 +51,38 @@ public class Parser {
             String newUrl = replaceUrl(group, tutorial);
             input = input.replaceAll("\"" + group + "\"", "\"" + newUrl + "\"");
         }
+        pattern = Pattern.compile(href1);
+        matcher = pattern.matcher(input);
+        while (matcher.find()) {
+            String group = matcher.group(1);
+            String newUrl = replaceUrl(matcher.group(1), tutorial);
+            input = input.replaceAll("'" + group + "'", "'" + newUrl + "\'");
+        }
         return input;
     }
+//
+//    public static String parseHtml(String input, Tutorial tutorial) throws URISyntaxException, IOException {
+//        Pattern pattern;
+//        Matcher matcher;
+//        //src files
+//        pattern = Pattern.compile(src);
+//        matcher = pattern.matcher(input);
+//        while (matcher.find()) {
+//            String group = matcher.group(1);
+//            String newUrl = replaceUrl(matcher.group(1), tutorial);
+//            input = input.replaceAll("\"" + group + "\"", "\"" + newUrl + "\"");
+//        }
+//
+//        //href links
+//        pattern = Pattern.compile(href);
+//        matcher = pattern.matcher(input);
+//        while (matcher.find()) {
+//            String group = matcher.group(1);
+//            String newUrl = replaceUrl(group, tutorial);
+//            input = input.replaceAll("\"" + group + "\"", "\"" + newUrl + "\"");
+//        }
+//        return input;
+//    }
 
     public static String parseCss(String input, Tutorial tutorial) throws IOException, URISyntaxException {
         Pattern pattern = Pattern.compile(CSSRegex);
@@ -48,7 +93,7 @@ public class Parser {
             group = group.replaceAll("\'", "");
             String newUrl = replaceUrl(group, tutorial);
             System.out.println(group + " " + newUrl);
-            input = input.replaceAll(group, newUrl);
+            input = input.replace(group, newUrl);
         }
         return input;
     }
@@ -58,9 +103,10 @@ public class Parser {
     }
 
     public static String parseFile(String input, Tutorial tutorial) throws URISyntaxException, IOException {
-        System.out.println(tutorial.getFiletype());
-        System.out.println(input);
-        if (tutorial.getFiletype().equals("html")) return parseHtml(input, tutorial);
+        if (tutorial.getFiletype().equals("html")) {
+            System.out.println(tutorial.getTitle());
+            return parseHtml(input, tutorial);
+        }
         else if (tutorial.getFiletype().equals("css")) return parseCss(input, tutorial);
         else if (tutorial.getFiletype().equals("js")) return parseJs(input, tutorial);
         return input;
@@ -68,11 +114,9 @@ public class Parser {
 
     public static String replaceUrl(String url, Tutorial tutorial) throws URISyntaxException, UnsupportedEncodingException {
         if (url.startsWith("http://localhost")) return url;
-        URI uri = new URI(url);
         String strFind = "../";
         int count = 0, fromIndex = 0;
         while ((fromIndex = url.indexOf(strFind, fromIndex)) != -1 ){
-            System.out.println("Found at index: " + fromIndex);
             count++;
             fromIndex++;
         }
@@ -89,6 +133,8 @@ public class Parser {
             newUrl = url;
         } else if (url.startsWith("#")) {
             newUrl = tutorial.getTitle() + url;
+        } else if (url.startsWith("//")) {
+            newUrl = "https:" + url;
         }
         else if (url.startsWith("/")) {
             URI link = new URI(tutorial.getTitle());
@@ -111,4 +157,6 @@ public class Parser {
         }
         return newUrl;
     }
+
+//
 }

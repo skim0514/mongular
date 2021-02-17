@@ -1,6 +1,6 @@
 package mas.bezkoder.crawler;
 
-import mas.bezkoder.model.Tutorial;
+import mas.bezkoder.parser.MimeTypes;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -19,11 +19,6 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.asynchttpclient.*;
-
-import static mas.bezkoder.parser.Parser.parseCss;
-import static mas.bezkoder.parser.Parser.replaceUrl;
 
 public class Crawler {
 
@@ -55,7 +50,7 @@ public class Crawler {
                     System.out.println(">> Depth: " + depth + " [" + slink + "]");
                 }
                 for (Element l : link) {
-                    String llink = (l.attr("abs:href"));
+                    String llink = l.attr("abs:href");
                     links.add(llink);
                     System.out.println(">> Depth: " + depth + " [" + llink + "]");
                 }
@@ -110,7 +105,7 @@ public class Crawler {
                 .transferFrom(readChannel, 0, Long.MAX_VALUE);
     }
 
-    public static String addTutorial(String link, String filetype, String description) throws IOException, JSONException {
+    public static String addTutorial(String link, String filetype, String description, String contentType) throws IOException, JSONException {
         URL url = new URL("http://localhost:8085/api/tutorials");
         URLConnection con = url.openConnection();
         HttpURLConnection http = (HttpURLConnection)con;
@@ -121,7 +116,8 @@ public class Crawler {
         arguments.put("domain", new URL(link).getHost().replace("www.", ""));
         arguments.put("filetype", filetype);
         arguments.put("description", description);
-        arguments.put("contentType", getContentType(link));
+        arguments.put("contentType", contentType);
+        arguments.put("contentEncoding", getEncoding(contentType));
         JSONObject js = new JSONObject(arguments);
         byte[] out = js.toString().getBytes(StandardCharsets.UTF_8);
         int length = out.length;
@@ -152,14 +148,39 @@ public class Crawler {
     public static String getContentType(String link) throws IOException {
         URL url = new URL(link);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("HEAD");
-        if (isRedirect(connection.getResponseCode())) {
-            String newUrl = connection.getHeaderField("Location"); // get redirect url from "location" header field
-            return getContentType(newUrl);
-        }
+//        connection.setRequestMethod("HEAD");
+//        boolean redirect;
+//        try {
+//            redirect = isRedirect(connection.getResponseCode());
+//            System.out.println(redirect);
+//        } catch (Exception e){
+//            redirect = false;
+//        }
+//        if (redirect) {
+//            String newUrl = connection.getHeaderField("Location"); // get redirect url from "location" header field
+//            return getContentType(newUrl);
+//        }
         String contentType = connection.getContentType();
         return contentType;
     }
+
+    public static String getEncoding(String contentType) {
+        if (contentType == null) return "UTF-8";
+        String[] values = contentType.split(";");
+        String charset = "";
+        for (String value : values) {
+            value = value.trim();
+            if (value.toLowerCase().startsWith("charset=")) {
+                charset = value.substring("charset=".length());
+            }
+        }
+
+        if ("".equals(charset)) {
+            charset = "UTF-8"; //Assumption
+        }
+        return charset;
+    }
+
     protected static boolean isRedirect(int statusCode) {
         if (statusCode != HttpURLConnection.HTTP_OK) {
             if (statusCode == HttpURLConnection.HTTP_MOVED_TEMP
@@ -171,19 +192,25 @@ public class Crawler {
         return false;
     }
 
-    public static void searchCss(String input, String string) throws IOException, URISyntaxException, JSONException {
+    public static HashSet<String> searchCss(String input, String string) throws IOException, URISyntaxException, JSONException {
+        HashSet<String> hs = new HashSet<>();
         Pattern pattern = Pattern.compile(CSSRegex);
         Matcher matcher = pattern.matcher(input);
         while (matcher.find()) {
             String group = matcher.group(1);
             group = group.replaceAll("\"", "");
             group = group.replaceAll("\'", "");
-            replaceUrl(group, string);
+            String newUrl = replaceUrl(group, string);
+            if (newUrl != null) hs.add(newUrl);
         }
+        return hs;
     }
 
-    public static void replaceUrl(String url, String string) throws URISyntaxException, IOException, JSONException {
-        URI uri = new URI(url);
+    public static String replaceUrl(String url, String string) throws URISyntaxException, IOException, JSONException {
+        System.out.println(url);
+        Pattern pattern = Pattern.compile("[~#@*+%{}<>\\[\\]|\"\\_^]");
+        Matcher matcher = pattern.matcher(url);
+        if (matcher.find()) return null;
         String strFind = "../";
         int count = 0, fromIndex = 0;
         while ((fromIndex = url.indexOf(strFind, fromIndex)) != -1 ){
@@ -193,11 +220,7 @@ public class Crawler {
         }
         String newUrl;
         newUrl = getUrlFromPath(url, string, count);
-        String extension = "";
-        extension = newUrl.substring(newUrl.lastIndexOf(".") + 1);
-        String id = addTutorial(newUrl, extension, extension);
-        downloadFile(newUrl, "files/" + id + "." + extension);
-        //
+        return newUrl;
     }
 
     private static String getUrlFromPath(String url, String string, int count) throws URISyntaxException, MalformedURLException {
@@ -207,6 +230,8 @@ public class Crawler {
             newUrl = url;
         } else if (url.startsWith("#")) {
             newUrl = string + url;
+        } else if (url.startsWith("//")) {
+            newUrl = "https:" + url;
         }
         else if (url.startsWith("/")) {
             URI link = new URI(string);
@@ -237,22 +262,47 @@ public class Crawler {
         crawler.setDomain(startDomain);
         crawler.getPageLinks(start, 0);
         HashSet<String> hs = crawler.getLinks();
-        for (String string: hs) {
+        HashSet<String> cssLinks = new HashSet<>();
+        for (String string : hs) {
             if (!string.startsWith("http")) continue;
             String extension = string.substring(string.lastIndexOf(".") + 1);
-            if (extension.equals("css")) {
-                String id = addTutorial(string, extension, extension);
-                downloadFile(string, "files/" + id + "." + extension);
-                Path cssFile = Path.of("files/" + id + "." + extension);
-                String content = Files.readString(cssFile);
-                searchCss(content, string);
-            } else if (extension.length() <= 4) {
-                String id = addTutorial(string, extension, extension);
-                downloadFile(string, "files/" + id + "." + extension);
-            } else {
-                String id = addTutorial(string, "html", "html");
-                downloadFile(string, "files/" + id + ".html");
+            String contentType = getContentType(string);
+            String filetype;
+            if (contentType == null) extension = "";
+            else {
+                filetype = contentType.split(";")[0];
+                extension = MimeTypes.getDefaultExt(filetype);
             }
+            if (extension.equals("css")) {
+                try {
+                    String id = addTutorial(string, extension, extension, contentType);
+                    downloadFile(string, "files/" + id + "." + extension);
+                    Path cssFile = Path.of("files/" + id + "." + extension);
+                    String content = Files.readString(cssFile);
+                    HashSet<String> cssHS = searchCss(content, string);
+                    cssLinks.addAll(cssHS);
+                } catch (IOException ex) {
+                    continue;
+                }
+            } else {
+                String id = addTutorial(string, extension, extension, contentType);
+                if (extension.equals("") || extension.equals("unknown")) downloadFile(string, "files/" + id);
+                else downloadFile(string, "files/" + id + "." + extension);
+            }
+        }
+        for (String string : cssLinks) {
+            if (!string.startsWith("http")) continue;
+            String extension = string.substring(string.lastIndexOf(".") + 1);
+            String contentType = getContentType(string);
+            String filetype;
+            if (contentType == null) extension = "";
+            else {
+                filetype = contentType.split(";")[0];
+                extension = MimeTypes.getDefaultExt(filetype);
+            }
+            String id = addTutorial(string, extension, extension, contentType);
+            if (extension.equals("") || extension.equals("unknown")) downloadFile(string, "files/" + id);
+            else downloadFile(string, "files/" + id + "." + extension);
         }
     }
 

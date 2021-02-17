@@ -14,24 +14,26 @@ public class Tutorial {
     private String domain;
     private String filetype;
     private String contentType;
+    private String contentEncoding;
     private LocalDateTime dateTime;
 
     public Tutorial() {
 
     }
 
-    public Tutorial(String title, String description, String domain, String filetype, String contentType) {
+    public Tutorial(String title, String description, String domain, String filetype, String contentType, String contentEncoding) {
         this.title = title;
         this.description = description;
         this.filetype = filetype;
         this.domain = domain;
         this.dateTime = LocalDateTime.now();
         this.contentType = contentType;
+        this.contentEncoding = contentEncoding;
     }
 
-    public Tutorial(String title, String description, String domain, String filetype) {
-        this(title, description, domain, filetype, "utf-8");
-    }
+//    public Tutorial(String title, String description, String domain, String filetype) {
+//        this(title, description, domain, filetype, "utf-8");
+//    }
 
     public String getId() {
         return id;
@@ -88,5 +90,13 @@ public class Tutorial {
 
     public void setContentType(String contentType) {
         this.contentType = contentType;
+    }
+
+    public String getContentEncoding() {
+        return contentEncoding;
+    }
+
+    public void setContentEncoding(String contentEncoding) {
+        this.contentEncoding = contentEncoding;
     }
 }
