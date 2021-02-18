@@ -40,10 +40,6 @@ public class TutorialController {
 //  private static String client = "http://118.67.133.84:8085/api/websites?web=";
   private static String client = "http://localhost:8085/api/websites?web=";
 //  private static String client = "http://localhost:8085/api/tutorials";
-  private static String href = "href=\"([^\"]*)\"";
-  private static String src = "src=\"([^\"]*)\"";
-  private static String scriptsrc = "<script.*?src=\"(.*?)\"";
-
   @GetMapping("/tutorials")
   public ResponseEntity<List<Tutorial>> getAllTutorials(@RequestParam(required = false) String title) {
     try {
