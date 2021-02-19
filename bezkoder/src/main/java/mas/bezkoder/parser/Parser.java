@@ -69,6 +69,18 @@ public class Parser {
             input = input.replace("'" + group + "'", "'" + newUrl + "\'");
         }
 
+        pattern = Pattern.compile(CSSRegex);
+        matcher = pattern.matcher(input);
+        while (matcher.find()) {
+            String group = matcher.group(1);
+            group = group.replaceAll("\"", "");
+            group = group.replaceAll("\'", "");
+            if (group.startsWith("data:")) continue;
+            if (group.contains("localhost")) continue;
+            String newUrl = replaceUrl(group, tutorial);
+            input = input.replace(group, newUrl);
+        }
+
         pattern = Pattern.compile(otherRegex);
         matcher = pattern.matcher(input);
         while (matcher.find()) {

@@ -179,8 +179,12 @@ public class TutorialController {
     if (website != null) {
       tutorialRepository.findByTitleContaining(website).forEach(tutorials::add);
     }
-    if (tutorials.size() != 0) return tutorials.get(0);
-    else return null;
+    if (tutorials.size() != 0) {
+      for (Tutorial t: tutorials) {
+        if (t.getTitle().equals(website)) return t;
+      }
+    }
+    return null;
   }
 
   public static String getTextFile(Tutorial tutorial) throws IOException {
