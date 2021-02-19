@@ -138,10 +138,14 @@ public class Parser {
         matcher = pattern.matcher(input);
         while (matcher.find()) {
             String group = matcher.group(0);
-            if (group.contains("localhost")) continue;
+            if (group.startsWith(client)) continue;
             if (group.startsWith("data:")) continue;
             String newUrl = replaceUrl(group, tutorial);
-            input = input.replace(group, newUrl);
+            try {
+                input = input.replace("'" + group,"'" + newUrl);
+                input = input.replace("\"" + group, "\"" + newUrl);
+            } catch (Exception ignored) {
+            }
         }
 
         return input;
