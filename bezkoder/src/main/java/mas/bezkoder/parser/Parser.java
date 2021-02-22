@@ -10,14 +10,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
 
 public class Parser {
 
@@ -28,7 +22,6 @@ public class Parser {
     private static final String href1 = "href='([^']*)'";
     private static final String src1 = "src='([^']*)'";
     private static final String otherRegex = "https?://([^\"'\\s)]*)";
-
 
     /**
      * function to parse if document is html
@@ -44,9 +37,9 @@ public class Parser {
 
         Pattern pattern;
         Matcher matcher;
+
         //src files
         Elements srcs = document.select("[src]");
-
         for (Element src : srcs) {
             String hold = src.toString();
             String replace = parseSrc(hold, tutorial);
@@ -55,12 +48,12 @@ public class Parser {
 
         //href links
         Elements hrefs = document.select("[href]");
-
         for (Element href : hrefs) {
             String hold = href.toString();
             String replace = parseHref(hold, tutorial);
             input = input.replace(hold, replace);
         }
+
 
         pattern = Pattern.compile(CSSRegex);
         matcher = pattern.matcher(input);
@@ -77,6 +70,15 @@ public class Parser {
         return input;
     }
 
+
+    /**
+     * checks input with simplest regex to find link
+     * @param input string input
+     * @param tutorial information about link
+     * @return parsed output
+     * @throws URISyntaxException if urls found have issues
+     * @throws UnsupportedEncodingException if encoding of text is unusual
+     */
     private static String otherRegex(String input, Tutorial tutorial) throws URISyntaxException, UnsupportedEncodingException {
         Pattern pattern;
         Matcher matcher;
@@ -97,6 +99,14 @@ public class Parser {
         return input;
     }
 
+    /**
+     * separated src side of parsing html
+     * @param input element string form input
+     * @param tutorial information about document
+     * @return new element form string
+     * @throws UnsupportedEncodingException if encoding of text is unusual
+     * @throws URISyntaxException if links found have problems.
+     */
     public static String parseSrc(String input, Tutorial tutorial) throws UnsupportedEncodingException, URISyntaxException {
         Pattern pattern;
         Matcher matcher;
@@ -126,6 +136,15 @@ public class Parser {
 
         return string;
     }
+
+    /**
+     * separated html parser for hrefs
+     * @param input element that contains href
+     * @param tutorial information about website to find absolute path
+     * @return parsed html element
+     * @throws UnsupportedEncodingException if encoding of text is unusual
+     * @throws URISyntaxException if url has issues being processed
+     */
 
     public static String parseHref(String input, Tutorial tutorial) throws UnsupportedEncodingException, URISyntaxException {
         Pattern pattern = Pattern.compile(href);
