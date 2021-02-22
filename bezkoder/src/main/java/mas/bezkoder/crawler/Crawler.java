@@ -24,7 +24,7 @@ public class Crawler {
 
     private static final int MAX_DEPTH = 2;
     private static final String CSSRegex = "url\\((.*?)\\)";
-    private static final String otherRegex = "https?://([^\"'\\s)]*)";
+    private static final String otherRegex = "https?://([^\"']*)";
     private String domain;
     private HashSet<String> links;
 
@@ -48,6 +48,14 @@ public class Crawler {
                 for (Element s : src) {
                     String slink = s.attr("abs:src");
                     links.add(slink);
+                    Pattern pattern = Pattern.compile(otherRegex);
+                    Matcher matcher = pattern.matcher(s.toString());
+                    while (matcher.find()) {
+                        String group = matcher.group(0);
+                        if (group.startsWith("data:")) continue;
+                        String newUrl = replaceUrl(group, s.toString());
+                        links.add(newUrl);
+                    }
                     System.out.println(">> Depth: " + depth + " [" + slink + "]");
                 }
                 for (Element l : link) {
@@ -64,9 +72,10 @@ public class Crawler {
                 }
             } catch (IOException e) {
                 System.err.println("For '" + URL + "': " + e.getMessage());
+            } catch (JSONException | URISyntaxException e) {
+                e.printStackTrace();
             }
         }
-
     }
 
     public HashSet<String> getLinks() {

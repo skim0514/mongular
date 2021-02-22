@@ -1,5 +1,10 @@
 package mas.bezkoder.parser;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
 import java.util.HashMap;
 
 /**
@@ -482,6 +487,10 @@ public class MimeTypes {
     }
     
     public static void main(String[] args) {
-        System.out.println(getDefaultExt("application/zip"));
+        Document doc = Jsoup.parse("https://40aprons.com/15-minute-spicy-ramen/");
+        Elements elements = doc.select("[src]");
+        for (Element element: elements) {
+            System.out.println(element.toString());
+        }
     }
 }

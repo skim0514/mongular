@@ -17,9 +17,15 @@ public class Tutorial {
     private String contentEncoding;
     private LocalDateTime dateTime;
 
-    public Tutorial() {
-
-    }
+    /**
+     * Tutorial Constructor
+     * @param title url
+     * @param description file information
+     * @param domain file domain
+     * @param filetype file type
+     * @param contentType http request content-type
+     * @param contentEncoding http request encoding
+     */
 
     public Tutorial(String title, String description, String domain, String filetype, String contentType, String contentEncoding) {
         this.title = title;
@@ -39,34 +45,34 @@ public class Tutorial {
         return id;
       }
     
-      public String getTitle() {
+    public String getTitle() {
         return title;
       }
     
-      public void setTitle(String title) {
+    public void setTitle(String title) {
         this.title = title;
       }
     
-      public String getDescription() {
+    public String getDescription() {
         return description;
       }
     
-      public void setDescription(String description) {
+    public void setDescription(String description) {
         this.description = description;
       }
 
-      public String getDomain() {
+    public String getDomain() {
           return domain;
       }
 
-      public void setDomain(String domain) {
+    public void setDomain(String domain) {
           this.domain = domain;
       }
 
-      @Override
-      public String toString() {
+    @Override
+    public String toString() {
         return "Tutorial [id=" + id + ", title=" + title + ", desc=" + description + "]";
-      }
+    }
 
     public String getFiletype() {
         return filetype;
