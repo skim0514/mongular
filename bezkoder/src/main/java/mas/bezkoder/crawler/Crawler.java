@@ -69,7 +69,7 @@ public class Crawler {
                     String[] strings = hold.split(", ");
                     for (String s: strings) {
                         String[] urls = s.split(" ");
-                        String newurl = replaceUrl(urls[0], this.domain);
+                        String newurl = replaceUrl(urls[0], URL);
                         links.add(newurl);
                         System.out.println(">> Depth: " + depth + " [" + newurl + "]");
                     }

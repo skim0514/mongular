@@ -1,6 +1,8 @@
 package mas.bezkoder.parser;
 
+import mas.bezkoder.crawler.Crawler;
 import mas.bezkoder.model.Tutorial;
+import org.json.JSONException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Attributes;
 import org.jsoup.nodes.Document;
@@ -11,9 +13,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -322,10 +322,20 @@ public class Parser {
         return newUrl;
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, URISyntaxException, JSONException {
         Document doc = Jsoup.connect("https://www.urlencoder.io/learn/#:~:text=ASCII%20control%20characters%20(e.g.%20backspace,have%20special%20meaning%20within%20URLs.").get();
-        String html = doc.toString();
-        System.out.println(html);
+        Elements srcsets = doc.select("[srcset]");
+        Set<String> links = new HashSet<>();
+        for (Element srcset : srcsets) {
+            String hold = srcset.attr("srcset");
+            String[] strings = hold.split(", ");
+            for (String s: strings) {
+                String[] urls = s.split(" ");
+                String newurl = Crawler.replaceUrl(urls[0], "urlencoder.io");
+                links.add(newurl);
+                System.out.println(newurl);
+            }
+        }
     }
 
 }
