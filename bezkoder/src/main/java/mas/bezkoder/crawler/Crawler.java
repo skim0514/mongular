@@ -24,7 +24,7 @@ public class Crawler {
 
     private static final int MAX_DEPTH = 2;
     private static final String CSSRegex = "url\\((.*?)\\)";
-    private static final String otherRegex = "https?://([^\"']*)";
+    private static final String otherRegex = "https?://([^{}<>\"'\\s)]*)";
     private String domain;
     private HashSet<String> links;
 
@@ -44,18 +44,18 @@ public class Crawler {
                 Elements linksOnPage = document.select("a[href]");
                 Elements src = document.select("[src]");
                 Elements link = document.select("link[href]");
+                Elements srcsets = document.select("[srcset]");
 
                 for (Element s : src) {
-                    String slink = s.attr("abs:src");
-                    links.add(slink);
                     Pattern pattern = Pattern.compile(otherRegex);
                     Matcher matcher = pattern.matcher(s.toString());
                     while (matcher.find()) {
                         String group = matcher.group(0);
-                        if (group.startsWith("data:")) continue;
-                        String newUrl = replaceUrl(group, s.toString());
-                        links.add(newUrl);
+                        links.add(group);
                     }
+                    String slink = s.attr("abs:src");
+                    links.add(slink);
+
                     System.out.println(">> Depth: " + depth + " [" + slink + "]");
                 }
                 for (Element l : link) {
@@ -64,12 +64,30 @@ public class Crawler {
                     System.out.println(">> Depth: " + depth + " [" + llink + "]");
                 }
 
+                for (Element srcset : srcsets) {
+                    String hold = srcset.attr("srcset");
+                    String[] strings = hold.split(",");
+                    for (String s: strings) {
+                        String[] urls = s.split(" ");
+                        String newurl = replaceUrl(urls[urls.length - 2], this.domain);
+                        links.add(newurl);
+                        System.out.println(">> Depth: " + depth + " [" + newurl + "]");
+                    }
+                }
+
                 depth++;
                 for (Element page : linksOnPage) {
                     String alink = page.attr("abs:href");
                     if(!alink.contains(this.domain)) continue;
                     getPageLinks(alink, depth);
                 }
+                Pattern pattern = Pattern.compile(otherRegex);
+                Matcher matcher = pattern.matcher(document.toString());
+                while (matcher.find()) {
+                    String group = matcher.group(0);
+                    links.add(group);
+                }
+
             } catch (IOException e) {
                 System.err.println("For '" + URL + "': " + e.getMessage());
             } catch (JSONException | URISyntaxException e) {

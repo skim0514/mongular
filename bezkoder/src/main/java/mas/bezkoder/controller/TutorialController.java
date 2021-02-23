@@ -138,7 +138,12 @@ public class TutorialController {
 
     HttpHeaders headers = new HttpHeaders();
     if (Filetype.getDescription(tutorial.getFiletype()).equals("string")) {
-      String file = getTextFile(tutorial);
+      String file;
+      try {
+        file = getTextFile(tutorial);
+      } catch (IOException e) {
+        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+      }
       file = Parser.parseFile(file, tutorial);
       byte[] byteArray = file.getBytes(tutorial.getContentEncoding());
       headers.set("content-type", tutorial.getContentType());
@@ -149,7 +154,12 @@ public class TutorialController {
       image = getImageFile(tutorial);
       return new ResponseEntity<>(image, headers, HttpStatus.OK);
     } else {
-      String file = getTextFile(tutorial);
+      String file;
+      try {
+        file = getTextFile(tutorial);
+      } catch (IOException e) {
+        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+      }
       headers.set("content-type", tutorial.getContentType());
       return new ResponseEntity<>(file, headers, HttpStatus.OK);
     }
