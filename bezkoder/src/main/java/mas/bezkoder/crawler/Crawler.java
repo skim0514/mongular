@@ -66,10 +66,10 @@ public class Crawler {
 
                 for (Element srcset : srcsets) {
                     String hold = srcset.attr("srcset");
-                    String[] strings = hold.split(",");
+                    String[] strings = hold.split(", ");
                     for (String s: strings) {
                         String[] urls = s.split(" ");
-                        String newurl = replaceUrl(urls[urls.length - 2], this.domain);
+                        String newurl = replaceUrl(urls[0], this.domain);
                         links.add(newurl);
                         System.out.println(">> Depth: " + depth + " [" + newurl + "]");
                     }
