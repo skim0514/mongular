@@ -28,11 +28,10 @@ public class Crawler {
     private String domain;
     private HashSet<String> links;
 
-    public Crawler() {
-        links = new HashSet<String>();
+    public Crawler(String domain) {
+        this.domain = domain;
+        this.links = new HashSet<String>();
     }
-
-
 
     public void getPageLinks(String URL, int depth) {
         if ((!links.contains(URL) && (depth < MAX_DEPTH))) {
@@ -99,27 +98,6 @@ public class Crawler {
     public HashSet<String> getLinks() {
         return this.links;
     }
-
-//    public static void downloadFile(String url, String fileName) throws IOException {
-//        AsyncHttpClient client = Dsl.asyncHttpClient();
-//        FileOutputStream stream = new FileOutputStream(fileName);
-//        client.prepareGet(url).execute(new AsyncCompletionHandler<FileOutputStream>() {
-//            @Override
-//            public State onBodyPartReceived(HttpResponseBodyPart bodyPart)
-//                    throws Exception {
-//                stream.getChannel().write(bodyPart.getBodyByteBuffer());
-//                return State.CONTINUE;
-//            }
-//
-//            @Override
-//            public FileOutputStream onCompleted(Response response)
-//                    throws Exception {
-//                return stream;
-//            }
-//        });
-//        stream.close();
-//        client.close();
-//    }
 
     public static boolean downloadFile(String url, String fileName) throws IOException {
         ReadableByteChannel readChannel = null;
@@ -205,7 +183,6 @@ public class Crawler {
                 charset = value.substring("charset=".length());
             }
         }
-
         if ("".equals(charset)) {
             charset = "UTF-8"; //Assumption
         }
@@ -250,7 +227,6 @@ public class Crawler {
         String strFind = "../";
         int count = 0, fromIndex = 0;
         while ((fromIndex = url.indexOf(strFind, fromIndex)) != -1 ){
-//            System.out.println("Found at index: " + fromIndex);
             count++;
             fromIndex++;
         }
@@ -291,11 +267,10 @@ public class Crawler {
         return newUrl;
     }
 
-    public static void main(String args[]) throws IOException, JSONException, URISyntaxException {
-        Crawler crawler = new Crawler();
-        String start = args[0];
+    public static void crawlSite(String url) throws IOException, JSONException, URISyntaxException {
+        String start = url;
         String startDomain = new URL(start).getHost().replace("www.", "");
-        crawler.setDomain(startDomain);
+        Crawler crawler = new Crawler(startDomain);
         crawler.getPageLinks(start, 0);
         HashSet<String> hs = crawler.getLinks();
         HashSet<String> otherLinks = new HashSet<>();
@@ -309,36 +284,28 @@ public class Crawler {
                 filetype = contentType.split(";")[0];
                 extension = MimeTypes.getDefaultExt(filetype);
             }
+            String id = addTutorial(string, extension, extension, contentType);
+            if (id == null) continue;
             if (extension.equals("css")) {
                 try {
-                    String id = addTutorial(string, extension, extension, contentType);
-                    if (id == null) continue;
-                    downloadFile(string, "files/" + id + "." + extension);
-                    Path cssFile = Path.of("files/" + id + "." + extension);
+                    downloadFile(string, "files/" + id);
+                    Path cssFile = Path.of("files/" + id);
                     String content = Files.readString(cssFile);
                     HashSet<String> cssLinks = searchCss(content, string);
                     otherLinks.addAll(cssLinks);
-                } catch (IOException ex) {
-                    continue;
+                } catch (IOException | URISyntaxException ignored) {
                 }
             } else if (extension.equals("js")) {
                 try {
-                    String id = addTutorial(string, extension, extension, contentType);
-                    if (id == null) continue;
-                    downloadFile(string, "files/" + id + "." + extension);
-                    Path jsFile = Path.of("files/" + id + "." + extension);
+                    downloadFile(string, "files/" + id);
+                    Path jsFile = Path.of("files/" + id);
                     String content = Files.readString(jsFile);
                     HashSet<String> jsLinks = searchJs(content, string);
                     otherLinks.addAll(jsLinks);
-            } catch (IOException ex) {
-                continue;
-            }
-            }
-            else {
-                String id = addTutorial(string, extension, extension, contentType);
-                if (id == null) continue;
-                if (extension.equals("") || extension.equals("unknown")) downloadFile(string, "files/" + id);
-                else downloadFile(string, "files/" + id + "." + extension);
+                } catch (IOException ignored) {
+                }
+            } else {
+                downloadFile(string, "files/" + id);
             }
         }
         for (String string : otherLinks) {
@@ -346,7 +313,7 @@ public class Crawler {
             String extension;
             String contentType;
             try {
-               contentType = getContentType(string);
+                contentType = getContentType(string);
             } catch (Exception e) {
                 continue;
             }
@@ -358,9 +325,12 @@ public class Crawler {
             }
             String id = addTutorial(string, extension, extension, contentType);
             if (id == null) continue;
-            if (extension.equals("") || extension.equals("unknown")) downloadFile(string, "files/" + id);
-            else downloadFile(string, "files/" + id + "." + extension);
+            downloadFile(string, "files/" + id);
         }
+    }
+
+    public static void main(String args[]) throws IOException, JSONException, URISyntaxException {
+        crawlSite(args[0]);
     }
 
     private static HashSet<String> searchJs(String content, String string) throws JSONException, IOException, URISyntaxException {
@@ -373,14 +343,6 @@ public class Crawler {
             if (newUrl != null) hs.add(newUrl);
         }
         return hs;
-    }
-
-    public String getDomain() {
-        return domain;
-    }
-
-    public void setDomain(String domain) {
-        this.domain = domain;
     }
 }
 

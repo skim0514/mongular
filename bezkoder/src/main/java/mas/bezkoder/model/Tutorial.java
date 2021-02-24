@@ -37,10 +37,6 @@ public class Tutorial {
         this.contentEncoding = contentEncoding;
     }
 
-//    public Tutorial(String title, String description, String domain, String filetype) {
-//        this(title, description, domain, filetype, "utf-8");
-//    }
-
     public String getId() {
         return id;
       }

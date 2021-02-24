@@ -15,20 +15,15 @@ import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import mas.bezkoder.model.Tutorial;
 import mas.bezkoder.repository.TutorialRepository;
 
 //http://118.67.133.84:8085/api/websites?web=https%253A%252F%252Fwww.s2wlab.com%252Fproducts.html
 
-@CrossOrigin(origins = "http://localhost:8081")
+@CrossOrigin(origins = "http://localhost:8085")
 @RestController
 @RequestMapping("/api")
 public class TutorialController {
@@ -168,7 +163,7 @@ public class TutorialController {
   private byte[] getImageFile(Tutorial tutorial) throws IOException {
     URL url = null;
     try {
-      url = new URL("http://localhost:8082/" + tutorial.getId() + "." + tutorial.getFiletype());
+      url = new URL("http://localhost:8082/" + tutorial.getId());
     } catch (MalformedURLException e) {
       e.printStackTrace();
     }
@@ -200,8 +195,8 @@ public class TutorialController {
   public static String getTextFile(Tutorial tutorial) throws IOException {
     URL url = null;
     try {
-      if (tutorial.getFiletype().equals("") || tutorial.getFiletype().equals("unknown")) url = new URL("http://localhost:8082/" + tutorial.getId());
-      else url = new URL("http://localhost:8082/" + tutorial.getId() + "." + tutorial.getFiletype());
+      url = new URL("http://localhost:8082/" + tutorial.getId());
+      System.out.println(tutorial.getId());
     } catch (MalformedURLException e) {
       e.printStackTrace();
     }
