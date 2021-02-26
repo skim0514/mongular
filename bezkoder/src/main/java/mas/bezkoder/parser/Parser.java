@@ -4,15 +4,13 @@ import mas.bezkoder.crawler.Crawler;
 import mas.bezkoder.model.Tutorial;
 import org.json.JSONException;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Attributes;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,7 +22,7 @@ public class Parser {
     private static final String htmlTag = "<(?!!)(?!/)\\s*([a-zA-Z0-9]+)(.*?)>";
     private static final String otherRegex = "https?://([^{}<>\"'\\s)]*)";
     private static final String srcSet = "srcset=\"([^\"]*)\"";
-    private static final String style ="<style((.|\\n|\\r)*?)<\\/style>";
+    private static final String style ="<style([\\s\\S]+?)</style>";
 
     /**
      * function to parse if document is html
@@ -36,27 +34,9 @@ public class Parser {
      */
     public static String parseHtml(String input, Tutorial tutorial) throws IOException, URISyntaxException {
 
-        //looking through all html tags for urls in http form.
-//        Pattern pattern = Pattern.compile(htmlTag);
-//        Matcher matcher = pattern.matcher(input);
-//        while (matcher.find()) {
-//            String group = matcher.group(0);
-//            Pattern srcset = Pattern.compile(srcSet, Pattern.CASE_INSENSITIVE);
-//            Matcher srcSetMatcher = srcset.matcher(group);
-//            while (srcSetMatcher.find()) {
-//                String set = srcSetMatcher.group(1);
-//                group = group.replace(set, parseSrcset(set, tutorial));
-//            }
-//            group = otherRegex(group, tutorial);
-//            if (!input.contains(matcher.group(0))) {
-//                System.out.println(group);
-//                System.out.println(matcher.group(0));
-//            }
-//
-//            input = input.replaceFirst(matcher.group(0), group);
-//        }
-
         Document document = Jsoup.parse(input);
+
+
 
         Elements srcsets = document.select("[srcset]");
         for (Element srcset : srcsets) {
@@ -71,13 +51,13 @@ public class Parser {
         for (Element src : srcs) {
             String hold = src.attr("src");
             if (!hold.startsWith("data:image") && !hold.startsWith(client))
-                src.attr("src", replaceUrl(hold, tutorial));
+                src.attr("src", client + replaceUrl(hold, tutorial.getTitle()));
         }
 
         Elements hrefs = document.select("[href]");
         for (Element href : hrefs) {
             String hold = href.attr("href");
-            href.attr("href", replaceUrl(hold, tutorial));
+            href.attr("href", client + replaceUrl(hold, tutorial.getTitle()));
         }
 
         //css styling within attributes
@@ -91,20 +71,20 @@ public class Parser {
         input = document.toString();
 
         //css styling as a separate attribute
-        elements = document.select("style");
-        for (Element css: elements) {
-            String replace = parseCss(css.toString(), tutorial);
-            input = input.replace(css.toString(), replace);
-            document = Jsoup.parse(input);
-            input = document.toString();
-        }
-
-        Pattern pattern = Pattern.compile(htmlTag);
+        Pattern pattern = Pattern.compile(style);
         Matcher matcher = pattern.matcher(input);
         while (matcher.find()) {
             String group = matcher.group(0);
+            group = parseCss(group, tutorial);
+            input = input.replace(matcher.group(0), group);
+        }
+
+        pattern = Pattern.compile(htmlTag);
+        matcher = pattern.matcher(input);
+        while (matcher.find()) {
+            String group = matcher.group(0);
             group = otherRegex(group, tutorial);
-            input = input.replaceFirst(matcher.group(0), group);
+            input = input.replace(matcher.group(0), group);
         }
         //all other urls starting with https?
 
@@ -112,14 +92,14 @@ public class Parser {
         return input;
     }
 
-    private static String parseSrcset(String hold, Tutorial tutorial) throws UnsupportedEncodingException, URISyntaxException {
+    private static String parseSrcset(String hold, Tutorial tutorial) throws UnsupportedEncodingException, URISyntaxException, MalformedURLException {
         String rs = hold;
         String[] strings;
-        strings = hold.split(",");
+        strings = hold.split(", ");
         for (String string: strings) {
             String[] urls = string.split(" ");
-            String url = urls[urls.length - 2];
-            rs = rs.replace(url, replaceUrl(url, tutorial));
+            String url = urls[0];
+            rs = rs.replace(url, client + replaceUrl(url, tutorial.getTitle()));
         }
         return rs;
     }
@@ -133,7 +113,7 @@ public class Parser {
      * @throws URISyntaxException if urls found have issues
      * @throws UnsupportedEncodingException if encoding of text is unusual
      */
-    private static String otherRegex(String input, Tutorial tutorial) throws URISyntaxException, UnsupportedEncodingException {
+    private static String otherRegex(String input, Tutorial tutorial) throws URISyntaxException, UnsupportedEncodingException, MalformedURLException {
         Pattern pattern;
         Matcher matcher;
 
@@ -143,7 +123,7 @@ public class Parser {
             String group = matcher.group(0);
             if (group.startsWith(client)) continue;
             if (group.startsWith("data:")) continue;
-            String newUrl = replaceUrl(group, tutorial);
+            String newUrl = client + replaceUrl(group, tutorial.getTitle());
             try {
                 input = input.replace("'" + group, "'" + newUrl);
                 input = input.replace("\"" + group, "\"" + newUrl);
@@ -171,12 +151,11 @@ public class Parser {
             group = group.replaceAll("\'", "");
             if (group.startsWith("data:")) continue;
             if (group.contains("localhost")) continue;
-            String newUrl = replaceUrl(group, tutorial);
+            String newUrl = client + replaceUrl(group, tutorial.getTitle());
             input = input.replace(group, newUrl);
         }
 
         input = otherRegex(input, tutorial);
-
         return input;
     }
 
@@ -188,7 +167,9 @@ public class Parser {
      * @throws UnsupportedEncodingException if encoding is not functional
      * @throws URISyntaxException if urls to parse is unusual
      */
-    public static String parseJs(String input, Tutorial tutorial) throws UnsupportedEncodingException, URISyntaxException {
+    public static String parseJs(String input, Tutorial tutorial) throws UnsupportedEncodingException, URISyntaxException, MalformedURLException {
+        input = input.replace("window.location", "");
+
         return otherRegex(input, tutorial);
     }
 
@@ -211,13 +192,13 @@ public class Parser {
     /**
      * helper function to take url and accordingly change based on file info
      * @param url input url
-     * @param tutorial information for changing url
+     * @param string full url
      * @return new url
      * @throws URISyntaxException if input string is incorrectly built
      * @throws UnsupportedEncodingException if encoding of string is non functional
      */
 
-    public static String replaceUrl(String url, Tutorial tutorial) throws URISyntaxException, UnsupportedEncodingException {
+    public static String replaceUrl(String url, String string) throws URISyntaxException, UnsupportedEncodingException, MalformedURLException {
         if (url.contains("localhost")) return url;
         String strFind = "../";
         int count = 0, fromIndex = 0;
@@ -228,46 +209,45 @@ public class Parser {
         String newUrl;
 
         //fixing paths
-        newUrl = getUrlFromPath(url, tutorial, count);
-        return client + newUrl;
+        newUrl = getUrlFromPath(url, string, count);
+        return newUrl;
     }
 
     /**
      * analyze and change url based on relative path
      * @param url input path
-     * @param tutorial information to adjust url
+     * @param title information to adjust url
      * @param count number of backtracks
      * @return full absolute path
      * @throws URISyntaxException
      */
 
-    private static String getUrlFromPath(String url, Tutorial tutorial, int count) throws URISyntaxException {
-        if (url.startsWith(client)) return url;
-
+    public static String getUrlFromPath(String url, String title, int count) throws URISyntaxException, MalformedURLException {
         String newUrl;
+        String domain = new URL(title).getHost();
         if (url.startsWith("http")) {
             newUrl = url;
         } else if (url.startsWith("#")) {
-            newUrl = tutorial.getTitle() + url;
+            newUrl = title + url;
         } else if (url.startsWith("//")) {
             newUrl = "https:" + url;
         }
         else if (url.startsWith("/")) {
-            URI link = new URI(tutorial.getTitle());
-            newUrl = link.getScheme() + "://" + tutorial.getDomain() + url;
+            URI link = new URI(title);
+            newUrl = link.getScheme() + "://" + domain + url;
         } else if (url.startsWith("./")) {
-            URI parent = new URI(tutorial.getTitle());
+            URI parent = new URI(title);
             parent = parent.getPath().endsWith("/") ? parent.resolve("..") : parent.resolve(".");
             newUrl = parent.toString() + url.substring(2);
         } else if (url.startsWith("../")) {
-            URI link = new URI(tutorial.getTitle());
+            URI link = new URI(title);
             for (int i = 0; i <= count; i++) {
                 URI parent = link.getPath().endsWith("/") ? link.resolve("..") : link.resolve(".");
                 link = parent;
             }
             newUrl = link.toString() + url.substring(3 * count);
         } else {
-            URI parent = new URI(tutorial.getTitle());
+            URI parent = new URI(title);
             parent = parent.getPath().endsWith("/") ? parent.resolve("..") : parent.resolve(".");
             newUrl = parent.toString() + url;
         }
@@ -275,13 +255,28 @@ public class Parser {
     }
 
     public static void main(String[] args) throws IOException, URISyntaxException, JSONException {
-        Document doc = Jsoup.connect("https://www.urlencoder.io/learn/#:~:text=ASCII%20control%20characters%20(e.g.%20backspace,have%20special%20meaning%20within%20URLs.").get();
-//        Pattern pattern = Pattern.compile("<style((.|\\n|\\r)*?)<\\/style>", Pattern.CASE_INSENSITIVE);
-//        Matcher matcher = pattern.matcher(doc.toString());
-//        while (matcher.find()) {
-//            System.out.println("okay");
-//        }
-//        System.out.println("done");
+        URL url;
+
+        try {
+            url = new URL("https://www.espn.go.com");
+        } catch (MalformedURLException e){
+            e.printStackTrace();
+            return;
+        }
+        HttpURLConnection connection = null;
+        try {
+            connection = (HttpURLConnection) url.openConnection();
+        } catch (Exception ignored) {
+        }
+
+        boolean redirect;
+        try {
+            redirect = Crawler.isRedirect(connection.getResponseCode());
+            System.out.println(redirect);
+        } catch (Exception e){
+            redirect = false;
+        }
+        System.out.println(connection.getResponseCode());
 
 //
     }

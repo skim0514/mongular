@@ -1,6 +1,7 @@
 package mas.bezkoder.crawler;
 
 import mas.bezkoder.parser.MimeTypes;
+import mas.bezkoder.parser.Parser;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -25,6 +26,7 @@ public class Crawler {
     private static final int MAX_DEPTH = 2;
     private static final String CSSRegex = "url\\((.*?)\\)";
     private static final String otherRegex = "https?://([^{}<>\"'\\s)]*)";
+    private static final String htmlTag = "<(?!!)(?!/)\\s*([a-zA-Z0-9]+)(.*?)>";
     private String domain;
     private HashSet<String> links;
 
@@ -39,6 +41,7 @@ public class Crawler {
             try {
                 links.add(URL);
 
+
                 Document document = Jsoup.connect(URL).get();
                 Elements linksOnPage = document.select("a[href]");
                 Elements src = document.select("[src]");
@@ -46,15 +49,8 @@ public class Crawler {
                 Elements srcsets = document.select("[srcset]");
 
                 for (Element s : src) {
-                    Pattern pattern = Pattern.compile(otherRegex);
-                    Matcher matcher = pattern.matcher(s.toString());
-                    while (matcher.find()) {
-                        String group = matcher.group(0);
-                        links.add(group);
-                    }
                     String slink = s.attr("abs:src");
                     links.add(slink);
-
                     System.out.println(">> Depth: " + depth + " [" + slink + "]");
                 }
                 for (Element l : link) {
@@ -68,18 +64,12 @@ public class Crawler {
                     String[] strings = hold.split(", ");
                     for (String s: strings) {
                         String[] urls = s.split(" ");
-                        String newurl = replaceUrl(urls[0], URL);
+                        String newurl = Parser.replaceUrl(urls[0], URL);
                         links.add(newurl);
                         System.out.println(">> Depth: " + depth + " [" + newurl + "]");
                     }
                 }
 
-                depth++;
-                for (Element page : linksOnPage) {
-                    String alink = page.attr("abs:href");
-                    if(!alink.contains(this.domain)) continue;
-                    getPageLinks(alink, depth);
-                }
                 Pattern pattern = Pattern.compile(otherRegex);
                 Matcher matcher = pattern.matcher(document.toString());
                 while (matcher.find()) {
@@ -87,9 +77,19 @@ public class Crawler {
                     links.add(group);
                 }
 
+                depth++;
+
+                for (Element page : linksOnPage) {
+                    String alink = page.attr("abs:href");
+                    if(!alink.contains(this.domain)) continue;
+                    getPageLinks(alink, depth);
+                }
+
+
+
             } catch (IOException e) {
                 System.err.println("For '" + URL + "': " + e.getMessage());
-            } catch (JSONException | URISyntaxException e) {
+            } catch (URISyntaxException e) {
                 e.printStackTrace();
             }
         }
@@ -122,7 +122,7 @@ public class Crawler {
         http.setDoOutput(true);
         Map<String,String> arguments = new HashMap<>();
         arguments.put("title", link);
-        arguments.put("domain", new URL(link).getHost().replace("www.", ""));
+        arguments.put("domain", new URL(link).getHost());
         arguments.put("filetype", filetype);
         arguments.put("description", description);
         arguments.put("contentType", contentType);
@@ -150,13 +150,26 @@ public class Crawler {
         JSONObject json = new JSONObject(rv);
         String id = json.getString("id");
         http.disconnect();
-        System.out.println("New Tutorial " + link);
         return id;
     }
 
     public static String getContentType(String link) throws IOException {
-        URL url = new URL(link);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        URL url;
+
+        try {
+            url = new URL(link);
+        } catch (MalformedURLException e){
+            e.printStackTrace();
+            return null;
+        }
+        HttpURLConnection connection;
+        try {
+            connection = (HttpURLConnection) url.openConnection();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
 //        connection.setRequestMethod("HEAD");
 //        boolean redirect;
 //        try {
@@ -189,7 +202,7 @@ public class Crawler {
         return charset;
     }
 
-    protected static boolean isRedirect(int statusCode) {
+    public static boolean isRedirect(int statusCode) {
         if (statusCode != HttpURLConnection.HTTP_OK) {
             if (statusCode == HttpURLConnection.HTTP_MOVED_TEMP
                     || statusCode == HttpURLConnection.HTTP_MOVED_PERM
@@ -209,7 +222,7 @@ public class Crawler {
             group = group.replaceAll("\"", "");
             group = group.replaceAll("\'", "");
             if (group.startsWith("data:")) continue;
-            String newUrl = replaceUrl(group, string);
+            String newUrl = Parser.replaceUrl(group, string);
             if (newUrl != null) hs.add(newUrl);
         }
         pattern = Pattern.compile(otherRegex);
@@ -217,74 +230,34 @@ public class Crawler {
         while (matcher.find()) {
             String group = matcher.group(0);
             if (group.startsWith("data:")) continue;
-            String newUrl = replaceUrl(group, string);
+            String newUrl = Parser.replaceUrl(group, string);
             if (newUrl != null) hs.add(newUrl);
         }
         return hs;
     }
 
-    public static String replaceUrl(String url, String string) throws URISyntaxException, IOException, JSONException {
-        String strFind = "../";
-        int count = 0, fromIndex = 0;
-        while ((fromIndex = url.indexOf(strFind, fromIndex)) != -1 ){
-            count++;
-            fromIndex++;
-        }
-        String newUrl;
-        newUrl = getUrlFromPath(url, string, count);
-        return newUrl;
-    }
-
-    private static String getUrlFromPath(String url, String string, int count) throws URISyntaxException, MalformedURLException {
-        String newUrl;
-        String domain = new URL(string).getHost().replace("www.", "");
-        if (url.startsWith("http")) {
-            newUrl = url;
-        } else if (url.startsWith("#")) {
-            newUrl = string + url;
-        } else if (url.startsWith("//")) {
-            newUrl = "https:" + url;
-        }
-        else if (url.startsWith("/")) {
-            URI link = new URI(string);
-            newUrl = link.getScheme() + "://" + domain + url;
-        } else if (url.startsWith("./")) {
-            URI parent = new URI(string);
-            parent = parent.getPath().endsWith("/") ? parent.resolve("..") : parent.resolve(".");
-            newUrl = parent.toString() + url.substring(2);
-        } else if (url.startsWith("../")) {
-            URI link = new URI(string);
-            for (int i = 0; i <= count; i++) {
-                URI parent = link.getPath().endsWith("/") ? link.resolve("..") : link.resolve(".");
-                link = parent;
-            }
-            newUrl = link.toString() + url.substring(3 * count);
-        } else {
-            URI parent = new URI(string);
-            parent = parent.getPath().endsWith("/") ? parent.resolve("..") : parent.resolve(".");
-            newUrl = parent.toString() + url;
-        }
-        return newUrl;
-    }
-
     public static void crawlSite(String url) throws IOException, JSONException, URISyntaxException {
         String start = url;
-        String startDomain = new URL(start).getHost().replace("www.", "");
+        String startDomain = new URL(start).getHost();
         Crawler crawler = new Crawler(startDomain);
         crawler.getPageLinks(start, 0);
         HashSet<String> hs = crawler.getLinks();
         HashSet<String> otherLinks = new HashSet<>();
+        int count = 1;
         for (String string : hs) {
             if (!string.startsWith("http")) continue;
             String extension;
             String contentType = getContentType(string);
             String filetype;
-            if (contentType == null) extension = "";
+            if (contentType == null) continue;
             else {
                 filetype = contentType.split(";")[0];
                 extension = MimeTypes.getDefaultExt(filetype);
             }
             String id = addTutorial(string, extension, extension, contentType);
+            System.out.println("New Tutorial" + string);
+            if (count % 10 == 0) System.out.println("Done with " + count + "/" + hs.size());
+            count++;
             if (id == null) continue;
             if (extension.equals("css")) {
                 try {
@@ -308,6 +281,7 @@ public class Crawler {
                 downloadFile(string, "files/" + id);
             }
         }
+        count = 1;
         for (String string : otherLinks) {
             if (!string.startsWith("http")) continue;
             String extension;
@@ -323,7 +297,11 @@ public class Crawler {
                 filetype = contentType.split(";")[0];
                 extension = MimeTypes.getDefaultExt(filetype);
             }
+
             String id = addTutorial(string, extension, extension, contentType);
+            System.out.println("New Tutorial" + string);
+            if (count % 10 == 0) System.out.println("Done with " + count + "/" + otherLinks.size());
+            count++;
             if (id == null) continue;
             downloadFile(string, "files/" + id);
         }
@@ -339,7 +317,7 @@ public class Crawler {
         Matcher matcher = pattern.matcher(content);
         while (matcher.find()) {
             String group = matcher.group(0);
-            String newUrl = replaceUrl(group, string);
+            String newUrl = Parser.replaceUrl(group, string);
             if (newUrl != null) hs.add(newUrl);
         }
         return hs;
