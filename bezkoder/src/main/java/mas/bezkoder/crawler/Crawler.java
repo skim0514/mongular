@@ -245,7 +245,10 @@ public class Crawler {
         HashSet<String> otherLinks = new HashSet<>();
         int count = 1;
         for (String string : hs) {
-            if (!string.startsWith("http")) continue;
+            if (!string.startsWith("http")) {
+                System.out.println(string + " fail");
+                continue;
+            }
             String extension;
             String contentType = getContentType(string);
             String filetype;
@@ -255,7 +258,7 @@ public class Crawler {
                 extension = MimeTypes.getDefaultExt(filetype);
             }
             String id = addTutorial(string, extension, extension, contentType);
-            System.out.println("New Tutorial" + string);
+            System.out.println("New Tutorial " + string);
             if (count % 10 == 0) System.out.println("Done with " + count + "/" + hs.size());
             count++;
             if (id == null) continue;
@@ -299,7 +302,7 @@ public class Crawler {
             }
 
             String id = addTutorial(string, extension, extension, contentType);
-            System.out.println("New Tutorial" + string);
+            System.out.println("New Tutorial " + string);
             if (count % 10 == 0) System.out.println("Done with " + count + "/" + otherLinks.size());
             count++;
             if (id == null) continue;

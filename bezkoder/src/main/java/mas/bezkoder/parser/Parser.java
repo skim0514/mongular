@@ -36,8 +36,6 @@ public class Parser {
 
         Document document = Jsoup.parse(input);
 
-
-
         Elements srcsets = document.select("[srcset]");
         for (Element srcset : srcsets) {
             String hold = srcset.attr("srcset");
@@ -168,7 +166,7 @@ public class Parser {
      * @throws URISyntaxException if urls to parse is unusual
      */
     public static String parseJs(String input, Tutorial tutorial) throws UnsupportedEncodingException, URISyntaxException, MalformedURLException {
-        input = input.replace("window.location", "");
+//        input = input.replace("window.location", "");
 
         return otherRegex(input, tutorial);
     }
