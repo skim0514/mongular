@@ -2,16 +2,19 @@ package mas.bezkoder.parser;
 
 import mas.bezkoder.crawler.Crawler;
 import mas.bezkoder.model.Tutorial;
-import org.json.JSONException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
-import java.util.*;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,7 +24,6 @@ public class Parser {
     private static final String CSSRegex = "url\\((.*?)\\)";
     private static final String htmlTag = "<(?!!)(?!/)\\s*([a-zA-Z0-9]+)(.*?)>";
     private static final String otherRegex = "https?://([^{}<>\"'\\s)]*)";
-    private static final String srcSet = "srcset=\"([^\"]*)\"";
     private static final String style ="<style([\\s\\S]+?)</style>";
 
     /**
@@ -146,7 +148,7 @@ public class Parser {
         while (matcher.find()) {
             String group = matcher.group(1);
             group = group.replaceAll("\"", "");
-            group = group.replaceAll("\'", "");
+            group = group.replaceAll("'", "");
             if (group.startsWith("data:")) continue;
             if (group.contains("localhost")) continue;
             String newUrl = client + replaceUrl(group, tutorial.getTitle());
@@ -208,6 +210,7 @@ public class Parser {
 
         //fixing paths
         newUrl = getUrlFromPath(url, string, count);
+        newUrl = java.net.URLEncoder.encode(newUrl, StandardCharsets.UTF_8.name());
         return newUrl;
     }
 
@@ -217,7 +220,7 @@ public class Parser {
      * @param title information to adjust url
      * @param count number of backtracks
      * @return full absolute path
-     * @throws URISyntaxException
+     * @throws URISyntaxException for incorrectly built urls
      */
 
     public static String getUrlFromPath(String url, String title, int count) throws URISyntaxException, MalformedURLException {
@@ -252,31 +255,24 @@ public class Parser {
         return newUrl;
     }
 
-    public static void main(String[] args) throws IOException, URISyntaxException, JSONException {
-        URL url;
+    public static void main (String[] args) throws IOException {
+        URL weburl = new URL("http://wiki22djp7zzzv4x3nimnl6jnghbfddac4e4dce5jkb6544h7e7kzfad.onion/#!index.md");
 
-        try {
-            url = new URL("https://www.espn.go.com");
-        } catch (MalformedURLException e){
-            e.printStackTrace();
-            return;
-        }
-        HttpURLConnection connection = null;
-        try {
-            connection = (HttpURLConnection) url.openConnection();
-        } catch (Exception ignored) {
-        }
+        Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("10.41.228.165", 8123));
 
-        boolean redirect;
-        try {
-            redirect = Crawler.isRedirect(connection.getResponseCode());
-            System.out.println(redirect);
-        } catch (Exception e){
-            redirect = false;
-        }
-        System.out.println(connection.getResponseCode());
 
 //
-    }
 
+//
+//        System.out.println(webProxyConnection.getContentType());
+//        System.out.println(webProxyConnection.getResponseCode());
+//        ReadableByteChannel readChannel;
+//        readChannel = Channels.newChannel(webProxyConnection.getInputStream());
+//        FileOutputStream fileOS = new FileOutputStream("/Users/skim/s2w/mongular/bezkoder/cde");
+//        FileChannel writeChannel = fileOS.getChannel();
+//        writeChannel
+//                .transferFrom(readChannel, 0, Long.MAX_VALUE);
+
+//        System.out.println(Jsoup.connect("https://finance.naver.com/news/news_read.nhn?mode=mainnews&office_id=008&article_id=0004550654").get().toString());
+    }
 }

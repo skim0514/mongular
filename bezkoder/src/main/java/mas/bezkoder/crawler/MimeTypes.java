@@ -1,4 +1,4 @@
-package mas.bezkoder.parser;
+package mas.bezkoder.crawler;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
