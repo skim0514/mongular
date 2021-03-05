@@ -20,7 +20,8 @@ import java.util.regex.Pattern;
 
 public class Parser {
 
-    private static final String client = "http://localhost:8085/api/websites?web=";
+//    private static final String client = "http://localhost:8085/api/websites?web=";
+    private static final String client = "http://118.67.133.84:8085/api/websites?web=";
     private static final String CSSRegex = "url\\((.*?)\\)";
     private static final String htmlTag = "<(?!!)(?!/)\\s*([a-zA-Z0-9]+)(.*?)>";
     private static final String otherRegex = "https?://([^{}<>\"'\\s)]*)";
@@ -150,7 +151,7 @@ public class Parser {
             group = group.replaceAll("\"", "");
             group = group.replaceAll("'", "");
             if (group.startsWith("data:")) continue;
-            if (group.contains("localhost")) continue;
+            if (group.contains(client)) continue;
             String newUrl = client + replaceUrl(group, tutorial.getTitle());
             input = input.replace(group, newUrl);
         }
@@ -199,7 +200,7 @@ public class Parser {
      */
 
     public static String replaceUrl(String url, String string) throws URISyntaxException, UnsupportedEncodingException, MalformedURLException {
-        if (url.contains("localhost")) return url;
+        if (url.contains(client)) return url;
         String strFind = "../";
         int count = 0, fromIndex = 0;
         while ((fromIndex = url.indexOf(strFind, fromIndex)) != -1 ){
