@@ -109,7 +109,7 @@ public class Crawler {
 //        }
         try {
             readChannel = Channels.newChannel(webProxyConnection.getInputStream());
-        } catch (IOException e) {
+        } catch (IOException | RuntimeException e) {
             return false;
         }
 
