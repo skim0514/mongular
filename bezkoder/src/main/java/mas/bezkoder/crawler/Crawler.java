@@ -96,14 +96,9 @@ public class Crawler {
                     if(!alink.contains(this.domain)) continue;
                     getPageLinks(alink, depth);
                 }
-
-
-
             } catch (IOException e) {
                 System.err.println("For '" + URL + "': " + e.getMessage());
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
+            } catch (URISyntaxException | JSONException e) {
                 e.printStackTrace();
             }
         }
