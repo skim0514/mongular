@@ -36,6 +36,12 @@ public class Crawler {
         this.links = new HashSet<>();
     }
 
+
+    /**
+     * page Link Extractor for given URL
+     * @param URL URL to examine
+     * @param depth current level depth that we are examining - useful when we are crawling limited layers
+     */
     public void getPageLinks(String URL, int depth) {
         if ((!links.contains(URL) && (depth < MAX_DEPTH))) {
             System.out.println(">> Depth: " + depth + " [" + URL + "]");
@@ -104,10 +110,21 @@ public class Crawler {
         }
     }
 
+    /**
+     * main function to call our link extractor
+     * @return hashet of strings of urls
+     */
     public HashSet<String> getLinks() {
         return this.links;
     }
 
+    /**
+     * downloads file with given URL
+     * @param url url of file to download
+     * @param fileName filename with location to download to
+     * @return success or not success
+     * @throws IOException for issues in url or fileName
+     */
     public static boolean downloadFile(String url, String fileName) throws IOException {
         HttpURLConnection webProxyConnection
                 = (HttpURLConnection) new URL(url).openConnection(webProxy);
@@ -131,6 +148,16 @@ public class Crawler {
         return true;
     }
 
+    /**
+     * add website information step of crawling
+     * @param link url for our website that we are adding to db
+     * @param filetype filetype of our website to add to db
+     * @param description ""
+     * @param contentType content type of our website
+     * @return id number for file download
+     * @throws IOException issues with links
+     * @throws JSONException issues with building our db entry
+     */
     public static String addTutorial(String link, String filetype, String description, String contentType) throws IOException, JSONException {
         URL url = new URL("http://localhost:8085/api/tutorials");
         URLConnection con = url.openConnection();
@@ -171,10 +198,14 @@ public class Crawler {
         return id;
     }
 
+    /**
+     * get content type by connecting to url
+     * @param link link of file to get contentType for
+     * @return content type information
+     * @throws IOException issues with our URLr
+     */
     public static String getContentType(String link) throws IOException {
         URL url;
-
-
         try {
             url = new URL(link);
         } catch (MalformedURLException e){
@@ -182,7 +213,6 @@ public class Crawler {
             System.out.println(link);
             return null;
         }
-
         HttpURLConnection connection;
         try {
 //            connection = (HttpURLConnection) url.openConnection();
@@ -191,7 +221,6 @@ public class Crawler {
             e.printStackTrace();
             return null;
         }
-
         try {
             return connection.getContentType();
         } catch (Exception ex) {
@@ -201,6 +230,11 @@ public class Crawler {
 
     }
 
+    /**
+     * get file encoding from contentType information
+     * @param contentType content type string which sometimes keeps encoding information
+     * @return returns file encoding information
+     */
     public static String getEncoding(String contentType) {
         if (contentType == null) return "UTF-8";
         String[] values = contentType.split(";");
@@ -217,6 +251,13 @@ public class Crawler {
         return charset;
     }
 
+    /**
+     * helper function to decode strings
+     * @param url url to decode
+     * @return decoded url
+     * @throws IOException issue with url
+     * @throws IllegalArgumentException illegally built url
+     */
     public static String decode(String url) throws IOException, IllegalArgumentException{
         String newlink = "";
         while (true) {
@@ -228,6 +269,11 @@ public class Crawler {
         return url;
     }
 
+    /**
+     * check if website is a redirected website
+     * @param statusCode inputs status code of link connection
+     * @return bool if our website is a redirect
+     */
     public static boolean isRedirect(int statusCode) {
         if (statusCode != HttpURLConnection.HTTP_OK) {
             return (statusCode == HttpURLConnection.HTTP_MOVED_TEMP
@@ -237,6 +283,15 @@ public class Crawler {
         return false;
     }
 
+    /**
+     * searches css for urls
+     * @param input input css string
+     * @param string our given domain for our website
+     * @return hashset of urls that are in the css
+     * @throws IOException issues with our url information.
+     * @throws URISyntaxException badly built url
+     * @throws JSONException issues building tutorial of website link
+     */
     public static HashSet<String> searchCss(String input, String string) throws IOException, URISyntaxException, JSONException {
         HashSet<String> hs = new HashSet<>();
         Pattern pattern = Pattern.compile(CSSRegex);
@@ -260,6 +315,13 @@ public class Crawler {
         return hs;
     }
 
+    /**
+     * main caller function
+     * @param url url of website to start at
+     * @throws JSONException issues building tutorials
+     * @throws URISyntaxException badly built url
+     * @throws IOException issues with url
+     */
     public static void crawlSite(String url) throws JSONException, URISyntaxException, IOException {
         String start = url;
         String startDomain = new URL(start).getHost();
