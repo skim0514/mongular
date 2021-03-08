@@ -236,7 +236,7 @@ public class Parser {
         }
         else if (url.startsWith("/")) {
             URI link = new URI(title);
-            newUrl = link.getScheme() + "://" + domain + url;
+            newUrl = link.getScheme() + "://" + domain + "/" + url;
         } else if (url.startsWith("./")) {
             URI parent = new URI(title);
             parent = parent.getPath().endsWith("/") ? parent.resolve("..") : parent.resolve(".");
