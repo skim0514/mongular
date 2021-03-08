@@ -20,8 +20,8 @@ import java.util.regex.Pattern;
 
 public class Parser {
 
-    private static final String client = "http://localhost:8085/api/websites?web=";
-//    private static final String client = "http://118.67.133.84:8085/api/websites?web=";
+//    private static final String client = "http://localhost:8085/api/websites?web=";
+    private static final String client = "http://118.67.133.84:8085/api/websites?web=";
     private static final String CSSRegex = "url\\((.*?)\\)";
     private static final String htmlTag = "<(?!!)(?!/)\\s*([a-zA-Z0-9]+)(.*?)>";
     private static final String otherRegex = "https?://([^{}<>\"'\\s)]*)";
@@ -239,46 +239,30 @@ public class Parser {
             newUrl = link.getScheme() + "://" + domain + url;
         } else if (url.startsWith("./")) {
             URI parent = new URI(title);
-            parent = parent.getPath().endsWith("/") ? parent.resolve("..") : parent.resolve(".");
-            newUrl = parent.toString() + url.substring(2);
+            parent = parent.resolve(".");
+            newUrl = parent.toString().endsWith("/") ? parent.toString() + url.substring(2) :
+                    parent.toString() + "/" + url.substring(2);
         } else if (url.startsWith("../")) {
+            int back = count;
+            if (title.endsWith("/")) back --;
             URI link = new URI(title);
-            for (int i = 0; i <= count; i++) {
+            for (int i = 0; i <= back; i++) {
                 URI parent = link.getPath().endsWith("/") ? link.resolve("..") : link.resolve(".");
                 link = parent;
             }
             newUrl = link.toString() + url.substring(3 * count);
         } else {
             URI parent = new URI(title);
-            parent = parent.getPath().endsWith("/") ? parent.resolve("..") : parent.resolve(".");
-            newUrl = parent.toString() + url;
+            parent = parent.resolve(".");
+            newUrl = parent.toString().endsWith("/") ? parent.toString() + url :
+                    parent.toString() + "/" + url;
         }
         return newUrl;
     }
 
-    public static void main (String[] args) throws IOException {
-        String weburl = "http://germany2igel45jbmjdipfbzdswjcpjqzqozxt4l33452kzrrda2rbid.onion/";
-        String fileName = "abc";
-        Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
-        HttpURLConnection webProxyConnection
-                = (HttpURLConnection) new URL(weburl).openConnection(webProxy);
-        Document document = Jsoup.connect(weburl).proxy(webProxy).get();
-        System.out.println(document.toString());
-//        Crawler.downloadFile(weburl, fileName);
-
-
-//
-
-//
-//        System.out.println(webProxyConnection.getContentType());
-//        System.out.println(webProxyConnection.getResponseCode());
-//        ReadableByteChannel readChannel;
-//        readChannel = Channels.newChannel(webProxyConnection.getInputStream());
-//        FileOutputStream fileOS = new FileOutputStream("/Users/skim/s2w/mongular/bezkoder/cde");
-//        FileChannel writeChannel = fileOS.getChannel();
-//        writeChannel
-//                .transferFrom(readChannel, 0, Long.MAX_VALUE);
-
-//        System.out.println(Jsoup.connect("https://finance.naver.com/news/news_read.nhn?mode=mainnews&office_id=008&article_id=0004550654").get().toString());
+    public static void main (String[] args) throws IOException, URISyntaxException {
+        String domain = "http://germany2igel45jbmjdipfbzdswjcpjqzqozxt4l33452kzrrda2rbid.onion/abcde/abc/";
+        String abc = "../abc.txt";
+        System.out.println(java.net.URLDecoder.decode(replaceUrl(abc, domain), StandardCharsets.UTF_8.name()));
     }
 }
