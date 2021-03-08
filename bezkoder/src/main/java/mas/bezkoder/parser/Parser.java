@@ -20,8 +20,8 @@ import java.util.regex.Pattern;
 
 public class Parser {
 
-//    private static final String client = "http://localhost:8085/api/websites?web=";
-    private static final String client = "http://118.67.133.84:8085/api/websites?web=";
+    private static final String client = "http://localhost:8085/api/websites?web=";
+//    private static final String client = "http://118.67.133.84:8085/api/websites?web=";
     private static final String CSSRegex = "url\\((.*?)\\)";
     private static final String htmlTag = "<(?!!)(?!/)\\s*([a-zA-Z0-9]+)(.*?)>";
     private static final String otherRegex = "https?://([^{}<>\"'\\s)]*)";
@@ -257,9 +257,14 @@ public class Parser {
     }
 
     public static void main (String[] args) throws IOException {
-        URL weburl = new URL("http://wiki22djp7zzzv4x3nimnl6jnghbfddac4e4dce5jkb6544h7e7kzfad.onion/#!index.md");
-
-        Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("10.41.228.165", 8123));
+        String weburl = "http://germany2igel45jbmjdipfbzdswjcpjqzqozxt4l33452kzrrda2rbid.onion/";
+        String fileName = "abc";
+        Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
+        HttpURLConnection webProxyConnection
+                = (HttpURLConnection) new URL(weburl).openConnection(webProxy);
+        Document document = Jsoup.connect(weburl).proxy(webProxy).get();
+        System.out.println(document.toString());
+//        Crawler.downloadFile(weburl, fileName);
 
 
 //

@@ -27,6 +27,7 @@ public class Crawler {
     private static final String otherRegex = "https?://([^{}<>\"'\\s)]*)";
     private static final String htmlTag = "<(?!!)(?!/)\\s*([a-zA-Z0-9]+)(.*?)>";
     private static final Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
+    private static final String style ="<style([\\s\\S]+?)</style>";
     private String domain;
     private HashSet<String> links;
 
@@ -68,8 +69,21 @@ public class Crawler {
                     }
                 }
 
-                Pattern pattern = Pattern.compile(otherRegex);
+                Elements elements = document.select("[style]");
+                for (Element css: elements) {
+                    String hold = css.attr("style");
+                    links.addAll(searchCss(hold, URL));
+                }
+
+                Pattern pattern = Pattern.compile(style);
                 Matcher matcher = pattern.matcher(document.toString());
+                while (matcher.find()) {
+                    String group = matcher.group(0);
+                    links.addAll(searchCss(group, URL));
+                }
+
+                pattern = Pattern.compile(otherRegex);
+                matcher = pattern.matcher(document.toString());
                 while (matcher.find()) {
                     String group = matcher.group(0);
                     links.add(group);
@@ -88,6 +102,8 @@ public class Crawler {
             } catch (IOException e) {
                 System.err.println("For '" + URL + "': " + e.getMessage());
             } catch (URISyntaxException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
