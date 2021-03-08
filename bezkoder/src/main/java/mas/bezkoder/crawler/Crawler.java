@@ -57,14 +57,14 @@ public class Crawler {
                     String slink = s.attr("src");
                     if (!slink.startsWith("data:image")) {
                         slink = Parser.replaceUrl(slink, URL);
-                        links.add(decode(slink));
+                        links.add(slink);
                         System.out.println(">> Depth: " + depth + " [" + slink + "]");
                     }
                 }
                 for (Element l : link) {
                     String llink = l.attr("href");
                     llink = Parser.replaceUrl(llink, URL);
-                    links.add(decode(llink));
+                    links.add(llink);
                     System.out.println(">> Depth: " + depth + " [" + llink + "]");
                 }
 
@@ -74,7 +74,7 @@ public class Crawler {
                     for (String s: strings) {
                         String[] urls = s.split(" ");
                         String newurl = Parser.replaceUrl(urls[0], URL);
-                        links.add(decode(newurl));
+                        links.add(newurl);
                         System.out.println(">> Depth: " + depth + " [" + newurl + "]");
                     }
                 }
@@ -104,7 +104,6 @@ public class Crawler {
                 for (Element page : linksOnPage) {
                     String alink = page.attr("href");
                     alink = Parser.replaceUrl(alink, URL);
-                    alink = decode(alink);
                     if(!alink.contains(this.domain)) continue;
                     getPageLinks(alink, depth);
                 }

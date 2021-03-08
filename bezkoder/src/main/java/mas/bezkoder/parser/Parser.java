@@ -52,13 +52,13 @@ public class Parser {
         for (Element src : srcs) {
             String hold = src.attr("src");
             if (!hold.startsWith("data:image") && !hold.startsWith(client))
-                src.attr("src", client + replaceUrl(hold, tutorial.getTitle()));
+                src.attr("src", client + java.net.URLEncoder.encode(replaceUrl(hold, tutorial.getTitle()), StandardCharsets.UTF_8.name()));
         }
 
         Elements hrefs = document.select("[href]");
         for (Element href : hrefs) {
             String hold = href.attr("href");
-            href.attr("href", client + replaceUrl(hold, tutorial.getTitle()));
+            href.attr("href", client + java.net.URLEncoder.encode(replaceUrl(hold, tutorial.getTitle()), StandardCharsets.UTF_8.name()));
         }
 
         //css styling within attributes
@@ -100,7 +100,7 @@ public class Parser {
         for (String string: strings) {
             String[] urls = string.split(" ");
             String url = urls[0];
-            rs = rs.replace(url, client + replaceUrl(url, tutorial.getTitle()));
+            rs = rs.replace(url, client + java.net.URLEncoder.encode(replaceUrl(url, tutorial.getTitle()), StandardCharsets.UTF_8.name()));
         }
         return rs;
     }
@@ -124,7 +124,7 @@ public class Parser {
             String group = matcher.group(0);
             if (group.startsWith(client)) continue;
             if (group.startsWith("data:")) continue;
-            String newUrl = client + replaceUrl(group, tutorial.getTitle());
+            String newUrl = client + java.net.URLEncoder.encode(replaceUrl(group, tutorial.getTitle()), StandardCharsets.UTF_8.name());
             try {
                 input = input.replace("'" + group, "'" + newUrl);
                 input = input.replace("\"" + group, "\"" + newUrl);
@@ -152,7 +152,7 @@ public class Parser {
             group = group.replaceAll("'", "");
             if (group.startsWith("data:")) continue;
             if (group.contains(client)) continue;
-            String newUrl = client + replaceUrl(group, tutorial.getTitle());
+            String newUrl = client + java.net.URLEncoder.encode(replaceUrl(group, tutorial.getTitle()), StandardCharsets.UTF_8.name());
             input = input.replace(group, newUrl);
         }
 
@@ -211,7 +211,6 @@ public class Parser {
 
         //fixing paths
         newUrl = getUrlFromPath(url, string, count);
-        newUrl = java.net.URLEncoder.encode(newUrl, StandardCharsets.UTF_8.name());
         return newUrl;
     }
 
@@ -261,8 +260,8 @@ public class Parser {
     }
 
     public static void main (String[] args) throws IOException, URISyntaxException {
-        String domain = "http://germany2igel45jbmjdipfbzdswjcpjqzqozxt4l33452kzrrda2rbid.onion/abcde/abc/";
-        String abc = "../abc.txt";
+        String domain = "http://bcbm4y7yusdxthg3.onion";
+        String abc = "/showthread.php?t=793";
         System.out.println(java.net.URLDecoder.decode(replaceUrl(abc, domain), StandardCharsets.UTF_8.name()));
     }
 }
