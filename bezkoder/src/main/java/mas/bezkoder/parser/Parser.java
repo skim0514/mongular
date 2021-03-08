@@ -20,8 +20,8 @@ import java.util.regex.Pattern;
 
 public class Parser {
 
-    private static final String client = "http://localhost:8085/api/websites?web=";
-//    private static final String client = "http://118.67.133.84:8085/api/websites?web=";
+//    private static final String client = "http://localhost:8085/api/websites?web=";
+    private static final String client = "http://118.67.133.84:8085/api/websites?web=";
     private static final String CSSRegex = "url\\((.*?)\\)";
     private static final String htmlTag = "<(?!!)(?!/)\\s*([a-zA-Z0-9]+)(.*?)>";
     private static final String otherRegex = "https?://([^{}<>\"'\\s)]*)";
