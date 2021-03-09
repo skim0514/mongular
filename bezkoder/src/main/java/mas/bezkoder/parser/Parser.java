@@ -2,6 +2,7 @@ package mas.bezkoder.parser;
 
 import mas.bezkoder.crawler.Crawler;
 import mas.bezkoder.model.Tutorial;
+import org.apache.commons.io.IOUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -9,6 +10,7 @@ import org.jsoup.select.Elements;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
 import java.nio.channels.Channels;
@@ -260,8 +262,30 @@ public class Parser {
     }
 
     public static void main (String[] args) throws IOException, URISyntaxException {
-        String domain = "http://bcbm4y7yusdxthg3.onion";
-        String abc = "/showthread.php?t=793";
-        System.out.println(java.net.URLDecoder.decode(replaceUrl(abc, domain), StandardCharsets.UTF_8.name()));
+        String domain = "http://crdclub4wraumez4.onion/forumdisplay.php?s=35e5c5ee36d6f07beb03a1f87e28a271&f=54";
+        URL url = new URL(domain);
+        String query = url.getQuery();
+        System.out.println(query);
+        String begin = domain.substring(0, domain.indexOf(query) - 1);
+        System.out.println(begin);
+//        Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
+//
+//        HttpURLConnection webProxyConnection
+//                = (HttpURLConnection) new URL(domain).openConnection(webProxy);
+//        ReadableByteChannel readChannel = null;
+////        try {
+////            readChannel = Channels.newChannel(new URL(url).openStream());
+////        } catch (IOException e) {
+////            return false;
+////        }
+//        try {
+//            readChannel = Channels.newChannel(webProxyConnection.getInputStream());
+//        } catch (IOException | RuntimeException e) {
+//        }
+//        InputStream is = Channels.newInputStream(readChannel);
+//        String text = IOUtils.toString(is, StandardCharsets.UTF_8.name());
+//
+//        System.out.println(text);
+
     }
 }

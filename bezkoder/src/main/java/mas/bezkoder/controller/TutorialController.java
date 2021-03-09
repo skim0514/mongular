@@ -181,13 +181,36 @@ public class TutorialController {
 
     if (website != null) {
       tutorialRepository.findByTitleContaining(website).forEach(tutorials::add);
-    }
+    } else return null;
     if (tutorials.size() != 0) {
       for (Tutorial t: tutorials) {
         if (t.getTitle().equals(website)) return t;
       }
     }
-    return null;
+    tutorials = new ArrayList<>();
+    URL url = new URL(website);
+    String query = url.getQuery();
+    if (query == null) return null;
+    String begin = website.substring(0, website.indexOf(query) - 1);
+    tutorialRepository.findByTitleContaining(begin).forEach(tutorials::add);
+    int maxQ = -1;
+    Tutorial maxTut = null;
+    if (tutorials.size() == 1) return tutorials.get(0);
+    else if (tutorials.size() == 0) return null;
+    else {
+      String[] queries = query.split("&");
+      int count = 0;
+      for (Tutorial t: tutorials) {
+        for (String q: queries) {
+          if (t.getTitle().contains(q)) count++;
+        }
+        if (count > maxQ) {
+          maxTut = t;
+          maxQ = count;
+        }
+      }
+      return maxTut;
+    }
   }
 
   public static String getTextFile(Tutorial tutorial) throws IOException {
