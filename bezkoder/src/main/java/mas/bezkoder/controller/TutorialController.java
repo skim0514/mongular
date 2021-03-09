@@ -109,7 +109,7 @@ public class TutorialController {
   }
 
   @GetMapping("/websites")
-  public ResponseEntity<?> getFileFromWebsite(@RequestParam("web") String website) throws IOException, URISyntaxException {
+  public ResponseEntity<?> getFileFromWebsite(@RequestParam("web") String website) throws IOException, URISyntaxException, JSONException {
     String url = "";
     try {
       while (true) {

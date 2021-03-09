@@ -1,26 +1,21 @@
 package mas.bezkoder.parser;
 
-import mas.bezkoder.crawler.Crawler;
+import mas.bezkoder.controller.TutorialController;
 import mas.bezkoder.model.Tutorial;
-import org.apache.commons.io.IOUtils;
+import org.json.JSONException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Parser {
+public class Parser extends LinkExtractor {
 
 //    private static final String client = "http://localhost:8085/api/websites?web=";
     private static final String client = "http://118.67.133.84:8085/api/websites?web=";
@@ -28,6 +23,10 @@ public class Parser {
     private static final String htmlTag = "<(?!!)(?!/)\\s*([a-zA-Z0-9]+)(.*?)>";
     private static final String otherRegex = "https?://([^{}<>\"'\\s)]*)";
     private static final String style ="<style([\\s\\S]+?)</style>";
+
+    public Parser(Document document, Tutorial tutorial) {
+        super(document, tutorial);
+    }
 
     /**
      * function to parse if document is html
@@ -37,65 +36,77 @@ public class Parser {
      * @throws IOException if something is missing
      * @throws URISyntaxException if parsed url is unusual
      */
-    public static String parseHtml(String input, Tutorial tutorial) throws IOException, URISyntaxException {
+    public static String parseHtml(String input, Tutorial tutorial) throws IOException, URISyntaxException, JSONException {
 
         Document document = Jsoup.parse(input);
+        Parser parser = new Parser(document, tutorial);
+        parser.extractHtml();
+        return parser.getInput();
+    }
 
-        Elements srcsets = document.select("[srcset]");
-        for (Element srcset : srcsets) {
+    public void parseSrcSet(Elements srcSets) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+        if (srcSets == null) return;
+        for (Element srcset : srcSets) {
             String hold = srcset.attr("srcset");
-            String replace = parseSrcset(hold, tutorial);
+            String replace = setHelp(hold, getTutorial());
             srcset.attr("srcset", replace);
         }
-        //src and href files
+    }
 
-
-        Elements srcs = document.select("[src]");
+    public void parseSrc(Elements srcs) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+        if (srcs == null) return;
         for (Element src : srcs) {
             String hold = src.attr("src");
             if (!hold.startsWith("data:image") && !hold.startsWith(client))
-                src.attr("src", client + java.net.URLEncoder.encode(replaceUrl(hold, tutorial.getTitle()), StandardCharsets.UTF_8.name()));
+                src.attr("src", client + java.net.URLEncoder.encode(replaceUrl(hold, getTutorial().getTitle()), StandardCharsets.UTF_8.name()));
         }
-
-        Elements hrefs = document.select("[href]");
-        for (Element href : hrefs) {
-            String hold = href.attr("href");
-            href.attr("href", client + java.net.URLEncoder.encode(replaceUrl(hold, tutorial.getTitle()), StandardCharsets.UTF_8.name()));
-        }
-
-        //css styling within attributes
-        Elements elements = document.select("[style]");
-        for (Element css: elements) {
-            String hold = css.attr("style");
-            String replace = parseCss(hold, tutorial);
-            css.attr("style", replace);
-        }
-
-        input = document.toString();
-
-        //css styling as a separate attribute
-        Pattern pattern = Pattern.compile(style);
-        Matcher matcher = pattern.matcher(input);
-        while (matcher.find()) {
-            String group = matcher.group(0);
-            group = parseCss(group, tutorial);
-            input = input.replace(matcher.group(0), group);
-        }
-
-        pattern = Pattern.compile(htmlTag);
-        matcher = pattern.matcher(input);
-        while (matcher.find()) {
-            String group = matcher.group(0);
-            group = otherRegex(group, tutorial);
-            input = input.replace(matcher.group(0), group);
-        }
-        //all other urls starting with https?
-
-
-        return input;
     }
 
-    private static String parseSrcset(String hold, Tutorial tutorial) throws UnsupportedEncodingException, URISyntaxException, MalformedURLException {
+    public void parseLinkLink(Elements hrefs) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+        if (hrefs == null) return;
+        for (Element href : hrefs) {
+            String hold = href.attr("href");
+            href.attr("href", client + java.net.URLEncoder.encode(replaceUrl(hold, getTutorial().getTitle()), StandardCharsets.UTF_8.name()));
+        }
+    }
+    public void parseALink(Elements hrefs) throws IOException, URISyntaxException, JSONException {
+        if (hrefs == null) return;
+        for (Element href : hrefs) {
+            String hold = href.attr("href");
+            href.attr("href", client + java.net.URLEncoder.encode(replaceUrl(hold, getTutorial().getTitle()), StandardCharsets.UTF_8.name()));
+        }
+    }
+    public void parseStyle(Elements style) throws JSONException, IOException, URISyntaxException {
+        if (style == null) return;
+        for (Element css: style) {
+            String hold = css.attr("style");
+            String replace = parseCss(hold, getTutorial());
+            css.attr("style", replace);
+        }
+    }
+    public void parseOtherStyle(Matcher matcher) throws JSONException, IOException, URISyntaxException {
+        if (matcher == null) return;
+        String input = getInput();
+        while (matcher.find()) {
+            String group = matcher.group(0);
+            group = parseCss(group, getTutorial());
+            input = input.replace(matcher.group(0), group);
+        }
+        setInput(input);
+    }
+
+    public void parseOther(Matcher matcher) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+        if (matcher == null) return;
+        String input = getInput();
+        while (matcher.find()) {
+            String group = matcher.group(0);
+            group = otherRegex(group, getTutorial());
+            input = input.replace(matcher.group(0), group);
+        }
+        setInput(input);
+    }
+
+    public static String setHelp(String hold, Tutorial tutorial) throws UnsupportedEncodingException, URISyntaxException, MalformedURLException {
         String rs = hold;
         String[] strings;
         strings = hold.split(", ");
@@ -116,7 +127,7 @@ public class Parser {
      * @throws URISyntaxException if urls found have issues
      * @throws UnsupportedEncodingException if encoding of text is unusual
      */
-    private static String otherRegex(String input, Tutorial tutorial) throws URISyntaxException, UnsupportedEncodingException, MalformedURLException {
+    public static String otherRegex(String input, Tutorial tutorial) throws URISyntaxException, UnsupportedEncodingException, MalformedURLException {
         Pattern pattern;
         Matcher matcher;
 
@@ -185,7 +196,7 @@ public class Parser {
      * @throws IOException if information is missing
      */
 
-    public static String parseFile(String input, Tutorial tutorial) throws URISyntaxException, IOException {
+    public static String parseFile(String input, Tutorial tutorial) throws URISyntaxException, IOException, JSONException {
         if (tutorial.getFiletype().equals("html")) return parseHtml(input, tutorial);
         else if (tutorial.getFiletype().equals("css")) return parseCss(input, tutorial);
         else if (tutorial.getFiletype().equals("js")) return parseJs(input, tutorial);
@@ -231,11 +242,12 @@ public class Parser {
         if (url.startsWith("http")) {
             newUrl = url;
         } else if (url.startsWith("#")) {
-            newUrl = title + url;
+            URL store = new URL(title);
+            if (store.getRef() == null) newUrl = title + url;
+            else newUrl = title.replace("#" + store.getRef(), "") + url;
         } else if (url.startsWith("//")) {
-            newUrl = "https:" + url;
-        }
-        else if (url.startsWith("/")) {
+            newUrl = "http:" + url;
+        } else if (url.startsWith("/")) {
             URI link = new URI(title);
             newUrl = link.getScheme() + "://" + domain + url;
         } else if (url.startsWith("./")) {
@@ -261,31 +273,13 @@ public class Parser {
         return newUrl;
     }
 
-    public static void main (String[] args) throws IOException, URISyntaxException {
-        String domain = "http://crdclub4wraumez4.onion/forumdisplay.php?s=35e5c5ee36d6f07beb03a1f87e28a271&f=54";
-        URL url = new URL(domain);
-        String query = url.getQuery();
-        System.out.println(query);
-        String begin = domain.substring(0, domain.indexOf(query) - 1);
-        System.out.println(begin);
-//        Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
-//
-//        HttpURLConnection webProxyConnection
-//                = (HttpURLConnection) new URL(domain).openConnection(webProxy);
-//        ReadableByteChannel readChannel = null;
-////        try {
-////            readChannel = Channels.newChannel(new URL(url).openStream());
-////        } catch (IOException e) {
-////            return false;
-////        }
-//        try {
-//            readChannel = Channels.newChannel(webProxyConnection.getInputStream());
-//        } catch (IOException | RuntimeException e) {
-//        }
-//        InputStream is = Channels.newInputStream(readChannel);
-//        String text = IOUtils.toString(is, StandardCharsets.UTF_8.name());
-//
-//        System.out.println(text);
+    public static void main (String[] args) throws IOException, URISyntaxException, JSONException {
+        String url = "http://crdclub4wraumez4.onion/";
+        Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
+        Document document = Jsoup.connect(url).proxy(webProxy).get();
+        Tutorial tutorial = new Tutorial(url, "okay", "crdclub4wraumez4.onion" , "okay", "text/html", "utf-8");
+        String input = parseHtml(document.toString(), tutorial);
+        System.out.println(input);
 
     }
 }

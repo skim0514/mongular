@@ -1,5 +1,6 @@
 package mas.bezkoder.crawler;
 
+import mas.bezkoder.parser.LinkExtractor;
 import mas.bezkoder.parser.Parser;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,7 +21,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Crawler {
+public class Crawler extends LinkExtractor {
 
     private static final int MAX_DEPTH = 2;
     private static final String CSSRegex = "url\\((.*?)\\)";
@@ -29,100 +30,116 @@ public class Crawler {
     private static final Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
     private static final String style ="<style([\\s\\S]+?)</style>";
     private String domain;
-    private HashSet<String> links;
 
-    public Crawler(String domain) {
+    public Crawler(String domain, int depth) {
+        super(domain, new HashSet<>(), depth);
         this.domain = domain;
-        this.links = new HashSet<>();
+    }
+
+    public Crawler(String url, String domain, int depth) {
+        super(url, new HashSet<>(), depth);
+        this.domain = domain;
     }
 
 
-    /**
-     * page Link Extractor for given URL
-     * @param URL URL to examine
-     * @param depth current level depth that we are examining - useful when we are crawling limited layers
-     */
-    public void getPageLinks(String URL, int depth) {
-        if ((!links.contains(URL) && (depth < MAX_DEPTH))) {
-            System.out.println(">> Depth: " + depth + " [" + URL + "]");
-            try {
-                links.add(URL);
-                Document document = Jsoup.connect(URL).proxy(webProxy).get();
-                Elements linksOnPage = document.select("a[href]");
-                Elements src = document.select("[src]");
-                Elements link = document.select("link[href]");
-                Elements srcsets = document.select("[srcset]");
-
-                for (Element s : src) {
-                    String slink = s.attr("src");
-                    if (!slink.startsWith("data:image")) {
-                        slink = Parser.replaceUrl(slink, URL);
-                        links.add(slink);
-                        System.out.println(">> Depth: " + depth + " [" + slink + "]");
-                    }
-                }
-                for (Element l : link) {
-                    String llink = l.attr("href");
-                    llink = Parser.replaceUrl(llink, URL);
-                    links.add(llink);
-                    System.out.println(">> Depth: " + depth + " [" + llink + "]");
-                }
-
-                for (Element srcset : srcsets) {
-                    String hold = srcset.attr("srcset");
-                    String[] strings = hold.split(", ");
-                    for (String s: strings) {
-                        String[] urls = s.split(" ");
-                        String newurl = Parser.replaceUrl(urls[0], URL);
-                        links.add(newurl);
-                        System.out.println(">> Depth: " + depth + " [" + newurl + "]");
-                    }
-                }
-
-                Elements elements = document.select("[style]");
-                for (Element css: elements) {
-                    String hold = css.attr("style");
-                    links.addAll(searchCss(hold, URL));
-                }
-
-                Pattern pattern = Pattern.compile(style);
-                Matcher matcher = pattern.matcher(document.toString());
-                while (matcher.find()) {
-                    String group = matcher.group(0);
-                    links.addAll(searchCss(group, URL));
-                }
-
-                pattern = Pattern.compile(otherRegex);
-                matcher = pattern.matcher(document.toString());
-                while (matcher.find()) {
-                    String group = matcher.group(0);
-                    links.add(group);
-                }
-
-                depth++;
-
-                for (Element page : linksOnPage) {
-                    String alink = page.attr("href");
-                    alink = Parser.replaceUrl(alink, URL);
-                    if(!alink.contains(this.domain)) continue;
-                    getPageLinks(alink, depth);
-                }
-            } catch (IOException e) {
-                System.err.println("For '" + URL + "': " + e.getMessage());
-            } catch (URISyntaxException | JSONException e) {
-                e.printStackTrace();
+    public void parseSrcSet(Elements srcsets) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+        HashSet<String> links = getUrls();
+        String current = getUrl();
+        for (Element srcset : srcsets) {
+            String hold = srcset.attr("srcset");
+            String[] strings = hold.split(", ");
+            for (String s: strings) {
+                String[] urls = s.split(" ");
+                String newurl = Parser.replaceUrl(urls[0], current);
+                links.add(newurl);
+                System.out.println(">> Depth: " + getDepth() + " [" + newurl + "]");
             }
         }
+        setUrls(links);
     }
 
-    /**
-     * main function to call our link extractor
-     * @return hashet of strings of urls
-     */
-    public HashSet<String> getLinks() {
-        return this.links;
+    public void parseSrc(Elements src) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+        HashSet<String> links = getUrls();
+        String current = getUrl();
+        for (Element s : src) {
+            String slink = s.attr("src");
+            if (!slink.startsWith("data:image")) {
+                slink = Parser.replaceUrl(slink, current);
+                links.add(slink);
+                System.out.println(">> Depth: " + getDepth() + " [" + slink + "]");
+            }
+        }
+        setUrls(links);
     }
 
+    public void parseLinkLink(Elements link) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+        HashSet<String> links = getUrls();
+        String current = getUrl();
+        for (Element l : link) {
+            String llink = l.attr("href");
+            llink = Parser.replaceUrl(llink, current);
+            links.add(llink);
+            System.out.println(">> Depth: " + getDepth() + " [" + llink + "]");
+        }
+        setUrls(links);
+    }
+
+    public void parseStyle(Elements style) throws JSONException, IOException, URISyntaxException {
+        HashSet<String> links = getUrls();
+        String current = getUrl();
+        for (Element css: style) {
+            String hold = css.attr("style");
+            links.addAll(searchCss(hold, current));
+        }
+        setUrls(links);
+    }
+
+    public void parseOtherStyle(Matcher matcher) throws JSONException, IOException, URISyntaxException {
+        HashSet<String> links = getUrls();
+        String current = getUrl();
+        while (matcher.find()) {
+            String group = matcher.group(0);
+            links.addAll(searchCss(group, current));
+        }
+        setUrls(links);
+    }
+
+    public void parseOther(Matcher matcher) {
+        HashSet<String> links = getUrls();
+        while (matcher.find()) {
+            String group = matcher.group(0);
+            links.add(group);
+        }
+        setUrls(links);
+    }
+
+    public void parseALink(Elements hrefs) throws IOException, URISyntaxException, JSONException {
+        HashSet<String> links = getUrls();
+        String current = getUrl();
+        for (Element page : hrefs) {
+            String alink = page.attr("href");
+            alink = Parser.replaceUrl(alink, current);
+            if(!alink.contains(this.domain)) continue;
+            if(links.contains(alink)) continue;
+            HashSet<String> hold = getPageLinks(alink, this.domain, getDepth() + 1);
+            if (hold != null) links.addAll(hold);
+        }
+        setUrls(links);
+    }
+
+    public static HashSet<String> getPageLinks(String URL, String domain, int depth) throws JSONException, IOException, URISyntaxException {
+        if (depth == MAX_DEPTH) return null;
+        Crawler crawler = new Crawler(URL, domain, depth);
+        try {
+            Document document = Jsoup.connect(URL).proxy(webProxy).get();
+            crawler.setDocument(document);
+            crawler.extractHtml();
+            return crawler.getUrls();
+        } catch (Exception ex) {
+            System.err.println("For '" + URL + "': " + ex.getMessage());
+            return null;
+        }
+    }
     /**
      * downloads file with given URL
      * @param url url of file to download
@@ -186,7 +203,6 @@ public class Crawler {
         try(OutputStream os = http.getOutputStream()) {
             os.write(out);
         }
-
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(http.getInputStream()));
         String inputLine;
@@ -232,7 +248,6 @@ public class Crawler {
             System.out.println(link);
             return null;
         }
-
     }
 
     /**
@@ -330,9 +345,7 @@ public class Crawler {
     public static void crawlSite(String url) throws JSONException, URISyntaxException, IOException {
         String start = url;
         String startDomain = new URL(start).getHost();
-        Crawler crawler = new Crawler(startDomain);
-        crawler.getPageLinks(start, 0);
-        HashSet<String> hs = crawler.getLinks();
+        HashSet<String> hs = getPageLinks(start, startDomain, 0);
         HashSet<String> otherLinks = new HashSet<>();
         int count = 1;
         for (String string : hs) {
@@ -417,10 +430,6 @@ public class Crawler {
         }
     }
 
-    public static void main(String args[]) throws IOException, JSONException, URISyntaxException {
-        crawlSite(args[0]);
-    }
-
     public static HashSet<String> searchJs(String content, String string) throws IOException, URISyntaxException {
         HashSet<String> hs = new HashSet<>();
         Pattern pattern = Pattern.compile(otherRegex);
@@ -432,6 +441,15 @@ public class Crawler {
         }
         return hs;
     }
+
+    public static void main(String args[]) throws IOException, JSONException, URISyntaxException {
+        HashSet<String> links = getPageLinks("http://crdclub4wraumez4.onion/", "crdclub4wraumez4.onion", 0);
+        System.out.println(links.size());
+
+//        crawlSite(args[0]);
+    }
+
+
 }
 
 
