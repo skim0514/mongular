@@ -44,68 +44,6 @@ public class Parser extends LinkExtractor {
         return parser.getInput();
     }
 
-    public void parseSrcSet(Elements srcSets) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
-        if (srcSets == null) return;
-        for (Element srcset : srcSets) {
-            String hold = srcset.attr("srcset");
-            String replace = setHelp(hold, getTutorial());
-            srcset.attr("srcset", replace);
-        }
-    }
-
-    public void parseSrc(Elements srcs) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
-        if (srcs == null) return;
-        for (Element src : srcs) {
-            String hold = src.attr("src");
-            if (!hold.startsWith("data:image") && !hold.startsWith(client))
-                src.attr("src", client + java.net.URLEncoder.encode(replaceUrl(hold, getTutorial().getTitle()), StandardCharsets.UTF_8.name()));
-        }
-    }
-
-    public void parseLinkLink(Elements hrefs) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
-        if (hrefs == null) return;
-        for (Element href : hrefs) {
-            String hold = href.attr("href");
-            href.attr("href", client + java.net.URLEncoder.encode(replaceUrl(hold, getTutorial().getTitle()), StandardCharsets.UTF_8.name()));
-        }
-    }
-    public void parseALink(Elements hrefs) throws IOException, URISyntaxException, JSONException {
-        if (hrefs == null) return;
-        for (Element href : hrefs) {
-            String hold = href.attr("href");
-            href.attr("href", client + java.net.URLEncoder.encode(replaceUrl(hold, getTutorial().getTitle()), StandardCharsets.UTF_8.name()));
-        }
-    }
-    public void parseStyle(Elements style) throws JSONException, IOException, URISyntaxException {
-        if (style == null) return;
-        for (Element css: style) {
-            String hold = css.attr("style");
-            String replace = parseCss(hold, getTutorial());
-            css.attr("style", replace);
-        }
-    }
-    public void parseOtherStyle(Matcher matcher) throws JSONException, IOException, URISyntaxException {
-        if (matcher == null) return;
-        String input = getInput();
-        while (matcher.find()) {
-            String group = matcher.group(0);
-            group = parseCss(group, getTutorial());
-            input = input.replace(matcher.group(0), group);
-        }
-        setInput(input);
-    }
-
-    public void parseOther(Matcher matcher) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
-        if (matcher == null) return;
-        String input = getInput();
-        while (matcher.find()) {
-            String group = matcher.group(0);
-            group = otherRegex(group, getTutorial());
-            input = input.replace(matcher.group(0), group);
-        }
-        setInput(input);
-    }
-
     public static String setHelp(String hold, Tutorial tutorial) throws UnsupportedEncodingException, URISyntaxException, MalformedURLException {
         String rs = hold;
         String[] strings;
@@ -117,7 +55,6 @@ public class Parser extends LinkExtractor {
         }
         return rs;
     }
-
 
     /**
      * checks input with simplest regex to find link
@@ -271,6 +208,82 @@ public class Parser extends LinkExtractor {
                     parent.toString() + "/" + url;
         }
         return newUrl;
+    }
+
+    /**
+     * implementation of LinkExtractor abstract func
+     * @param srcSets elements to replace
+     * @throws UnsupportedEncodingException if encoding is unusual
+     * @throws MalformedURLException if url is unusual
+     * @throws URISyntaxException incorrectly built url
+     */
+    public void parseSrcSet(Elements srcSets) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+        if (srcSets == null) return;
+        for (Element srcset : srcSets) {
+            String hold = srcset.attr("srcset");
+            String replace = setHelp(hold, getTutorial());
+            srcset.attr("srcset", replace);
+        }
+    }
+
+    /**
+     *
+     * @param srcs
+     * @throws UnsupportedEncodingException
+     * @throws MalformedURLException
+     * @throws URISyntaxException
+     */
+    public void parseSrc(Elements srcs) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+        if (srcs == null) return;
+        for (Element src : srcs) {
+            String hold = src.attr("src");
+            if (!hold.startsWith("data:image") && !hold.startsWith(client))
+                src.attr("src", client + java.net.URLEncoder.encode(replaceUrl(hold, getTutorial().getTitle()), StandardCharsets.UTF_8.name()));
+        }
+    }
+
+    public void parseLinkLink(Elements hrefs) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+        if (hrefs == null) return;
+        for (Element href : hrefs) {
+            String hold = href.attr("href");
+            href.attr("href", client + java.net.URLEncoder.encode(replaceUrl(hold, getTutorial().getTitle()), StandardCharsets.UTF_8.name()));
+        }
+    }
+    public void parseALink(Elements hrefs) throws IOException, URISyntaxException, JSONException {
+        if (hrefs == null) return;
+        for (Element href : hrefs) {
+            String hold = href.attr("href");
+            href.attr("href", client + java.net.URLEncoder.encode(replaceUrl(hold, getTutorial().getTitle()), StandardCharsets.UTF_8.name()));
+        }
+    }
+    public void parseStyle(Elements style) throws JSONException, IOException, URISyntaxException {
+        if (style == null) return;
+        for (Element css: style) {
+            String hold = css.attr("style");
+            String replace = parseCss(hold, getTutorial());
+            css.attr("style", replace);
+        }
+    }
+    public void parseOtherStyle(Matcher matcher) throws JSONException, IOException, URISyntaxException {
+        if (matcher == null) return;
+        String input = getInput();
+        while (matcher.find()) {
+            String group = matcher.group(0);
+            group = parseCss(group, getTutorial());
+            input = input.replace(matcher.group(0), group);
+        }
+        setInput(input);
+    }
+
+    public void parseOther(Matcher matcher) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+        if (matcher == null) return;
+        String input = getInput();
+        while (matcher.find()) {
+            String group = matcher.group(0);
+            group = otherRegex(group, getTutorial());
+            input = input.replace(matcher.group(0), group);
+        }
+        setInput(input);
     }
 
     public static void main (String[] args) throws IOException, URISyntaxException, JSONException {

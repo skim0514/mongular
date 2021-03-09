@@ -443,10 +443,10 @@ public class Crawler extends LinkExtractor {
     }
 
     public static void main(String args[]) throws IOException, JSONException, URISyntaxException {
-        HashSet<String> links = getPageLinks("http://crdclub4wraumez4.onion/", "crdclub4wraumez4.onion", 0);
-        System.out.println(links.size());
+//        HashSet<String> links = getPageLinks("http://crdclub4wraumez4.onion/", "crdclub4wraumez4.onion", 0);
+//        System.out.println(links.size());
 
-//        crawlSite(args[0]);
+        crawlSite(args[0]);
     }
 
 
