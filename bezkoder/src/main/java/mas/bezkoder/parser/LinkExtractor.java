@@ -64,7 +64,7 @@ public abstract class LinkExtractor {
         Matcher matcher = pattern.matcher(this.input);
         parseOtherStyle(matcher);
 
-        pattern = Pattern.compile(htmlTag);
+        pattern = Pattern.compile(otherRegex);
         matcher = pattern.matcher(this.input);
         parseOther(matcher);
     }
