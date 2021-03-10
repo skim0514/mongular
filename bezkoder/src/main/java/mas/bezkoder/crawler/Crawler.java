@@ -121,7 +121,6 @@ public class Crawler extends LinkExtractor {
             alink = Parser.replaceUrl(alink, current);
             if(!alink.contains(this.domain)) continue;
             if(links.contains(alink)) continue;
-            else links.add(alink);
             HashSet<String> hold = getPageLinks(alink, this.domain, getDepth() + 1);
             if (hold != null) links.addAll(hold);
         }
@@ -131,6 +130,9 @@ public class Crawler extends LinkExtractor {
     public static HashSet<String> getPageLinks(String URL, String domain, int depth) throws JSONException, IOException, URISyntaxException {
         if (depth == MAX_DEPTH) return null;
         Crawler crawler = new Crawler(URL, domain, depth);
+        HashSet<String> hs = crawler.getUrls();
+        hs.add(URL);
+        crawler.setUrls(hs);
         try {
             Document document = Jsoup.connect(URL).proxy(webProxy).get();
             crawler.setDocument(document);
@@ -446,6 +448,7 @@ public class Crawler extends LinkExtractor {
     public static void main(String args[]) throws IOException, JSONException, URISyntaxException {
 //        HashSet<String> links = getPageLinks("http://crdclub4wraumez4.onion/", "crdclub4wraumez4.onion", 0);
 //        System.out.println(links.size());
+
 
         crawlSite(args[0]);
     }
