@@ -48,6 +48,9 @@ public abstract class LinkExtractor {
         Elements srcs = document.select("[src]");
         parseSrc(srcs);
 
+        Elements background = document.select("[background]");
+        parseBackground(background);
+
         Elements hrefs = document.select("link[href]");
         parseLinkLink(hrefs);
 
@@ -69,6 +72,7 @@ public abstract class LinkExtractor {
         parseOther(matcher);
     }
 
+    public abstract void parseBackground(Elements background) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException;
     public abstract void parseSrcSet(Elements srcSets) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException;
     public abstract void parseSrc(Elements srcs) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException;
     public abstract void parseLinkLink(Elements hrefs) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException;

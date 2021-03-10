@@ -1,6 +1,5 @@
 package mas.bezkoder.parser;
 
-import mas.bezkoder.controller.TutorialController;
 import mas.bezkoder.model.Tutorial;
 import org.json.JSONException;
 import org.jsoup.Jsoup;
@@ -146,10 +145,9 @@ public class Parser extends LinkExtractor {
      * @param string full url
      * @return new url
      * @throws URISyntaxException if input string is incorrectly built
-     * @throws UnsupportedEncodingException if encoding of string is non functional
      */
 
-    public static String replaceUrl(String url, String string) throws URISyntaxException, UnsupportedEncodingException, MalformedURLException {
+    public static String replaceUrl(String url, String string) throws URISyntaxException, MalformedURLException {
         if (url.contains(client)) return url;
         String strFind = "../";
         int count = 0, fromIndex = 0;
@@ -227,11 +225,11 @@ public class Parser extends LinkExtractor {
     }
 
     /**
-     *
-     * @param srcs
-     * @throws UnsupportedEncodingException
-     * @throws MalformedURLException
-     * @throws URISyntaxException
+     * implementation of parseSrc for LinkExtractor
+     * @param srcs src elements to replace
+     * @throws UnsupportedEncodingException if encoding is unusual
+     * @throws MalformedURLException if url is unusual
+     * @throws URISyntaxException incorrectly built url
      */
     public void parseSrc(Elements srcs) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
         if (srcs == null) return;
@@ -242,6 +240,22 @@ public class Parser extends LinkExtractor {
         }
     }
 
+    public void parseBackground(Elements background) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+        if (background == null) return;
+        for (Element b : background) {
+            String hold = b.attr("background");
+            if (!hold.startsWith("data:image") && !hold.startsWith(client))
+                b.attr("background", client + java.net.URLEncoder.encode(replaceUrl(hold, getTutorial().getTitle()), StandardCharsets.UTF_8.name()));
+        }
+    }
+
+    /**
+     * implementation of parseHref for LinkExtractor
+     * @param hrefs href elements to replace
+     * @throws UnsupportedEncodingException if encoding is unusual
+     * @throws MalformedURLException if url is unusual
+     * @throws URISyntaxException incorrectly built url
+     */
     public void parseLinkLink(Elements hrefs) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
         if (hrefs == null) return;
         for (Element href : hrefs) {
@@ -249,6 +263,14 @@ public class Parser extends LinkExtractor {
             href.attr("href", client + java.net.URLEncoder.encode(replaceUrl(hold, getTutorial().getTitle()), StandardCharsets.UTF_8.name()));
         }
     }
+
+    /**
+     * implementation of parseHref for A-links which redirect
+     * @param hrefs
+     * @throws IOException
+     * @throws URISyntaxException
+     * @throws JSONException
+     */
     public void parseALink(Elements hrefs) throws IOException, URISyntaxException, JSONException {
         if (hrefs == null) return;
         for (Element href : hrefs) {
@@ -287,12 +309,17 @@ public class Parser extends LinkExtractor {
     }
 
     public static void main (String[] args) throws IOException, URISyntaxException, JSONException {
-        String url = "http://crdclub4wraumez4.onion/";
+        String url = "http://bcbm4y7yusdxthg3.onion/index.php";
         Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
         Document document = Jsoup.connect(url).proxy(webProxy).get();
-        Tutorial tutorial = new Tutorial(url, "okay", "crdclub4wraumez4.onion" , "okay", "text/html", "utf-8");
-        String input = parseHtml(document.toString(), tutorial);
-        System.out.println(input);
+        Elements elements = document.select("[background]");
+        for (Element b : elements) {
+            String slink = b.attr("background");
+            if (!slink.startsWith("data:image")) {
+                slink = Parser.replaceUrl(slink, url);
+                System.out.println(slink);
+            }
+        }
 
     }
 }

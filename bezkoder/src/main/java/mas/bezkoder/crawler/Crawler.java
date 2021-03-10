@@ -72,6 +72,22 @@ public class Crawler extends LinkExtractor {
         setUrls(links);
     }
 
+    public void parseBackground(Elements background) throws MalformedURLException, URISyntaxException {
+        HashSet<String> links = getUrls();
+        String current = getUrl();
+        for (Element b : background) {
+            String blink = b.attr("background");
+            if (!blink.startsWith("data:image")) {
+                blink = Parser.replaceUrl(blink, current);
+                links.add(blink);
+                System.out.println(">> Depth: " + getDepth() + " [" + blink + "]");
+            }
+        }
+        setUrls(links);
+    }
+
+
+
     public void parseLinkLink(Elements link) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
         HashSet<String> links = getUrls();
         String current = getUrl();
@@ -282,7 +298,7 @@ public class Crawler extends LinkExtractor {
      * @throws IllegalArgumentException illegally built url
      */
     public static String decode(String url) throws IOException, IllegalArgumentException{
-        String newlink = "";
+        String newlink;
         while (true) {
             newlink = java.net.URLDecoder.decode(url, StandardCharsets.UTF_8.name());
             if (newlink.equals(url)) break;
@@ -351,6 +367,7 @@ public class Crawler extends LinkExtractor {
         HashSet<String> hs = getPageLinks(start, startDomain, 0);
         HashSet<String> otherLinks = new HashSet<>();
         int count = 1;
+        if (hs == null) return;
         for (String string : hs) {
             try {
                 string = decode(string);
