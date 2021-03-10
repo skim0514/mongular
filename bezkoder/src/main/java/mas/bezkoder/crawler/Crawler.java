@@ -121,6 +121,7 @@ public class Crawler extends LinkExtractor {
             alink = Parser.replaceUrl(alink, current);
             if(!alink.contains(this.domain)) continue;
             if(links.contains(alink)) continue;
+            else links.add(alink);
             HashSet<String> hold = getPageLinks(alink, this.domain, getDepth() + 1);
             if (hold != null) links.addAll(hold);
         }
