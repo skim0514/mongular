@@ -77,9 +77,7 @@ public abstract class LinkExtractor implements HTMLExtractor, CSSExtractor {
         Matcher matcher = pattern.matcher(this.input);
         parseOtherStyle(matcher);
 
-        pattern = Pattern.compile(otherRegex);
-        matcher = pattern.matcher(this.input);
-        parseOther(matcher);
+        extractOther();
     }
 
     public void extractCSS() throws MalformedURLException, URISyntaxException, UnsupportedEncodingException {
@@ -87,8 +85,12 @@ public abstract class LinkExtractor implements HTMLExtractor, CSSExtractor {
         Matcher matcher = pattern.matcher(this.input);
         parseCSS(matcher);
 
-        pattern = Pattern.compile(otherRegex);
-        matcher = pattern.matcher(this.input);
+        extractOther();
+    }
+
+    public void extractOther() throws UnsupportedEncodingException, URISyntaxException, MalformedURLException {
+        Pattern pattern = Pattern.compile(otherRegex);
+        Matcher matcher = pattern.matcher(this.input);
         parseOther(matcher);
     }
 

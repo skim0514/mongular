@@ -27,21 +27,43 @@ public class Crawler extends LinkExtractor {
     private static final Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
     private String domain;
 
-    public Crawler(String domain, int depth) {
-        super(domain, new HashSet<>(), depth);
+    /**
+     * Constructor for HTML crawler
+     * @param domain website/domain to crawl
+     */
+    public Crawler(String domain) {
+        super(domain, new HashSet<>(), 0);
         this.domain = domain;
     }
 
+    /**
+     * Normal constructor for HTML crawler
+     * @param url website to crawl
+     * @param domain domain of website
+     * @param depth current depth of crawl
+     */
     public Crawler(String url, String domain, int depth) {
         super(url, new HashSet<>(), depth);
         this.domain = domain;
     }
 
+    /**
+     * contructor used for css crawling
+     * @param input style text
+     * @param url current url of file
+     * @param urls set of urls stored
+     */
     public Crawler(String input, String url, HashSet<String> urls) {
         super(input, url, urls);
     }
 
-
+    /**
+     * overriden function for going through srcset style html attribute
+     * @param srcsets Elements with srcset sources
+     * @throws UnsupportedEncodingException If links are encoded incorrectly
+     * @throws MalformedURLException If Urls are formed incorrectly
+     * @throws URISyntaxException Syntax errors while building URI
+     */
     public void parseSrcSet(Elements srcsets) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
         HashSet<String> links = getUrls();
         String current = getUrl();
