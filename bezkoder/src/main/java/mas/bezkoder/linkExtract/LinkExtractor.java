@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 
 public abstract class LinkExtractor implements HTMLExtractor, CSSExtractor {
     private static final String CSSRegex = "url\\((.*?)\\)";
-    private static final String htmlTag = "<(?!!)(?!/)\\s*([a-zA-Z0-9]+)(.*?)>";
+//    private static final String htmlTag = "<(?!!)(?!/)\\s*([a-zA-Z0-9]+)(.*?)>";
     private static final String client = "http://118.67.133.84:8085/api/websites?web=";
     private static final String otherRegex = "https?://([^{}<>\"'\\s)]*)";
     private static final String style ="<style([\\s\\S]+?)</style>";
@@ -28,7 +28,7 @@ public abstract class LinkExtractor implements HTMLExtractor, CSSExtractor {
     private String input;
     private int depth;
 
-    public LinkExtractor(String url, HashSet hs, int depth) {
+    public LinkExtractor(String url, HashSet<String> hs, int depth) {
         this.url = url;
         this.urls = hs;
         this.depth = depth;
@@ -39,7 +39,7 @@ public abstract class LinkExtractor implements HTMLExtractor, CSSExtractor {
         this.document = document;
     }
 
-    public LinkExtractor(String input, String url, HashSet urls) {
+    public LinkExtractor(String input, String url, HashSet<String> urls) {
         this.input = input;
         this.url = url;
         this.urls = urls;
@@ -149,8 +149,7 @@ public abstract class LinkExtractor implements HTMLExtractor, CSSExtractor {
             URI link = new URI(title);
             for (int i = 0; i <= back; i++) {
                 if (link.getPath().length() <= 1) continue;
-                URI parent = link.getPath().endsWith("/") ? link.resolve("..") : link.resolve(".");
-                link = parent;
+                link = link.getPath().endsWith("/") ? link.resolve("..") : link.resolve(".");
             }
             newUrl = link.toString() + url.substring(3 * count);
         } else {
