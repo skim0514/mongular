@@ -1,5 +1,6 @@
 package mas.bezkoder.parser;
 
+import mas.bezkoder.linkExtract.LinkExtractor;
 import mas.bezkoder.model.Tutorial;
 import org.json.JSONException;
 import org.jsoup.Jsoup;
@@ -21,10 +22,18 @@ public class Parser extends LinkExtractor {
     private static final String CSSRegex = "url\\((.*?)\\)";
     private static final String htmlTag = "<(?!!)(?!/)\\s*([a-zA-Z0-9]+)(.*?)>";
     private static final String otherRegex = "https?://([^{}<>\"'\\s)]*)";
-    private static final String style ="<style([\\s\\S]+?)</style>";
 
+    /**
+     * constructor to build Parser object for each individual website
+     * @param document current jsoup document to parse
+     * @param tutorial information about document
+     */
     public Parser(Document document, Tutorial tutorial) {
         super(document, tutorial);
+    }
+
+    public Parser(String input, Tutorial tutorial) {
+        super(input, tutorial);
     }
 
     /**
@@ -43,6 +52,15 @@ public class Parser extends LinkExtractor {
         return parser.getInput();
     }
 
+    /**
+     * helper function for srcset Parser
+     * @param hold URls holding all srcsets
+     * @param tutorial information about current website
+     * @return new srcset style html attribute
+     * @throws UnsupportedEncodingException badly encoded url
+     * @throws URISyntaxException incorrect url syntax
+     * @throws MalformedURLException badly formed url
+     */
     public static String setHelp(String hold, Tutorial tutorial) throws UnsupportedEncodingException, URISyntaxException, MalformedURLException {
         String rs = hold;
         String[] strings;
@@ -92,21 +110,23 @@ public class Parser extends LinkExtractor {
      * @throws URISyntaxException if url is unusual
      */
 
-    public static String parseCss(String input, Tutorial tutorial) throws IOException, URISyntaxException {
-        Pattern pattern = Pattern.compile(CSSRegex, Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(input);
-        while (matcher.find()) {
-            String group = matcher.group(1);
-            group = group.replaceAll("\"", "");
-            group = group.replaceAll("'", "");
-            if (group.startsWith("data:")) continue;
-            if (group.contains(client)) continue;
-            String newUrl = client + java.net.URLEncoder.encode(replaceUrl(group, tutorial.getTitle()), StandardCharsets.UTF_8.name());
-            input = input.replace(group, newUrl);
-        }
-
-        input = otherRegex(input, tutorial);
-        return input;
+    public static String parseCssDoc(String input, Tutorial tutorial) throws IOException, URISyntaxException {
+        Parser cssParser = new Parser(input, tutorial);
+        cssParser.extractCSS();
+//        Pattern pattern = Pattern.compile(CSSRegex, Pattern.CASE_INSENSITIVE);
+//        Matcher matcher = pattern.matcher(input);
+//        while (matcher.find()) {
+//            String group = matcher.group(1);
+//            group = group.replaceAll("\"", "");
+//            group = group.replaceAll("'", "");
+//            if (group.startsWith("data:")) continue;
+//            if (group.contains(client)) continue;
+//            String newUrl = client + java.net.URLEncoder.encode(replaceUrl(group, tutorial.getTitle()), StandardCharsets.UTF_8.name());
+//            input = input.replace(group, newUrl);
+//        }
+//
+//        input = otherRegex(input, tutorial);
+        return cssParser.getInput();
     }
 
     /**
@@ -118,8 +138,6 @@ public class Parser extends LinkExtractor {
      * @throws URISyntaxException if urls to parse is unusual
      */
     public static String parseJs(String input, Tutorial tutorial) throws UnsupportedEncodingException, URISyntaxException, MalformedURLException {
-//        input = input.replace("window.location", "");
-
         return otherRegex(input, tutorial);
     }
 
@@ -134,78 +152,9 @@ public class Parser extends LinkExtractor {
 
     public static String parseFile(String input, Tutorial tutorial) throws URISyntaxException, IOException, JSONException {
         if (tutorial.getFiletype().equals("html")) return parseHtml(input, tutorial);
-        else if (tutorial.getFiletype().equals("css")) return parseCss(input, tutorial);
+        else if (tutorial.getFiletype().equals("css")) return parseCssDoc(input, tutorial);
         else if (tutorial.getFiletype().equals("js")) return parseJs(input, tutorial);
         return input;
-    }
-
-    /**
-     * helper function to take url and accordingly change based on file info
-     * @param url input url
-     * @param string full url
-     * @return new url
-     * @throws URISyntaxException if input string is incorrectly built
-     */
-
-    public static String replaceUrl(String url, String string) throws URISyntaxException, MalformedURLException {
-        if (url.contains(client)) return url;
-        String strFind = "../";
-        int count = 0, fromIndex = 0;
-        while ((fromIndex = url.indexOf(strFind, fromIndex)) != -1 ){
-            count++;
-            fromIndex++;
-        }
-        String newUrl;
-
-        //fixing paths
-        newUrl = getUrlFromPath(url, string, count);
-        return newUrl;
-    }
-
-    /**
-     * analyze and change url based on relative path
-     * @param url input path
-     * @param title information to adjust url
-     * @param count number of backtracks
-     * @return full absolute path
-     * @throws URISyntaxException for incorrectly built urls
-     */
-
-    public static String getUrlFromPath(String url, String title, int count) throws URISyntaxException, MalformedURLException {
-        String newUrl;
-        String domain = new URL(title).getHost();
-        if (url.startsWith("http")) {
-            newUrl = url;
-        } else if (url.startsWith("#")) {
-            URL store = new URL(title);
-            if (store.getRef() == null) newUrl = title + url;
-            else newUrl = title.replace("#" + store.getRef(), "") + url;
-        } else if (url.startsWith("//")) {
-            newUrl = "http:" + url;
-        } else if (url.startsWith("/")) {
-            URI link = new URI(title);
-            newUrl = link.getScheme() + "://" + domain + url;
-        } else if (url.startsWith("./")) {
-            URI parent = new URI(title);
-            parent = parent.resolve(".");
-            newUrl = parent.toString().endsWith("/") ? parent.toString() + url.substring(2) :
-                    parent.toString() + "/" + url.substring(2);
-        } else if (url.startsWith("../")) {
-            int back = count;
-            if (title.endsWith("/")) back --;
-            URI link = new URI(title);
-            for (int i = 0; i <= back; i++) {
-                URI parent = link.getPath().endsWith("/") ? link.resolve("..") : link.resolve(".");
-                link = parent;
-            }
-            newUrl = link.toString() + url.substring(3 * count);
-        } else {
-            URI parent = new URI(title);
-            parent = parent.resolve(".");
-            newUrl = parent.toString().endsWith("/") ? parent.toString() + url :
-                    parent.toString() + "/" + url;
-        }
-        return newUrl;
     }
 
     /**
@@ -240,6 +189,13 @@ public class Parser extends LinkExtractor {
         }
     }
 
+    /**
+     * implementation of parseBackground for LinkExtractor
+     * @param background background elements to replace for old htmls
+     * @throws UnsupportedEncodingException if encoding is unusual
+     * @throws MalformedURLException if url is unusual
+     * @throws URISyntaxException incorrectly built url
+     */
     public void parseBackground(Elements background) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
         if (background == null) return;
         for (Element b : background) {
@@ -266,10 +222,10 @@ public class Parser extends LinkExtractor {
 
     /**
      * implementation of parseHref for A-links which redirect
-     * @param hrefs
-     * @throws IOException
-     * @throws URISyntaxException
-     * @throws JSONException
+     * @param hrefs links that redirect to another page
+     * @throws IOException errors happening while replacing url
+     * @throws URISyntaxException issues in building url
+     * @throws JSONException issues while retrieving file information
      */
     public void parseALink(Elements hrefs) throws IOException, URISyntaxException, JSONException {
         if (hrefs == null) return;
@@ -278,25 +234,47 @@ public class Parser extends LinkExtractor {
             href.attr("href", client + java.net.URLEncoder.encode(replaceUrl(hold, getTutorial().getTitle()), StandardCharsets.UTF_8.name()));
         }
     }
+
+    /**
+     * implementation of style tags which having different sources connected
+     * @param style links from html embedded css
+     * @throws IOException errors happening while replacing url
+     * @throws URISyntaxException issues in building url
+     * @throws JSONException issues while retrieving file information
+     */
     public void parseStyle(Elements style) throws JSONException, IOException, URISyntaxException {
         if (style == null) return;
         for (Element css: style) {
             String hold = css.attr("style");
-            String replace = parseCss(hold, getTutorial());
+            String replace = parseCssDoc(hold, getTutorial());
             css.attr("style", replace);
         }
     }
-    public void parseOtherStyle(Matcher matcher) throws JSONException, IOException, URISyntaxException {
+
+    /**
+     * implementation of other format of css embedded in html
+     * @param matcher urls retrieved using regex
+     * @throws IOException errors happening while replacing url
+     * @throws URISyntaxException issues in building url
+     */
+    public void parseOtherStyle(Matcher matcher) throws IOException, URISyntaxException {
         if (matcher == null) return;
         String input = getInput();
         while (matcher.find()) {
             String group = matcher.group(0);
-            group = parseCss(group, getTutorial());
+            group = parseCssDoc(group, getTutorial());
             input = input.replace(matcher.group(0), group);
         }
         setInput(input);
     }
 
+    /**
+     * parser for other urls that can be placed in css, including js
+     * @param matcher urls retrieved using regex
+     * @throws UnsupportedEncodingException badly encoded url
+     * @throws MalformedURLException badly formed urls
+     * @throws URISyntaxException error parsing url
+     */
     public void parseOther(Matcher matcher) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
         if (matcher == null) return;
         String input = getInput();
@@ -308,18 +286,24 @@ public class Parser extends LinkExtractor {
         setInput(input);
     }
 
-    public static void main (String[] args) throws IOException, URISyntaxException, JSONException {
-        String url = "http://bcbm4y7yusdxthg3.onion/index.php";
-        Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
-        Document document = Jsoup.connect(url).proxy(webProxy).get();
-        Elements elements = document.select("[background]");
-        for (Element b : elements) {
-            String slink = b.attr("background");
-            if (!slink.startsWith("data:image")) {
-                slink = Parser.replaceUrl(slink, url);
-                System.out.println(slink);
-            }
+    public void parseCSS(Matcher matcher) throws MalformedURLException, URISyntaxException, UnsupportedEncodingException {
+        String input = getInput();
+        while (matcher.find()) {
+            String group = matcher.group(1);
+            group = group.replaceAll("\"", "");
+            group = group.replaceAll("'", "");
+            if (group.startsWith("data:")) continue;
+            if (group.contains(client)) continue;
+            String newUrl = client + java.net.URLEncoder.encode(replaceUrl(group, getTutorial().getTitle()), StandardCharsets.UTF_8.name());
+            input = input.replace(group, newUrl);
         }
+        setInput(input);
+    }
+
+    public static void main (String[] args) throws IOException, URISyntaxException, JSONException {
+        String url = "http://bcbm4y7yusdxthg3.onion/";
+        URI uri = new URI(url);
+        System.out.println(replaceUrl("./okay", url));
 
     }
 }
