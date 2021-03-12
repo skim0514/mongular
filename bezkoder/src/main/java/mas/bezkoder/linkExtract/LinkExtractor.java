@@ -171,7 +171,6 @@ public abstract class LinkExtractor implements HTMLExtractor, CSSExtractor {
     public abstract void parseStyle(Elements style) throws JSONException, IOException, URISyntaxException;
     public abstract void parseOtherStyle(Matcher matcher) throws JSONException, IOException, URISyntaxException;
     public abstract void parseOther(Matcher matcher) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException;
-
     public abstract void parseCSS(Matcher matcher) throws MalformedURLException, URISyntaxException, UnsupportedEncodingException;
 
     public String getUrl() {
