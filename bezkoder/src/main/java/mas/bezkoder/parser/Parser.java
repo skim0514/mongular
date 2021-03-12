@@ -236,17 +236,10 @@ public class Parser extends LinkExtractor {
     }
 
     public static void main (String[] args) throws IOException, URISyntaxException, JSONException {
-        String url = "http://bcbm4y7yusdxthg3.onion/index.php";
+        String url = "https://freehacks.io/";
         Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
-        Document document = Jsoup.connect(url).proxy(webProxy).get();
-        Elements elements = document.select("[background]");
-        for (Element b : elements) {
-            String slink = b.attr("background");
-            if (!slink.startsWith("data:image")) {
-                slink = replaceUrl(slink, url);
-                System.out.println(slink);
-            }
-        }
+        Document document = Jsoup.connect(url).get();
+        System.out.println(document.toString());
 
     }
 }

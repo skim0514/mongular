@@ -152,8 +152,16 @@ public class Crawler extends LinkExtractor {
             crawler.extractHtml();
             return crawler.getUrls();
         } catch (Exception ex) {
-            System.err.println("For '" + URL + "': " + ex.getMessage());
-            return null;
+            try {
+                Document document = Jsoup.connect(URL).proxy(webProxy).get();
+                crawler.setDocument(document);
+                crawler.extractHtml();
+                return crawler.getUrls();
+            } catch (Exception e) {
+                System.err.println("For '" + URL + "': " + ex.getMessage() + e.getMessage());
+                return null;
+            }
+
         }
     }
     /**
@@ -164,8 +172,18 @@ public class Crawler extends LinkExtractor {
      * @throws IOException for issues in url or fileName
      */
     public static boolean downloadFile(String url, String fileName) throws IOException {
-        HttpURLConnection webProxyConnection
-                = (HttpURLConnection) new URL(url).openConnection(webProxy);
+        HttpURLConnection webProxyConnection;
+        try {
+            webProxyConnection
+                    = (HttpURLConnection) new URL(url).openConnection(webProxy);
+        } catch (Exception e) {
+            try {
+                webProxyConnection = (HttpURLConnection) new URL(url).openConnection();
+            } catch (Exception ex) {
+                System.out.println(e.getMessage() + ex.getMessage());
+                return false;
+            }
+        }
 
         ReadableByteChannel readChannel;
 //        try {
@@ -254,8 +272,13 @@ public class Crawler extends LinkExtractor {
 //            connection = (HttpURLConnection) url.openConnection();
             connection = (HttpURLConnection) url.openConnection(webProxy);
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            try {
+                connection = (HttpURLConnection) url.openConnection();
+            } catch (Exception ex) {
+                e.printStackTrace();
+                ex.printStackTrace();
+                return null;
+            }
         }
         try {
             return connection.getContentType();
