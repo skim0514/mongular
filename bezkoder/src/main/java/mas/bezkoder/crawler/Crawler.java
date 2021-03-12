@@ -50,7 +50,7 @@ public class Crawler extends LinkExtractor {
             String[] strings = hold.split(", ");
             for (String s: strings) {
                 String[] urls = s.split(" ");
-                String newurl = Parser.replaceUrl(urls[0], current);
+                String newurl = replaceUrl(urls[0], current);
                 links.add(newurl);
                 System.out.println(">> Depth: " + getDepth() + " [" + newurl + "]");
             }
@@ -64,7 +64,7 @@ public class Crawler extends LinkExtractor {
         for (Element s : src) {
             String slink = s.attr("src");
             if (!slink.startsWith("data:image")) {
-                slink = Parser.replaceUrl(slink, current);
+                slink = replaceUrl(slink, current);
                 links.add(slink);
                 System.out.println(">> Depth: " + getDepth() + " [" + slink + "]");
             }
@@ -78,7 +78,7 @@ public class Crawler extends LinkExtractor {
         for (Element b : background) {
             String blink = b.attr("background");
             if (!blink.startsWith("data:image")) {
-                blink = Parser.replaceUrl(blink, current);
+                blink = replaceUrl(blink, current);
                 links.add(blink);
                 System.out.println(">> Depth: " + getDepth() + " [" + blink + "]");
             }
@@ -93,7 +93,7 @@ public class Crawler extends LinkExtractor {
         String current = getUrl();
         for (Element l : link) {
             String llink = l.attr("href");
-            llink = Parser.replaceUrl(llink, current);
+            llink = replaceUrl(llink, current);
             links.add(llink);
             System.out.println(">> Depth: " + getDepth() + " [" + llink + "]");
         }
@@ -134,7 +134,7 @@ public class Crawler extends LinkExtractor {
         String current = getUrl();
         for (Element page : hrefs) {
             String alink = page.attr("href");
-            alink = Parser.replaceUrl(alink, current);
+            alink = replaceUrl(alink, current);
             if(!alink.contains(this.domain)) continue;
             if(links.contains(alink)) continue;
             HashSet<String> hold = getPageLinks(alink, this.domain, getDepth() + 1);
@@ -340,7 +340,7 @@ public class Crawler extends LinkExtractor {
             group = group.replaceAll("\"", "");
             group = group.replaceAll("'", "");
             if (group.startsWith("data:")) continue;
-            String newUrl = Parser.replaceUrl(group, string);
+            String newUrl = replaceUrl(group, string);
             hs.add(newUrl);
         }
         pattern = Pattern.compile(otherRegex);
@@ -348,7 +348,7 @@ public class Crawler extends LinkExtractor {
         while (matcher.find()) {
             String group = matcher.group(0);
             if (group.startsWith("data:")) continue;
-            String newUrl = Parser.replaceUrl(group, string);
+            String newUrl = replaceUrl(group, string);
             hs.add(newUrl);
         }
         return hs;
@@ -456,7 +456,7 @@ public class Crawler extends LinkExtractor {
         Matcher matcher = pattern.matcher(content);
         while (matcher.find()) {
             String group = matcher.group(0);
-            String newUrl = Parser.replaceUrl(group, string);
+            String newUrl = replaceUrl(group, string);
             hs.add(newUrl);
         }
         return hs;

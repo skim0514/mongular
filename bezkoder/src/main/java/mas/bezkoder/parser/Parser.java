@@ -140,75 +140,6 @@ public class Parser extends LinkExtractor {
     }
 
     /**
-     * helper function to take url and accordingly change based on file info
-     * @param url input url
-     * @param string full url
-     * @return new url
-     * @throws URISyntaxException if input string is incorrectly built
-     */
-
-    public static String replaceUrl(String url, String string) throws URISyntaxException, MalformedURLException {
-        if (url.contains(client)) return url;
-        String strFind = "../";
-        int count = 0, fromIndex = 0;
-        while ((fromIndex = url.indexOf(strFind, fromIndex)) != -1 ){
-            count++;
-            fromIndex++;
-        }
-        String newUrl;
-
-        //fixing paths
-        newUrl = getUrlFromPath(url, string, count);
-        return newUrl;
-    }
-
-    /**
-     * analyze and change url based on relative path
-     * @param url input path
-     * @param title information to adjust url
-     * @param count number of backtracks
-     * @return full absolute path
-     * @throws URISyntaxException for incorrectly built urls
-     */
-
-    public static String getUrlFromPath(String url, String title, int count) throws URISyntaxException, MalformedURLException {
-        String newUrl;
-        String domain = new URL(title).getHost();
-        if (url.startsWith("http")) {
-            newUrl = url;
-        } else if (url.startsWith("#")) {
-            URL store = new URL(title);
-            if (store.getRef() == null) newUrl = title + url;
-            else newUrl = title.replace("#" + store.getRef(), "") + url;
-        } else if (url.startsWith("//")) {
-            newUrl = "http:" + url;
-        } else if (url.startsWith("/")) {
-            URI link = new URI(title);
-            newUrl = link.getScheme() + "://" + domain + url;
-        } else if (url.startsWith("./")) {
-            URI parent = new URI(title);
-            parent = parent.resolve(".");
-            newUrl = parent.toString().endsWith("/") ? parent.toString() + url.substring(2) :
-                    parent.toString() + "/" + url.substring(2);
-        } else if (url.startsWith("../")) {
-            int back = count;
-            if (title.endsWith("/")) back --;
-            URI link = new URI(title);
-            for (int i = 0; i <= back; i++) {
-                URI parent = link.getPath().endsWith("/") ? link.resolve("..") : link.resolve(".");
-                link = parent;
-            }
-            newUrl = link.toString() + url.substring(3 * count);
-        } else {
-            URI parent = new URI(title);
-            parent = parent.resolve(".");
-            newUrl = parent.toString().endsWith("/") ? parent.toString() + url :
-                    parent.toString() + "/" + url;
-        }
-        return newUrl;
-    }
-
-    /**
      * implementation of LinkExtractor abstract func
      * @param srcSets elements to replace
      * @throws UnsupportedEncodingException if encoding is unusual
@@ -316,7 +247,7 @@ public class Parser extends LinkExtractor {
         for (Element b : elements) {
             String slink = b.attr("background");
             if (!slink.startsWith("data:image")) {
-                slink = Parser.replaceUrl(slink, url);
+                slink = replaceUrl(slink, url);
                 System.out.println(slink);
             }
         }
