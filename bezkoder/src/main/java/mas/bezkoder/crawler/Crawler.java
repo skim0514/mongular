@@ -1,7 +1,6 @@
 package mas.bezkoder.crawler;
 
-import mas.bezkoder.parser.LinkExtractor;
-import mas.bezkoder.parser.Parser;
+import mas.bezkoder.linkExtract.LinkExtractor;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -24,24 +23,47 @@ import java.util.regex.Pattern;
 public class Crawler extends LinkExtractor {
 
     private static final int MAX_DEPTH = 2;
-    private static final String CSSRegex = "url\\((.*?)\\)";
     private static final String otherRegex = "https?://([^{}<>\"'\\s)]*)";
-    private static final String htmlTag = "<(?!!)(?!/)\\s*([a-zA-Z0-9]+)(.*?)>";
     private static final Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
-    private static final String style ="<style([\\s\\S]+?)</style>";
     private String domain;
 
-    public Crawler(String domain, int depth) {
-        super(domain, new HashSet<>(), depth);
+    /**
+     * Constructor for HTML crawler
+     * @param domain website/domain to crawl
+     */
+    public Crawler(String domain) {
+        super(domain, new HashSet<>(), 0);
         this.domain = domain;
     }
 
+    /**
+     * Normal constructor for HTML crawler
+     * @param url website to crawl
+     * @param domain domain of website
+     * @param depth current depth of crawl
+     */
     public Crawler(String url, String domain, int depth) {
         super(url, new HashSet<>(), depth);
         this.domain = domain;
     }
 
+    /**
+     * contructor used for css crawling
+     * @param input style text
+     * @param url current url of file
+     * @param urls set of urls stored
+     */
+    public Crawler(String input, String url, HashSet<String> urls) {
+        super(input, url, urls);
+    }
 
+    /**
+     * overriden function for going through srcset style html attribute
+     * @param srcsets Elements with srcset sources
+     * @throws UnsupportedEncodingException If links are encoded incorrectly
+     * @throws MalformedURLException If Urls are formed incorrectly
+     * @throws URISyntaxException Syntax errors while building URI
+     */
     public void parseSrcSet(Elements srcsets) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
         HashSet<String> links = getUrls();
         String current = getUrl();
@@ -50,7 +72,7 @@ public class Crawler extends LinkExtractor {
             String[] strings = hold.split(", ");
             for (String s: strings) {
                 String[] urls = s.split(" ");
-                String newurl = Parser.replaceUrl(urls[0], current);
+                String newurl = replaceUrl(urls[0], current);
                 links.add(newurl);
                 System.out.println(">> Depth: " + getDepth() + " [" + newurl + "]");
             }
@@ -64,7 +86,7 @@ public class Crawler extends LinkExtractor {
         for (Element s : src) {
             String slink = s.attr("src");
             if (!slink.startsWith("data:image")) {
-                slink = Parser.replaceUrl(slink, current);
+                slink = replaceUrl(slink, current);
                 links.add(slink);
                 System.out.println(">> Depth: " + getDepth() + " [" + slink + "]");
             }
@@ -78,7 +100,7 @@ public class Crawler extends LinkExtractor {
         for (Element b : background) {
             String blink = b.attr("background");
             if (!blink.startsWith("data:image")) {
-                blink = Parser.replaceUrl(blink, current);
+                blink = replaceUrl(blink, current);
                 links.add(blink);
                 System.out.println(">> Depth: " + getDepth() + " [" + blink + "]");
             }
@@ -86,14 +108,12 @@ public class Crawler extends LinkExtractor {
         setUrls(links);
     }
 
-
-
     public void parseLinkLink(Elements link) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
         HashSet<String> links = getUrls();
         String current = getUrl();
         for (Element l : link) {
             String llink = l.attr("href");
-            llink = Parser.replaceUrl(llink, current);
+            llink = replaceUrl(llink, current);
             links.add(llink);
             System.out.println(">> Depth: " + getDepth() + " [" + llink + "]");
         }
@@ -129,12 +149,26 @@ public class Crawler extends LinkExtractor {
         setUrls(links);
     }
 
-    public void parseALink(Elements hrefs) throws IOException, URISyntaxException, JSONException {
+    public void parseCSS(Matcher matcher) throws MalformedURLException, URISyntaxException {
+        HashSet<String> links = getUrls();
+        String current = getUrl();
+        while (matcher.find()) {
+            String group = matcher.group(1);
+            group = group.replaceAll("\"", "");
+            group = group.replaceAll("'", "");
+            if (group.startsWith("data:")) continue;
+            String newUrl = replaceUrl(group, current);
+            links.add(newUrl);
+        }
+        setUrls(links);
+    }
+
+    public void parseALink(Elements hrefs) throws IOException, URISyntaxException {
         HashSet<String> links = getUrls();
         String current = getUrl();
         for (Element page : hrefs) {
             String alink = page.attr("href");
-            alink = Parser.replaceUrl(alink, current);
+            alink = replaceUrl(alink, current);
             if(!alink.contains(this.domain)) continue;
             if(links.contains(alink)) continue;
             HashSet<String> hold = getPageLinks(alink, this.domain, getDepth() + 1);
@@ -143,7 +177,7 @@ public class Crawler extends LinkExtractor {
         setUrls(links);
     }
 
-    public static HashSet<String> getPageLinks(String URL, String domain, int depth) throws JSONException, IOException, URISyntaxException {
+    public static HashSet<String> getPageLinks(String URL, String domain, int depth) {
         if (depth == MAX_DEPTH) return null;
         Crawler crawler = new Crawler(URL, domain, depth);
         HashSet<String> hs = crawler.getUrls();
@@ -159,6 +193,22 @@ public class Crawler extends LinkExtractor {
             return null;
         }
     }
+
+    /**
+     * searches css for urls
+     * @param input input css string
+     * @param string our given domain for our website
+     * @return hashset of urls that are in the css
+     * @throws IOException issues with our url information.
+     * @throws URISyntaxException badly built url
+     * @throws JSONException issues building tutorial of website link
+     */
+    public static HashSet<String> searchCss(String input, String string) throws IOException, URISyntaxException, JSONException {
+        Crawler cssCrawler = new Crawler(input, string, new HashSet<>());
+        cssCrawler.extractCSS();
+        return cssCrawler.getUrls();
+    }
+
     /**
      * downloads file with given URL
      * @param url url of file to download
@@ -225,7 +275,7 @@ public class Crawler extends LinkExtractor {
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(http.getInputStream()));
         String inputLine;
-        StringBuffer content = new StringBuffer();
+        StringBuilder content = new StringBuilder();
         while ((inputLine = in.readLine()) != null) {
             content.append(inputLine);
         }
@@ -242,9 +292,8 @@ public class Crawler extends LinkExtractor {
      * get content type by connecting to url
      * @param link link of file to get contentType for
      * @return content type information
-     * @throws IOException issues with our URLr
      */
-    public static String getContentType(String link) throws IOException {
+    public static String getContentType(String link) {
         URL url;
         try {
             url = new URL(link);
@@ -323,38 +372,6 @@ public class Crawler extends LinkExtractor {
     }
 
     /**
-     * searches css for urls
-     * @param input input css string
-     * @param string our given domain for our website
-     * @return hashset of urls that are in the css
-     * @throws IOException issues with our url information.
-     * @throws URISyntaxException badly built url
-     * @throws JSONException issues building tutorial of website link
-     */
-    public static HashSet<String> searchCss(String input, String string) throws IOException, URISyntaxException, JSONException {
-        HashSet<String> hs = new HashSet<>();
-        Pattern pattern = Pattern.compile(CSSRegex);
-        Matcher matcher = pattern.matcher(input);
-        while (matcher.find()) {
-            String group = matcher.group(1);
-            group = group.replaceAll("\"", "");
-            group = group.replaceAll("'", "");
-            if (group.startsWith("data:")) continue;
-            String newUrl = Parser.replaceUrl(group, string);
-            hs.add(newUrl);
-        }
-        pattern = Pattern.compile(otherRegex);
-        matcher = pattern.matcher(input);
-        while (matcher.find()) {
-            String group = matcher.group(0);
-            if (group.startsWith("data:")) continue;
-            String newUrl = Parser.replaceUrl(group, string);
-            hs.add(newUrl);
-        }
-        return hs;
-    }
-
-    /**
      * main caller function
      * @param url url of website to start at
      * @throws JSONException issues building tutorials
@@ -362,9 +379,8 @@ public class Crawler extends LinkExtractor {
      * @throws IOException issues with url
      */
     public static void crawlSite(String url) throws JSONException, URISyntaxException, IOException {
-        String start = url;
-        String startDomain = new URL(start).getHost();
-        HashSet<String> hs = getPageLinks(start, startDomain, 0);
+        String startDomain = new URL(url).getHost();
+        HashSet<String> hs = getPageLinks(url, startDomain, 0);
         HashSet<String> otherLinks = new HashSet<>();
         int count = 1;
         if (hs == null) return;
@@ -456,7 +472,7 @@ public class Crawler extends LinkExtractor {
         Matcher matcher = pattern.matcher(content);
         while (matcher.find()) {
             String group = matcher.group(0);
-            String newUrl = Parser.replaceUrl(group, string);
+            String newUrl = replaceUrl(group, string);
             hs.add(newUrl);
         }
         return hs;
@@ -465,8 +481,6 @@ public class Crawler extends LinkExtractor {
     public static void main(String args[]) throws IOException, JSONException, URISyntaxException {
 //        HashSet<String> links = getPageLinks("http://crdclub4wraumez4.onion/", "crdclub4wraumez4.onion", 0);
 //        System.out.println(links.size());
-
-
         crawlSite(args[0]);
     }
 
