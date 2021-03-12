@@ -19,9 +19,7 @@ public class Parser extends LinkExtractor {
 //    private static final String client = "http://localhost:8085/api/websites?web=";
     private static final String client = "http://118.67.133.84:8085/api/websites?web=";
     private static final String CSSRegex = "url\\((.*?)\\)";
-    private static final String htmlTag = "<(?!!)(?!/)\\s*([a-zA-Z0-9]+)(.*?)>";
     private static final String otherRegex = "https?://([^{}<>\"'\\s)]*)";
-    private static final String style ="<style([\\s\\S]+?)</style>";
 
     public Parser(Document document, Tutorial tutorial) {
         super(document, tutorial);
@@ -133,9 +131,14 @@ public class Parser extends LinkExtractor {
      */
 
     public static String parseFile(String input, Tutorial tutorial) throws URISyntaxException, IOException, JSONException {
-        if (tutorial.getFiletype().equals("html")) return parseHtml(input, tutorial);
-        else if (tutorial.getFiletype().equals("css")) return parseCss(input, tutorial);
-        else if (tutorial.getFiletype().equals("js")) return parseJs(input, tutorial);
+        switch (tutorial.getFiletype()) {
+            case "html":
+                return parseHtml(input, tutorial);
+            case "css":
+                return parseCss(input, tutorial);
+            case "js":
+                return parseJs(input, tutorial);
+        }
         return input;
     }
 
@@ -195,14 +198,7 @@ public class Parser extends LinkExtractor {
         }
     }
 
-    /**
-     * implementation of parseHref for A-links which redirect
-     * @param hrefs
-     * @throws IOException
-     * @throws URISyntaxException
-     * @throws JSONException
-     */
-    public void parseALink(Elements hrefs) throws IOException, URISyntaxException, JSONException {
+    public void parseALink(Elements hrefs) throws IOException, URISyntaxException {
         if (hrefs == null) return;
         for (Element href : hrefs) {
             String hold = href.attr("href");
@@ -217,7 +213,7 @@ public class Parser extends LinkExtractor {
             css.attr("style", replace);
         }
     }
-    public void parseOtherStyle(Matcher matcher) throws JSONException, IOException, URISyntaxException {
+    public void parseOtherStyle(Matcher matcher) throws IOException, URISyntaxException {
         if (matcher == null) return;
         String input = getInput();
         while (matcher.find()) {

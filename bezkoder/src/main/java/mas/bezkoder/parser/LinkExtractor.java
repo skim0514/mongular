@@ -2,7 +2,6 @@ package mas.bezkoder.parser;
 
 import mas.bezkoder.model.Tutorial;
 import org.json.JSONException;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
@@ -16,12 +15,7 @@ import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static mas.bezkoder.parser.Parser.otherRegex;
-import static mas.bezkoder.parser.Parser.parseCss;
-
 public abstract class LinkExtractor {
-    private static final String CSSRegex = "url\\((.*?)\\)";
-    private static final String htmlTag = "<(?!!)(?!/)\\s*([a-zA-Z0-9]+)(.*?)>";
     private static final String client = "http://118.67.133.84:8085/api/websites?web=";
     private static final String otherRegex = "https?://([^{}<>\"'\\s)]*)";
     private static final String style ="<style([\\s\\S]+?)</style>";
@@ -32,7 +26,7 @@ public abstract class LinkExtractor {
     private String input;
     private int depth;
 
-    public LinkExtractor(String url, HashSet hs, int depth) {
+    public LinkExtractor(String url, HashSet<String> hs, int depth) {
         this.url = url;
         this.urls = hs;
         this.depth = depth;
@@ -178,8 +172,7 @@ public abstract class LinkExtractor {
             URI link = new URI(title);
             for (int i = 0; i <= back; i++) {
                 if (link.getPath().length() <= 1) break;
-                URI parent = link.getPath().endsWith("/") ? link.resolve("..") : link.resolve(".");
-                link = parent;
+                link = link.getPath().endsWith("/") ? link.resolve("..") : link.resolve(".");
             }
             newUrl = link.toString() + url.substring(3 * count);
         } else {
