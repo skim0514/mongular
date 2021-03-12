@@ -124,6 +124,22 @@ public class TutorialController {
     }
   }
 
+  @DeleteMapping("/websites")
+  public ResponseEntity<?> deleteFileFromWebsite(@RequestParam("web") String website) throws IOException, JSONException, URISyntaxException {
+    List<Tutorial> tutorials = new ArrayList<>();
+
+    if (website != null) {
+      tutorialRepository.findByTitleContaining(website).forEach(tutorials::add);
+    }
+    for (Tutorial tutorial: tutorials) {
+      try {
+        deleteTutorial(tutorial.getId());
+      } catch (Exception ignored) {
+      }
+    }
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  }
+
   @GetMapping("/websites")
   public ResponseEntity<?> getFileFromWebsite(@RequestParam("web") String website) throws IOException, URISyntaxException, JSONException {
     String url = "";
