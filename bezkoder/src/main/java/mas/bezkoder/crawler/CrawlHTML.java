@@ -13,7 +13,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 
 import static mas.bezkoder.crawler.CrawlCSS.crawlCSS;
-import static mas.bezkoder.crawler.CrawlMain.searchCss;
 
 public class CrawlHTML extends HTMLExtractor {
     private static final int MAX_DEPTH = 2;
