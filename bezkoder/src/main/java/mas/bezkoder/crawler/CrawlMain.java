@@ -2,8 +2,6 @@ package mas.bezkoder.crawler;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 
 import java.io.*;
 import java.net.*;
@@ -19,7 +17,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static mas.bezkoder.LinkExtractor.LinkExtractor.replaceUrl;
+import static mas.bezkoder.LinkExtractor.HTMLExtractor.replaceUrl;
+import static mas.bezkoder.crawler.CrawlCSS.crawlCSS;
 import static mas.bezkoder.crawler.CrawlHTML.getPageLinks;
 
 public class CrawlMain {
@@ -75,10 +74,7 @@ public class CrawlMain {
                     downloadFile(string, "files/" + id);
                     Path cssFile = Path.of("files/" + id);
                     String content = Files.readString(cssFile);
-                    CrawlCSS css = new CrawlCSS(string, content, new HashSet<>());
-                    css.extractCSS();
-                    HashSet<String> cssLinks = css.getUrls();
-                    otherLinks.addAll(cssLinks);
+                    otherLinks.addAll(crawlCSS(string, content));
                 } catch (IOException | URISyntaxException ignored) {
                 }
             } else if (extension.equals("js")) {

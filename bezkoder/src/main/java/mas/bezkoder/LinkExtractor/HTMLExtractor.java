@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public abstract class LinkExtractor {
+public abstract class HTMLExtractor {
     private static final String client = "http://118.67.133.84:8085/api/websites?web=";
     private static final String otherRegex = "https?://([^{}<>\"'\\s)]*)";
     private static final String style ="<style([\\s\\S]+?)</style>";
@@ -26,13 +26,13 @@ public abstract class LinkExtractor {
     private String input;
     private int depth;
 
-    public LinkExtractor(String url, HashSet<String> hs, int depth) {
+    public HTMLExtractor(String url, HashSet<String> hs, int depth) {
         this.url = url;
         this.urls = hs;
         this.depth = depth;
     }
 
-    public LinkExtractor(Document document, Tutorial tutorial) {
+    public HTMLExtractor(Document document, Tutorial tutorial) {
         this.tutorial = tutorial;
         this.document = document;
     }

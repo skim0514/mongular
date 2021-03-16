@@ -1,6 +1,6 @@
 package mas.bezkoder.crawler;
 
-import mas.bezkoder.LinkExtractor.LinkExtractor;
+import mas.bezkoder.LinkExtractor.HTMLExtractor;
 import org.json.JSONException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -12,9 +12,10 @@ import java.net.*;
 import java.util.*;
 import java.util.regex.Matcher;
 
+import static mas.bezkoder.crawler.CrawlCSS.crawlCSS;
 import static mas.bezkoder.crawler.CrawlMain.searchCss;
 
-public class CrawlHTML extends LinkExtractor {
+public class CrawlHTML extends HTMLExtractor {
     private static final int MAX_DEPTH = 2;
     private static final Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
     private String domain;
@@ -91,7 +92,7 @@ public class CrawlHTML extends LinkExtractor {
         String current = getUrl();
         for (Element css: style) {
             String hold = css.attr("style");
-            links.addAll(searchCss(hold, current));
+            links.addAll(crawlCSS(current, hold));
         }
         setUrls(links);
     }
@@ -101,7 +102,7 @@ public class CrawlHTML extends LinkExtractor {
         String current = getUrl();
         while (matcher.find()) {
             String group = matcher.group(0);
-            links.addAll(searchCss(group, current));
+            links.addAll(crawlCSS(current, group));
         }
         setUrls(links);
     }

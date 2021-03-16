@@ -10,12 +10,18 @@ import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.regex.Matcher;
 
-import static mas.bezkoder.LinkExtractor.LinkExtractor.replaceUrl;
+import static mas.bezkoder.LinkExtractor.HTMLExtractor.replaceUrl;
 
 public class CrawlCSS extends CSSExtractor {
 
     public CrawlCSS(String url, String input, HashSet<String> hs) {
         super(url, input, hs);
+    }
+
+    public static HashSet<String> crawlCSS(String url, String input) throws JSONException, IOException, URISyntaxException {
+        CrawlCSS css = new CrawlCSS(url, input, new HashSet<>());
+        css.extractCSS();
+        return css.getUrls();
     }
 
     @Override
