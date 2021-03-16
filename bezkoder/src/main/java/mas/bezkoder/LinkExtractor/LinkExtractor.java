@@ -1,4 +1,4 @@
-package mas.bezkoder.parser;
+package mas.bezkoder.LinkExtractor;
 
 import mas.bezkoder.model.Tutorial;
 import org.json.JSONException;
