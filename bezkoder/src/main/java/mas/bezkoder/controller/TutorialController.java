@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import mas.bezkoder.crawler.Crawler;
 import mas.bezkoder.parser.Parser;
@@ -201,8 +202,9 @@ public class TutorialController {
       String[] queries = query.split("&");
       int count = 0;
       for (Tutorial t: tutorials) {
+        Set<String> queriesHold = Set.of((new URL(t.getTitle())).getQuery().split("&"));
         for (String q: queries) {
-          if (t.getTitle().contains(q)) count++;
+          if (queriesHold.contains(q)) count++;
         }
         if (count > maxQ) {
           maxTut = t;
