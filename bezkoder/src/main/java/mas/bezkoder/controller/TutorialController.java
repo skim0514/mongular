@@ -3,14 +3,14 @@ package mas.bezkoder.controller;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import mas.bezkoder.crawler.Crawler;
-import mas.bezkoder.parser.Parser;
+import mas.bezkoder.crawler.CrawlMain;
+import mas.bezkoder.parser.ParseMain;
+
 import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import mas.bezkoder.model.Tutorial;
 import mas.bezkoder.repository.TutorialRepository;
 
-//http://118.67.133.84:8085/api/websites?web=https%253A%252F%252Fwww.s2wlab.com%252Fproducts.html
 
 @CrossOrigin(origins = "http://localhost:8085")
 @RestController
@@ -138,7 +137,7 @@ public class TutorialController {
       } catch (IOException e) {
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
       }
-      file = Parser.parseFile(file, tutorial);
+      file = ParseMain.parseFile(file, tutorial);
       byte[] byteArray = file.getBytes(tutorial.getContentEncoding());
       headers.set("content-type", tutorial.getContentType());
       return new ResponseEntity<>(byteArray, headers, HttpStatus.OK);
@@ -243,8 +242,7 @@ public class TutorialController {
 
   @PostMapping("/websites")
   public ResponseEntity<?> postFileFromWebsite(@RequestParam("web") String website) throws IOException, JSONException, URISyntaxException {
-    String[] string = {website};
-    Crawler.main(string);
+    CrawlMain.run(website);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 }

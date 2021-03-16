@@ -1,0 +1,155 @@
+package mas.bezkoder.crawler;
+
+import mas.bezkoder.LinkExtractor.LinkExtractor;
+import org.json.JSONException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.*;
+import java.net.*;
+import java.util.*;
+import java.util.regex.Matcher;
+
+import static mas.bezkoder.crawler.CrawlMain.searchCss;
+
+public class CrawlHTML extends LinkExtractor {
+    private static final int MAX_DEPTH = 2;
+    private static final Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
+    private String domain;
+
+    public CrawlHTML(String domain, int depth) {
+        super(domain, new HashSet<>(), depth);
+        this.domain = domain;
+    }
+
+    public CrawlHTML(String url, String domain, int depth) {
+        super(url, new HashSet<>(), depth);
+        this.domain = domain;
+    }
+
+
+    public void parseSrcSet(Elements srcsets) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+        HashSet<String> links = getUrls();
+        String current = getUrl();
+        for (Element srcset : srcsets) {
+            String hold = srcset.attr("srcset");
+            String[] strings = hold.split(", ");
+            for (String s: strings) {
+                String[] urls = s.split(" ");
+                String newurl = replaceUrl(urls[0], current);
+                links.add(newurl);
+                System.out.println(">> Depth: " + getDepth() + " [" + newurl + "]");
+            }
+        }
+        setUrls(links);
+    }
+
+    public void parseSrc(Elements src) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+        HashSet<String> links = getUrls();
+        String current = getUrl();
+        for (Element s : src) {
+            String slink = s.attr("src");
+            if (!slink.startsWith("data:image")) {
+                slink = replaceUrl(slink, current);
+                links.add(slink);
+                System.out.println(">> Depth: " + getDepth() + " [" + slink + "]");
+            }
+        }
+        setUrls(links);
+    }
+
+    public void parseBackground(Elements background) throws MalformedURLException, URISyntaxException {
+        HashSet<String> links = getUrls();
+        String current = getUrl();
+        for (Element b : background) {
+            String blink = b.attr("background");
+            if (!blink.startsWith("data:image")) {
+                blink = replaceUrl(blink, current);
+                links.add(blink);
+                System.out.println(">> Depth: " + getDepth() + " [" + blink + "]");
+            }
+        }
+        setUrls(links);
+    }
+
+    public void parseLinkLink(Elements link) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+        HashSet<String> links = getUrls();
+        String current = getUrl();
+        for (Element l : link) {
+            String llink = l.attr("href");
+            llink = replaceUrl(llink, current);
+            links.add(llink);
+            System.out.println(">> Depth: " + getDepth() + " [" + llink + "]");
+        }
+        setUrls(links);
+    }
+
+    public void parseStyle(Elements style) throws JSONException, IOException, URISyntaxException {
+        HashSet<String> links = getUrls();
+        String current = getUrl();
+        for (Element css: style) {
+            String hold = css.attr("style");
+            links.addAll(searchCss(hold, current));
+        }
+        setUrls(links);
+    }
+
+    public void parseOtherStyle(Matcher matcher) throws JSONException, IOException, URISyntaxException {
+        HashSet<String> links = getUrls();
+        String current = getUrl();
+        while (matcher.find()) {
+            String group = matcher.group(0);
+            links.addAll(searchCss(group, current));
+        }
+        setUrls(links);
+    }
+
+    public void parseOther(Matcher matcher) {
+        HashSet<String> links = getUrls();
+        while (matcher.find()) {
+            String group = matcher.group(0);
+            links.add(group);
+        }
+        setUrls(links);
+    }
+
+    public void parseALink(Elements hrefs) throws IOException, URISyntaxException{
+        HashSet<String> links = getUrls();
+        String current = getUrl();
+        for (Element page : hrefs) {
+            String alink = page.attr("href");
+            alink = replaceUrl(alink, current);
+            if(!alink.contains(this.domain)) continue;
+            if(links.contains(alink)) continue;
+            HashSet<String> hold = getPageLinks(alink, this.domain, getDepth() + 1);
+            if (hold != null) links.addAll(hold);
+        }
+        setUrls(links);
+    }
+
+
+    public static HashSet<String> getPageLinks(String URL, String domain, int depth) {
+        if (depth == MAX_DEPTH) return null;
+        CrawlHTML crawler = new CrawlHTML(URL, domain, depth);
+        HashSet<String> hs = crawler.getUrls();
+        hs.add(URL);
+        crawler.setUrls(hs);
+        try {
+            Document document = Jsoup.connect(URL).proxy(webProxy).get();
+            crawler.setDocument(document);
+            crawler.extractHtml();
+            return crawler.getUrls();
+        } catch (Exception ex) {
+            System.err.println("For '" + URL + "': " + ex.getMessage());
+            return null;
+        }
+    }
+
+
+
+
+}
+
+
