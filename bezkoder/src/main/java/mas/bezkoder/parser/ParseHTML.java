@@ -15,14 +15,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Parser extends LinkExtractor {
+public class ParseHTML extends LinkExtractor {
 
 //    private static final String client = "http://localhost:8085/api/websites?web=";
     private static final String client = "http://118.67.133.84:8085/api/websites?web=";
     private static final String CSSRegex = "url\\((.*?)\\)";
     private static final String otherRegex = "https?://([^{}<>\"'\\s)]*)";
 
-    public Parser(Document document, Tutorial tutorial) {
+    public ParseHTML(Document document, Tutorial tutorial) {
         super(document, tutorial);
     }
 
@@ -37,7 +37,7 @@ public class Parser extends LinkExtractor {
     public static String parseHtml(String input, Tutorial tutorial) throws IOException, URISyntaxException, JSONException {
 
         Document document = Jsoup.parse(input);
-        Parser parser = new Parser(document, tutorial);
+        ParseHTML parser = new ParseHTML(document, tutorial);
         parser.extractHtml();
         return parser.getInput();
     }
@@ -117,32 +117,7 @@ public class Parser extends LinkExtractor {
      * @throws URISyntaxException if urls to parse is unusual
      */
     public static String parseJs(String input, Tutorial tutorial) throws UnsupportedEncodingException, URISyntaxException, MalformedURLException {
-//        input = input.replace("window.location", "");
-
         return otherRegex(input, tutorial);
-    }
-
-    /**
-     * overall file parsing function
-     * @param input string input of file
-     * @param tutorial file information
-     * @return String of parsed file
-     * @throws URISyntaxException if helper take incorrect urls
-     * @throws IOException if information is missing
-     */
-
-    public static String parseFile(String input, Tutorial tutorial) throws URISyntaxException, IOException, JSONException {
-        switch (tutorial.getFiletype()) {
-            case "html":
-                return parseHtml(input, tutorial);
-            case "css":
-                ParseCSS css = new ParseCSS(input, tutorial);
-                css.extractCSS();
-                return css.getInput();
-            case "js":
-                return parseJs(input, tutorial);
-        }
-        return input;
     }
 
     /**
