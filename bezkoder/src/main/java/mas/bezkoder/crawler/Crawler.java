@@ -1,6 +1,6 @@
 package mas.bezkoder.crawler;
 
-import mas.bezkoder.parser.LinkExtractor;
+import mas.bezkoder.LinkExtractor.LinkExtractor;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -394,7 +394,9 @@ public class Crawler extends LinkExtractor {
                     downloadFile(string, "files/" + id);
                     Path cssFile = Path.of("files/" + id);
                     String content = Files.readString(cssFile);
-                    HashSet<String> cssLinks = searchCss(content, string);
+                    CrawlCSS css = new CrawlCSS(string, content, new HashSet<>());
+                    css.extractCSS();
+                    HashSet<String> cssLinks = css.getUrls();
                     otherLinks.addAll(cssLinks);
                 } catch (IOException | URISyntaxException ignored) {
                 }

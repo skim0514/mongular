@@ -1,5 +1,6 @@
 package mas.bezkoder.parser;
 
+import mas.bezkoder.LinkExtractor.LinkExtractor;
 import mas.bezkoder.model.Tutorial;
 import org.json.JSONException;
 import org.jsoup.Jsoup;
@@ -135,7 +136,9 @@ public class Parser extends LinkExtractor {
             case "html":
                 return parseHtml(input, tutorial);
             case "css":
-                return parseCss(input, tutorial);
+                ParseCSS css = new ParseCSS(input, tutorial);
+                css.extractCSS();
+                return css.getInput();
             case "js":
                 return parseJs(input, tutorial);
         }
