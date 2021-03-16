@@ -15,8 +15,15 @@ import static mas.bezkoder.LinkExtractor.LinkExtractor.replaceUrl;
 
 public class ParseCSS extends CSSExtractor {
     private static final String client = "http://118.67.133.84:8085/api/websites?web=";
+
     public ParseCSS(String input, Tutorial tutorial) {
         super(input, tutorial);
+    }
+
+    public static String parseCSS(String input, Tutorial tutorial) throws JSONException, IOException, URISyntaxException {
+        ParseCSS css = new ParseCSS(input, tutorial);
+        css.extractCSS();
+        return css.getInput();
     }
 
     @Override
