@@ -23,6 +23,7 @@ import mas.bezkoder.model.Tutorial;
 import mas.bezkoder.repository.TutorialRepository;
 
 
+
 @CrossOrigin(origins = "http://localhost:8085")
 @RestController
 @RequestMapping("/api")

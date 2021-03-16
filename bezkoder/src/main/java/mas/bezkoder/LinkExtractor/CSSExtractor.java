@@ -2,28 +2,22 @@ package mas.bezkoder.LinkExtractor;
 
 import mas.bezkoder.model.Tutorial;
 import org.json.JSONException;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class CSSExtractor {
-    private static final String client = "http://118.67.133.84:8085/api/websites?web=";
     private static final String otherRegex = "https?://([^{}<>\"'\\s)]*)";
     private static final String CSSRegex = "url\\((.*?)\\)";
     private String url;
     private HashSet<String> urls;
     private Tutorial tutorial;
     private String input;
-    private int depth;
 
     public CSSExtractor(String input, String url, HashSet<String> hs) {
         this.url = url;
@@ -72,12 +66,6 @@ public abstract class CSSExtractor {
     }
     public void setTutorial(Tutorial tutorial) {
         this.tutorial = tutorial;
-    }
-    public int getDepth() {
-        return depth;
-    }
-    public void setDepth(int depth) {
-        this.depth = depth;
     }
 
 }

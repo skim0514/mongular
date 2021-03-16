@@ -84,32 +84,6 @@ public class ParseHTML extends LinkExtractor {
         return input;
     }
 
-//    /**
-//     * function to parse if document is css
-//     * @param input complete css string
-//     * @param tutorial information of css file
-//     * @return parsed css string
-//     * @throws IOException if file is missing
-//     * @throws URISyntaxException if url is unusual
-//     */
-//
-//    public static String parseCss(String input, Tutorial tutorial) throws IOException, URISyntaxException {
-//        Pattern pattern = Pattern.compile(CSSRegex, Pattern.CASE_INSENSITIVE);
-//        Matcher matcher = pattern.matcher(input);
-//        while (matcher.find()) {
-//            String group = matcher.group(1);
-//            group = group.replaceAll("\"", "");
-//            group = group.replaceAll("'", "");
-//            if (group.startsWith("data:")) continue;
-//            if (group.contains(client)) continue;
-//            String newUrl = client + java.net.URLEncoder.encode(replaceUrl(group, tutorial.getTitle()), StandardCharsets.UTF_8.name());
-//            input = input.replace(group, newUrl);
-//        }
-//
-//        input = otherRegex(input, tutorial);
-//        return input;
-//    }
-
     /**
      * parser if file is javascript
      * @param input full string input document

@@ -27,7 +27,7 @@ public class ParseCSS extends CSSExtractor {
     }
 
     @Override
-    public void parseURL(Matcher matcher) throws JSONException, IOException, URISyntaxException {
+    public void parseURL(Matcher matcher) throws IOException, URISyntaxException {
         String input = getInput();
         Tutorial tutorial = getTutorial();
         while (matcher.find()) {
