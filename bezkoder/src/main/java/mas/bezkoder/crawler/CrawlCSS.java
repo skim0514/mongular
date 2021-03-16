@@ -14,12 +14,12 @@ import static mas.bezkoder.LinkExtractor.HTMLExtractor.replaceUrl;
 
 public class CrawlCSS extends CSSExtractor {
 
-    public CrawlCSS(String url, String input, HashSet<String> hs) {
-        super(url, input, hs);
+    public CrawlCSS(String input, String url, HashSet<String> hs) {
+        super(input, url, hs);
     }
 
-    public static HashSet<String> crawlCSS(String url, String input) throws JSONException, IOException, URISyntaxException {
-        CrawlCSS css = new CrawlCSS(url, input, new HashSet<>());
+    public static HashSet<String> crawlCSS(String input, String url) throws JSONException, IOException, URISyntaxException {
+        CrawlCSS css = new CrawlCSS(input, url, new HashSet<>());
         css.extractCSS();
         return css.getUrls();
     }

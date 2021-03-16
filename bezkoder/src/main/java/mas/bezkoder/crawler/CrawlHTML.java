@@ -91,7 +91,7 @@ public class CrawlHTML extends HTMLExtractor {
         String current = getUrl();
         for (Element css: style) {
             String hold = css.attr("style");
-            links.addAll(crawlCSS(current, hold));
+            links.addAll(crawlCSS(hold, current));
         }
         setUrls(links);
     }
@@ -101,7 +101,7 @@ public class CrawlHTML extends HTMLExtractor {
         String current = getUrl();
         while (matcher.find()) {
             String group = matcher.group(0);
-            links.addAll(crawlCSS(current, group));
+            links.addAll(crawlCSS(group, current));
         }
         setUrls(links);
     }

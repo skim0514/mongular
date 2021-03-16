@@ -74,7 +74,7 @@ public class CrawlMain {
                     downloadFile(string, "files/" + id);
                     Path cssFile = Path.of("files/" + id);
                     String content = Files.readString(cssFile);
-                    otherLinks.addAll(crawlCSS(string, content));
+                    otherLinks.addAll(crawlCSS(content, string));
                 } catch (IOException | URISyntaxException ignored) {
                 }
             } else if (extension.equals("js")) {
