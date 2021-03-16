@@ -6,6 +6,7 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import static mas.bezkoder.parser.ParseCSS.parseCSS;
 import static mas.bezkoder.parser.ParseHTML.parseHtml;
 import static mas.bezkoder.parser.ParseHTML.parseJs;
 
@@ -24,9 +25,7 @@ public class ParseMain {
             case "html":
                 return parseHtml(input, tutorial);
             case "css":
-                ParseCSS css = new ParseCSS(input, tutorial);
-                css.extractCSS();
-                return css.getInput();
+                return parseCSS(input, tutorial);
             case "js":
                 return parseJs(input, tutorial);
         }
