@@ -29,7 +29,7 @@ public class CrawlHTML extends HTMLExtractor {
         this.domain = domain;
     }
 
-
+    @Override
     public void parseSrcSet(Elements srcsets) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
         HashSet<String> links = getUrls();
         String current = getUrl();
@@ -46,6 +46,7 @@ public class CrawlHTML extends HTMLExtractor {
         setUrls(links);
     }
 
+    @Override
     public void parseSrc(Elements src) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
         HashSet<String> links = getUrls();
         String current = getUrl();
@@ -60,6 +61,7 @@ public class CrawlHTML extends HTMLExtractor {
         setUrls(links);
     }
 
+    @Override
     public void parseBackground(Elements background) throws MalformedURLException, URISyntaxException {
         HashSet<String> links = getUrls();
         String current = getUrl();
@@ -74,6 +76,7 @@ public class CrawlHTML extends HTMLExtractor {
         setUrls(links);
     }
 
+    @Override
     public void parseLinkLink(Elements link) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
         HashSet<String> links = getUrls();
         String current = getUrl();
@@ -86,6 +89,7 @@ public class CrawlHTML extends HTMLExtractor {
         setUrls(links);
     }
 
+    @Override
     public void parseStyle(Elements style) throws JSONException, IOException, URISyntaxException {
         HashSet<String> links = getUrls();
         String current = getUrl();
@@ -96,6 +100,7 @@ public class CrawlHTML extends HTMLExtractor {
         setUrls(links);
     }
 
+    @Override
     public void parseOtherStyle(Matcher matcher) throws JSONException, IOException, URISyntaxException {
         HashSet<String> links = getUrls();
         String current = getUrl();
@@ -106,6 +111,7 @@ public class CrawlHTML extends HTMLExtractor {
         setUrls(links);
     }
 
+    @Override
     public void parseOther(Matcher matcher) {
         HashSet<String> links = getUrls();
         while (matcher.find()) {
@@ -115,6 +121,7 @@ public class CrawlHTML extends HTMLExtractor {
         setUrls(links);
     }
 
+    @Override
     public void parseALink(Elements hrefs) throws IOException, URISyntaxException{
         HashSet<String> links = getUrls();
         String current = getUrl();
@@ -128,7 +135,6 @@ public class CrawlHTML extends HTMLExtractor {
         }
         setUrls(links);
     }
-
 
     public static HashSet<String> getPageLinks(String URL, String domain, int depth) {
         if (depth == MAX_DEPTH) return null;

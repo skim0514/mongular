@@ -25,11 +25,12 @@ public class CrawlCSS extends CSSExtractor {
     }
 
     @Override
-    public void parseURL(Matcher matcher) throws JSONException, IOException, URISyntaxException {
+    public void parseURL(Matcher matcher) throws IOException, URISyntaxException {
         String url = getUrl();
         HashSet<String> hs = getUrls();
         while (matcher.find()) {
             String group = matcher.group(1);
+            System.out.println("URL " + group);
             group = group.replaceAll("\"", "");
             group = group.replaceAll("'", "");
             if (group.startsWith("data:")) continue;
@@ -45,6 +46,7 @@ public class CrawlCSS extends CSSExtractor {
         HashSet<String> hs = getUrls();
         while (matcher.find()) {
             String group = matcher.group(0);
+            System.out.println("other " + group);
             if (group.startsWith("data:")) continue;
             String newUrl = replaceUrl(group, url);
             hs.add(newUrl);
