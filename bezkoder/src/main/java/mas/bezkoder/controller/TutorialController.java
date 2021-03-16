@@ -99,7 +99,7 @@ public class TutorialController {
     }
   }
 
-  @DeleteMapping("/tutorials/{id}")
+  @DeleteMapping("/websites")
   public ResponseEntity<HttpStatus> deleteWebsite(@RequestParam("web") String website) {
     try {
       String url = "";
