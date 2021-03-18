@@ -334,4 +334,15 @@ public class CrawlMain {
         return hs;
     }
 
+    public static void main(String[] args) throws IOException {
+        String url = "https://exploit.in/";
+        String startDomain = new URL(url).getHost();
+        HashSet<String> hs = getPageLinks(url, startDomain, 0);
+        HashSet<String> otherLinks = new HashSet<>();
+        if (hs == null) return;
+        for (String string: hs) {
+            System.out.println(string);
+        }
+    }
+
 }
