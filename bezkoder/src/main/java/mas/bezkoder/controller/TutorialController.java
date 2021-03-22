@@ -201,15 +201,22 @@ public class TutorialController {
     website = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
 
     List<Tutorial> tutorials = new ArrayList<>();
+    Tutorial toReturn = null;
 
     if (website != null) {
       tutorialRepository.findByTitleContaining(website).forEach(tutorials::add);
     } else return null;
     if (tutorials.size() != 0) {
-      for (Tutorial t: tutorials) {
-        if (t.getTitle().equals(website)) return t;
+      for (Tutorial t : tutorials) {
+        if (t.getTitle().equals(website)) {
+          if (toReturn == null) toReturn = t;
+          else if (toReturn.getDateTime().isBefore(t.getDateTime())) {
+            toReturn = t;
+          }
+        }
       }
     }
+    if (toReturn != null) return toReturn;
     tutorials = new ArrayList<>();
     URL url = new URL(website);
     String query = url.getQuery();
