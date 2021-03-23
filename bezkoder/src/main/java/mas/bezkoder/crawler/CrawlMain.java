@@ -110,10 +110,7 @@ public class CrawlMain {
             out.write(it.next());
             out.newLine();
         }
-<<<<<<< HEAD
 
-=======
->>>>>>> css-edit
         for (String string : otherLinks) {
             try {
                 string = decode(string);
