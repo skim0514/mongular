@@ -43,6 +43,7 @@ public class CrawlMain {
         HashSet<String> otherLinks = new HashSet<>();
         int count = 1;
         if (hs == null) return;
+        final long startTime  = System.currentTimeMillis();
         for (String string : hs) {
             try {
                 string = decode(string);
@@ -122,6 +123,8 @@ public class CrawlMain {
             count++;
             downloadFile(string, "files/" + id);
         }
+        final long endTime = System.currentTimeMillis();
+        System.out.println("Done: " + (endTime - startTime));
     }
 
     public static HashSet<String> searchJs(String content, String string) throws IOException, URISyntaxException {
