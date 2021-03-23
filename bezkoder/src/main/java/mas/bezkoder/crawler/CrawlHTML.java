@@ -1,6 +1,6 @@
 package mas.bezkoder.crawler;
 
-import mas.bezkoder.LinkExtractor.LinkExtractor;
+import mas.bezkoder.LinkExtractor.HTMLExtractor;
 import org.json.JSONException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -12,9 +12,9 @@ import java.net.*;
 import java.util.*;
 import java.util.regex.Matcher;
 
-import static mas.bezkoder.crawler.CrawlMain.searchCss;
+import static mas.bezkoder.crawler.CrawlCSS.crawlCSS;
 
-public class CrawlHTML extends LinkExtractor {
+public class CrawlHTML extends HTMLExtractor {
     private static final int MAX_DEPTH = 2;
     private static final Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
     private String domain;
@@ -29,7 +29,7 @@ public class CrawlHTML extends LinkExtractor {
         this.domain = domain;
     }
 
-
+    @Override
     public void parseSrcSet(Elements srcsets) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
         HashSet<String> links = getUrls();
         String current = getUrl();
@@ -46,6 +46,7 @@ public class CrawlHTML extends LinkExtractor {
         setUrls(links);
     }
 
+    @Override
     public void parseSrc(Elements src) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
         HashSet<String> links = getUrls();
         String current = getUrl();
@@ -60,6 +61,7 @@ public class CrawlHTML extends LinkExtractor {
         setUrls(links);
     }
 
+    @Override
     public void parseBackground(Elements background) throws MalformedURLException, URISyntaxException {
         HashSet<String> links = getUrls();
         String current = getUrl();
@@ -74,6 +76,7 @@ public class CrawlHTML extends LinkExtractor {
         setUrls(links);
     }
 
+    @Override
     public void parseLinkLink(Elements link) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
         HashSet<String> links = getUrls();
         String current = getUrl();
@@ -86,26 +89,29 @@ public class CrawlHTML extends LinkExtractor {
         setUrls(links);
     }
 
+    @Override
     public void parseStyle(Elements style) throws JSONException, IOException, URISyntaxException {
         HashSet<String> links = getUrls();
         String current = getUrl();
         for (Element css: style) {
             String hold = css.attr("style");
-            links.addAll(searchCss(hold, current));
+            links.addAll(crawlCSS(hold, current));
         }
         setUrls(links);
     }
 
+    @Override
     public void parseOtherStyle(Matcher matcher) throws JSONException, IOException, URISyntaxException {
         HashSet<String> links = getUrls();
         String current = getUrl();
         while (matcher.find()) {
             String group = matcher.group(0);
-            links.addAll(searchCss(group, current));
+            links.addAll(crawlCSS(group, current));
         }
         setUrls(links);
     }
 
+    @Override
     public void parseOther(Matcher matcher) {
         HashSet<String> links = getUrls();
         while (matcher.find()) {
@@ -115,6 +121,7 @@ public class CrawlHTML extends LinkExtractor {
         setUrls(links);
     }
 
+    @Override
     public void parseALink(Elements hrefs) throws IOException, URISyntaxException{
         HashSet<String> links = getUrls();
         String current = getUrl();
@@ -128,7 +135,6 @@ public class CrawlHTML extends LinkExtractor {
         }
         setUrls(links);
     }
-
 
     public static HashSet<String> getPageLinks(String URL, String domain, int depth) {
         if (depth == MAX_DEPTH) return null;

@@ -11,7 +11,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 
-import static mas.bezkoder.LinkExtractor.LinkExtractor.replaceUrl;
+import static mas.bezkoder.LinkExtractor.HTMLExtractor.replaceUrl;
 
 public class ParseCSS extends CSSExtractor {
     private static final String client = "http://118.67.133.84:8085/api/websites?web=";
@@ -27,7 +27,7 @@ public class ParseCSS extends CSSExtractor {
     }
 
     @Override
-    public void parseURL(Matcher matcher) throws JSONException, IOException, URISyntaxException {
+    public void parseURL(Matcher matcher) throws IOException, URISyntaxException {
         String input = getInput();
         Tutorial tutorial = getTutorial();
         while (matcher.find()) {

@@ -2,8 +2,6 @@ package mas.bezkoder.crawler;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 
 import java.io.*;
 import java.net.*;
@@ -21,7 +19,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static mas.bezkoder.LinkExtractor.LinkExtractor.replaceUrl;
+import static mas.bezkoder.LinkExtractor.HTMLExtractor.replaceUrl;
+import static mas.bezkoder.crawler.CrawlCSS.crawlCSS;
 import static mas.bezkoder.crawler.CrawlHTML.getPageLinks;
 
 public class CrawlMain {
@@ -88,10 +87,7 @@ public class CrawlMain {
                     downloadFile(string, "files/" + id);
                     Path cssFile = Path.of("files/" + id);
                     String content = Files.readString(cssFile);
-                    CrawlCSS css = new CrawlCSS(string, content, new HashSet<>());
-                    css.extractCSS();
-                    HashSet<String> cssLinks = css.getUrls();
-                    otherLinks.addAll(cssLinks);
+                    otherLinks.addAll(crawlCSS(content, string));
                 } catch (IOException | URISyntaxException ignored) {
                 }
             } else if (extension.equals("js")) {
@@ -114,7 +110,10 @@ public class CrawlMain {
             out.write(it.next());
             out.newLine();
         }
+<<<<<<< HEAD
 
+=======
+>>>>>>> css-edit
         for (String string : otherLinks) {
             try {
                 string = decode(string);
@@ -324,37 +323,37 @@ public class CrawlMain {
         return false;
     }
 
-    /**
-     * searches css for urls
-     * @param input input css string
-     * @param string our given domain for our website
-     * @return hashset of urls that are in the css
-     * @throws IOException issues with our url information.
-     * @throws URISyntaxException badly built url
-     * @throws JSONException issues building tutorial of website link
-     */
-    public static HashSet<String> searchCss(String input, String string) throws IOException, URISyntaxException, JSONException {
-        HashSet<String> hs = new HashSet<>();
-        Pattern pattern = Pattern.compile(CSSRegex);
-        Matcher matcher = pattern.matcher(input);
-        while (matcher.find()) {
-            String group = matcher.group(1);
-            group = group.replaceAll("\"", "");
-            group = group.replaceAll("'", "");
-            if (group.startsWith("data:")) continue;
-            String newUrl = replaceUrl(group, string);
-            hs.add(newUrl);
-        }
-        pattern = Pattern.compile(otherRegex);
-        matcher = pattern.matcher(input);
-        while (matcher.find()) {
-            String group = matcher.group(0);
-            if (group.startsWith("data:")) continue;
-            String newUrl = replaceUrl(group, string);
-            hs.add(newUrl);
-        }
-        return hs;
-    }
+//    /**
+//     * searches css for urls
+//     * @param input input css string
+//     * @param string our given domain for our website
+//     * @return hashset of urls that are in the css
+//     * @throws IOException issues with our url information.
+//     * @throws URISyntaxException badly built url
+//     * @throws JSONException issues building tutorial of website link
+//     */
+//    public static HashSet<String> searchCss(String input, String string) throws IOException, URISyntaxException, JSONException {
+//        HashSet<String> hs = new HashSet<>();
+//        Pattern pattern = Pattern.compile(CSSRegex);
+//        Matcher matcher = pattern.matcher(input);
+//        while (matcher.find()) {
+//            String group = matcher.group(1);
+//            group = group.replaceAll("\"", "");
+//            group = group.replaceAll("'", "");
+//            if (group.startsWith("data:")) continue;
+//            String newUrl = replaceUrl(group, string);
+//            hs.add(newUrl);
+//        }
+//        pattern = Pattern.compile(otherRegex);
+//        matcher = pattern.matcher(input);
+//        while (matcher.find()) {
+//            String group = matcher.group(0);
+//            if (group.startsWith("data:")) continue;
+//            String newUrl = replaceUrl(group, string);
+//            hs.add(newUrl);
+//        }
+//        return hs;
+//    }
 
     public static void main(String[] args) throws IOException {
         String url = "https://exploit.in/";

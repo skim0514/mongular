@@ -1,6 +1,6 @@
 package mas.bezkoder.parser;
 
-import mas.bezkoder.LinkExtractor.LinkExtractor;
+import mas.bezkoder.LinkExtractor.HTMLExtractor;
 import mas.bezkoder.model.Tutorial;
 import org.json.JSONException;
 import org.jsoup.Jsoup;
@@ -15,7 +15,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ParseHTML extends LinkExtractor {
+import static mas.bezkoder.parser.ParseCSS.parseCSS;
+
+public class ParseHTML extends HTMLExtractor {
 
 //    private static final String client = "http://localhost:8085/api/websites?web=";
     private static final String client = "http://118.67.133.84:8085/api/websites?web=";
@@ -79,32 +81,6 @@ public class ParseHTML extends LinkExtractor {
             } catch (Exception ignored) {
             }
         }
-        return input;
-    }
-
-    /**
-     * function to parse if document is css
-     * @param input complete css string
-     * @param tutorial information of css file
-     * @return parsed css string
-     * @throws IOException if file is missing
-     * @throws URISyntaxException if url is unusual
-     */
-
-    public static String parseCss(String input, Tutorial tutorial) throws IOException, URISyntaxException {
-        Pattern pattern = Pattern.compile(CSSRegex, Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(input);
-        while (matcher.find()) {
-            String group = matcher.group(1);
-            group = group.replaceAll("\"", "");
-            group = group.replaceAll("'", "");
-            if (group.startsWith("data:")) continue;
-            if (group.contains(client)) continue;
-            String newUrl = client + java.net.URLEncoder.encode(replaceUrl(group, tutorial.getTitle()), StandardCharsets.UTF_8.name());
-            input = input.replace(group, newUrl);
-        }
-
-        input = otherRegex(input, tutorial);
         return input;
     }
 
@@ -187,16 +163,16 @@ public class ParseHTML extends LinkExtractor {
         if (style == null) return;
         for (Element css: style) {
             String hold = css.attr("style");
-            String replace = parseCss(hold, getTutorial());
+            String replace = parseCSS(hold, getTutorial());
             css.attr("style", replace);
         }
     }
-    public void parseOtherStyle(Matcher matcher) throws IOException, URISyntaxException {
+    public void parseOtherStyle(Matcher matcher) throws IOException, URISyntaxException, JSONException {
         if (matcher == null) return;
         String input = getInput();
         while (matcher.find()) {
             String group = matcher.group(0);
-            group = parseCss(group, getTutorial());
+            group = parseCSS(group, getTutorial());
             input = input.replace(matcher.group(0), group);
         }
         setInput(input);

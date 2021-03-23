@@ -23,6 +23,7 @@ import mas.bezkoder.model.Tutorial;
 import mas.bezkoder.repository.TutorialRepository;
 
 
+
 @CrossOrigin(origins = "http://localhost:8085")
 @RestController
 @RequestMapping("/api")
@@ -121,6 +122,28 @@ public class TutorialController {
     }
   }
 
+  @DeleteMapping("/websites")
+  public ResponseEntity<HttpStatus> deleteWebsite(@RequestParam("web") String website) {
+    try {
+      String url = "";
+      while (true) {
+          url = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
+          if (url.equals(website)) break;
+          else website = url;
+      }
+      List<Tutorial> tutorials = new ArrayList<>();
+      if (website != null) {
+        tutorialRepository.findByTitleContaining(website).forEach(tutorials::add);
+      } else return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+      for (Tutorial tutorial: tutorials) {
+        deleteTutorial(tutorial.getId());
+      }
+      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    } catch (Exception e) {
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   @DeleteMapping("/tutorials")
   public ResponseEntity<HttpStatus> deleteAllTutorials() {
     try {
@@ -201,15 +224,22 @@ public class TutorialController {
     website = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
 
     List<Tutorial> tutorials = new ArrayList<>();
+    Tutorial toReturn = null;
 
     if (website != null) {
       tutorialRepository.findByTitleContaining(website).forEach(tutorials::add);
     } else return null;
     if (tutorials.size() != 0) {
-      for (Tutorial t: tutorials) {
-        if (t.getTitle().equals(website)) return t;
+      for (Tutorial t : tutorials) {
+        if (t.getTitle().equals(website)) {
+          if (toReturn == null) toReturn = t;
+          else if (toReturn.getDateTime().isBefore(t.getDateTime())) {
+            toReturn = t;
+          }
+        }
       }
     }
+    if (toReturn != null) return toReturn;
     tutorials = new ArrayList<>();
     URL url = new URL(website);
     String query = url.getQuery();
