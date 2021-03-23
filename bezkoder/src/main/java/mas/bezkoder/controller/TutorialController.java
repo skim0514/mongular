@@ -89,29 +89,6 @@ public class TutorialController {
     }
   }
 
-  @DeleteMapping("/websites")
-  public ResponseEntity<HttpStatus> deleteWebsite(@RequestParam("web") String website) {
-    try {
-      String url = "";
-      while (true) {
-        url = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
-        if (url.equals(website)) break;
-        else website = url;
-      }
-      List<Tutorial> tutorials = new ArrayList<>();
-      if (website != null) {
-        tutorialRepository.findByTitleContaining(website).forEach(tutorials::add);
-      } else return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-      for (Tutorial tutorial: tutorials) {
-        deleteTutorial(tutorial.getId());
-      }
-      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    } catch (Exception e) {
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-
   @DeleteMapping("/tutorials/{id}")
   public ResponseEntity<HttpStatus> deleteTutorial(@PathVariable("id") String id) {
     try {
