@@ -48,7 +48,7 @@ public class CrawlMain {
         if (hs == null) return;
 
         //write urls to file to compare
-        BufferedWriter out = new BufferedWriter(new FileWriter(url + ".txt"));
+        BufferedWriter out = new BufferedWriter(new FileWriter(startDomain.replace(".onion", "") + ".txt"));
         out.write(LocalDateTime.now().toString());
         out.newLine();
         Iterator<String> it = hs.iterator();
