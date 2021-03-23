@@ -13,8 +13,10 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,6 +46,17 @@ public class CrawlMain {
         HashSet<String> otherLinks = new HashSet<>();
         int count = 1;
         if (hs == null) return;
+
+        //write urls to file to compare
+        BufferedWriter out = new BufferedWriter(new FileWriter(url + ".txt"));
+        out.write(LocalDateTime.now().toString());
+        out.newLine();
+        Iterator<String> it = hs.iterator();
+        while (it.hasNext()) {
+            out.write(it.next());
+            out.newLine();
+        }
+
         for (String string : hs) {
             try {
                 string = decode(string);
@@ -95,6 +108,13 @@ public class CrawlMain {
             }
         }
         count = 1;
+
+        it = otherLinks.iterator();
+        while (it.hasNext()) {
+            out.write(it.next());
+            out.newLine();
+        }
+
         for (String string : otherLinks) {
             try {
                 string = decode(string);
@@ -126,6 +146,8 @@ public class CrawlMain {
             count++;
             downloadFile(string, "files/" + id);
         }
+        out.write(LocalDateTime.now().toString());
+        out.close();
     }
 
     public static HashSet<String> searchJs(String content, String string) throws IOException, URISyntaxException {
