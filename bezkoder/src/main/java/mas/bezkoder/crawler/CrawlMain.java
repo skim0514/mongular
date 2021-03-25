@@ -153,6 +153,7 @@ public class CrawlMain {
      * @throws IOException for issues in url or fileName
      */
     public static boolean downloadFile(String url, String fileName) throws IOException {
+        if (url.startsWith("https://href.li/?")) url = url.replace("https://href.li/?", "");
         HttpURLConnection webProxyConnection
                 = (HttpURLConnection) new URL(url).openConnection(webProxy);
 
@@ -230,6 +231,7 @@ public class CrawlMain {
      * @return content type information
      */
     public static String getContentType(String link) {
+        if (link.startsWith("https://href.li/?")) link = link.replace("https://href.li/?", "");
         URL url;
         try {
             url = new URL(link);
