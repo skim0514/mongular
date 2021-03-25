@@ -82,10 +82,9 @@ public class CrawlMain {
             }
             if (count % 10 == 0) System.out.println("Done with " + count + "/" + hs.size());
             count++;
-            boolean download = downloadFile(string, "files/" + id);
-            if (!download) System.out.println("failed " + string);
             if (extension.equals("css")) {
                 try {
+                    downloadFile(string, "files/" + id);
                     Path cssFile = Path.of("files/" + id);
                     String content = Files.readString(cssFile);
                     otherLinks.addAll(crawlCSS(content, string));
@@ -93,12 +92,15 @@ public class CrawlMain {
                 }
             } else if (extension.equals("js")) {
                 try {
+                    downloadFile(string, "files/" + id);
                     Path jsFile = Path.of("files/" + id);
                     String content = Files.readString(jsFile);
                     HashSet<String> jsLinks = searchJs(content, string);
                     otherLinks.addAll(jsLinks);
                 } catch (IOException ignored) {
                 }
+            } else {
+                downloadFile(string,"files/" + id);
             }
         }
         count = 1;
@@ -138,8 +140,7 @@ public class CrawlMain {
             }
             if (count % 10 == 0) System.out.println("Done with " + count + "/" + otherLinks.size());
             count++;
-            boolean download = downloadFile(string, "files/" + id);
-            if (!download) System.out.println("failed " + string);
+            downloadFile(string, "files/" + id);
         }
         out.write(LocalDateTime.now().toString());
         out.close();
