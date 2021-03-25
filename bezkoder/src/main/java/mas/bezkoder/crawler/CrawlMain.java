@@ -47,14 +47,6 @@ public class CrawlMain {
         if (hs == null) return;
 
         //write urls to file to compare
-        BufferedWriter out = new BufferedWriter(new FileWriter("store/" + startDomain.replace(".onion", "") + ".txt"));
-        out.write(LocalDateTime.now().toString());
-        out.newLine();
-        Iterator<String> it = hs.iterator();
-        while (it.hasNext()) {
-            out.write(it.next());
-            out.newLine();
-        }
 
         for (String string : hs) {
             try {
@@ -105,12 +97,6 @@ public class CrawlMain {
         }
         count = 1;
 
-        it = otherLinks.iterator();
-        while (it.hasNext()) {
-            out.write(it.next());
-            out.newLine();
-        }
-
         for (String string : otherLinks) {
             try {
                 string = decode(string);
@@ -142,8 +128,6 @@ public class CrawlMain {
             count++;
             downloadFile(string, "files/" + id);
         }
-        out.write(LocalDateTime.now().toString());
-        out.close();
     }
 
     public static HashSet<String> searchJs(String content, String string) throws IOException, URISyntaxException {
