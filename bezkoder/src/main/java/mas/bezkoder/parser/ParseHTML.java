@@ -19,8 +19,8 @@ import static mas.bezkoder.parser.ParseCSS.parseCSS;
 
 public class ParseHTML extends HTMLExtractor {
 
-    private static final String client = "http://localhost:8085/api/websites?web=";
-//    private static final String client = "http://118.67.133.84:8085/api/websites?web=";
+//    private static final String client = "http://localhost:8085/api/websites?web=";
+    private static final String client = "http://118.67.133.84:8085/api/websites?web=";
     private static final String CSSRegex = "url\\((.*?)\\)";
     private static final String otherRegex = "https?://([^{}<>\"'\\s)]*)";
 
