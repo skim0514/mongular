@@ -250,7 +250,6 @@ public class TutorialController {
     URL url = null;
     try {
       url = new URL("http://localhost:8085/api/file/" + tutorial.getSha());
-      System.out.println(tutorial.getTitle());
     } catch (MalformedURLException e) {
       e.printStackTrace();
     }
@@ -259,7 +258,7 @@ public class TutorialController {
     con.setRequestProperty("content-type", tutorial.getContentType());
     int status = con.getResponseCode();
     BufferedReader in = new BufferedReader(
-            new InputStreamReader(con.getInputStream(), tutorial.getContentEncoding()));
+            new InputStreamReader(con.getInputStream(), tutorial.getContentEncoding().toUpperCase()));
     String inputLine;
     StringBuffer content = new StringBuffer();
     while ((inputLine = in.readLine()) != null) {

@@ -1,5 +1,6 @@
 package mas.bezkoder.crawler;
 
+import com.mongodb.MongoWriteException;
 import mas.bezkoder.model.Tutorial;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -94,6 +95,7 @@ public class CrawlMain {
                 ex.printStackTrace();
                 continue;
             }
+
             if (extension.equals("css")) {
                 try {
                     otherLinks.addAll(crawlCSS(content, string));
@@ -142,6 +144,8 @@ public class CrawlMain {
             }
             if (count % 10 == 0) System.out.println("Done with " + count + "/" + otherLinks.size());
             count++;
+
+
         }
     }
 
@@ -185,6 +189,9 @@ public class CrawlMain {
         String checksum = bytesToHex(sha256Hash);
         try {
             addDownload(checksum, bytes);
+        } catch (MongoWriteException ex) {
+            System.out.println("File Already Exists");
+            return null;
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
