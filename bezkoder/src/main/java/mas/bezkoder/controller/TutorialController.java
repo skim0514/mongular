@@ -65,7 +65,7 @@ public class TutorialController {
   @PostMapping("/tutorials")
   public ResponseEntity<Tutorial> createTutorial(@RequestBody Tutorial tutorial) {
     try {
-      Tutorial _tutorial = tutorialRepository.save(new Tutorial(tutorial.getTitle(), tutorial.getDescription(),
+      Tutorial _tutorial = tutorialRepository.save(new Tutorial(tutorial.getTitle(), tutorial.getDescription(), tutorial.getSha(),
               tutorial.getDomain(), tutorial.getFiletype(), tutorial.getContentType(), tutorial.getContentEncoding()));
       return new ResponseEntity<>(_tutorial, HttpStatus.CREATED);
     } catch (Exception e) {
@@ -148,6 +148,7 @@ public class TutorialController {
       tutorial = getTutorial(url);
       if (tutorial == null) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     } catch (Exception e) {
+      e.printStackTrace();
       return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -157,6 +158,7 @@ public class TutorialController {
       try {
         file = getTextFile(tutorial);
       } catch (IOException e) {
+        e.printStackTrace();
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
       }
       file = ParseMain.parseFile(file, tutorial);
@@ -173,6 +175,7 @@ public class TutorialController {
       try {
         file = getTextFile(tutorial);
       } catch (IOException e) {
+        e.printStackTrace();
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
       }
       headers.set("content-type", tutorial.getContentType());
@@ -183,7 +186,7 @@ public class TutorialController {
   private byte[] getImageFile(Tutorial tutorial) throws IOException {
     URL url = null;
     try {
-      url = new URL("http://localhost:8082/" + tutorial.getId());
+      url = new URL("http://localhost:8085/api/file/" + tutorial.getSha());
     } catch (MalformedURLException e) {
       e.printStackTrace();
     }
@@ -246,8 +249,8 @@ public class TutorialController {
   public static String getTextFile(Tutorial tutorial) throws IOException {
     URL url = null;
     try {
-      url = new URL("http://localhost:8082/" + tutorial.getId());
-      System.out.println(tutorial.getId());
+      url = new URL("http://localhost:8085/api/file/" + tutorial.getSha());
+      System.out.println(tutorial.getTitle());
     } catch (MalformedURLException e) {
       e.printStackTrace();
     }

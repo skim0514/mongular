@@ -14,7 +14,8 @@ import java.util.regex.Matcher;
 import static mas.bezkoder.LinkExtractor.HTMLExtractor.replaceUrl;
 
 public class ParseCSS extends CSSExtractor {
-    private static final String client = "http://118.67.133.84:8085/api/websites?web=";
+//    private static final String client = "http://118.67.133.84:8085/api/websites?web=";
+    private static final String client = "http://localhost:8085/api/websites?web=";
 
     public ParseCSS(String input, Tutorial tutorial) {
         super(input, tutorial);

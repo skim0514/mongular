@@ -33,8 +33,8 @@ public class FileService {
         return id.toString();
     }
 
-    public Storage getFile(String id) throws IllegalStateException, IOException {
-        GridFSFile file = gridFsTemplate.findOne(new Query(Criteria.where("_id").is(id)));
+    public Storage getFile(String sha256) throws IllegalStateException, IOException {
+        GridFSFile file = gridFsTemplate.findOne(new Query(Criteria.where("metadata.title").is(sha256)));
         Storage storage = new Storage();
         assert file != null;
         assert file.getMetadata() != null;
@@ -42,4 +42,5 @@ public class FileService {
         storage.setStream(operations.getResource(file).getInputStream());
         return storage;
     }
+
 }
