@@ -191,7 +191,7 @@ public class CrawlMain {
             addDownload(checksum, bytes);
         } catch (MongoWriteException ex) {
             System.out.println("File Already Exists");
-            return null;
+            return checksum;
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
