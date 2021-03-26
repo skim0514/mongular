@@ -29,7 +29,6 @@ import mas.bezkoder.repository.TutorialRepository;
 @RequestMapping("/api")
 public class TutorialController {
 
-
   @Autowired
   TutorialRepository tutorialRepository;
   private static String files = "http://localhost:8082/";

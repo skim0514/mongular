@@ -1,21 +1,26 @@
 package mas.bezkoder.crawler;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.ByteArrayBody;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.*;
 import java.net.*;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,7 +34,11 @@ public class CrawlMain {
     private static final Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
 
     public static void run(String link) throws IOException, JSONException, URISyntaxException {
-        crawlSite(link);
+        try {
+            crawlSite(link);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -39,7 +48,7 @@ public class CrawlMain {
      * @throws URISyntaxException badly built url
      * @throws IOException issues with url
      */
-    public static void crawlSite(String url) throws JSONException, URISyntaxException, IOException {
+    public static void crawlSite(String url) throws JSONException, URISyntaxException, IOException, NoSuchAlgorithmException {
         String startDomain = new URL(url).getHost();
         HashSet<String> hs = getPageLinks(url, startDomain, 0);
         HashSet<String> otherLinks = new HashSet<>();
@@ -74,7 +83,7 @@ public class CrawlMain {
             }
             if (count % 10 == 0) System.out.println("Done with " + count + "/" + hs.size());
             count++;
-            boolean success = downloadFile(string, "files/" + id);
+            boolean success = downloadFile(string);
             if (!success) {
                 System.out.println("fail " + string);
                 continue;
@@ -128,7 +137,7 @@ public class CrawlMain {
             }
             if (count % 10 == 0) System.out.println("Done with " + count + "/" + otherLinks.size());
             count++;
-            boolean success = downloadFile(string, "files/" + id);
+            boolean success = downloadFile(string);
             if (!success) System.out.println("fail " + string);
         }
     }
@@ -148,32 +157,67 @@ public class CrawlMain {
     /**
      * downloads file with given URL
      * @param url url of file to download
-     * @param fileName filename with location to download to
      * @return success or not success
      * @throws IOException for issues in url or fileName
      */
-    public static boolean downloadFile(String url, String fileName) throws IOException {
+    public static boolean downloadFile(String url) throws IOException, NoSuchAlgorithmException {
         if (url.startsWith("https://href.li/?")) url = url.replace("https://href.li/?", "");
         HttpURLConnection webProxyConnection
                 = (HttpURLConnection) new URL(url).openConnection(webProxy);
 
         ReadableByteChannel readChannel;
+        InputStream is = null;
 //        try {
 //            readChannel = Channels.newChannel(new URL(url).openStream());
 //        } catch (IOException e) {
 //            return false;
 //        }
         try {
-            readChannel = Channels.newChannel(webProxyConnection.getInputStream());
+            is = webProxyConnection.getInputStream();
+
         } catch (IOException | RuntimeException e) {
             return false;
         }
 
-        FileOutputStream fileOS = new FileOutputStream(fileName);
-        FileChannel writeChannel = fileOS.getChannel();
-        writeChannel
-                .transferFrom(readChannel, 0, Long.MAX_VALUE);
+        byte[] bytes = IOUtils.toByteArray(is);
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        String checksum = getFileChecksum(digest, is);
+        try {
+            addDownload(checksum, bytes);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
         return true;
+    }
+
+    private static String getFileChecksum(MessageDigest digest, InputStream fis) throws IOException
+    {
+        //Get file input stream for reading the file content
+
+        //Create byte array to read data in chunks
+        byte[] byteArray = new byte[1024];
+        int bytesCount = 0;
+
+        //Read file data and update in message digest
+        while ((bytesCount = fis.read(byteArray)) != -1) {
+            digest.update(byteArray, 0, bytesCount);
+        }
+        //close the stream; We don't need it now.
+        fis.close();
+
+        //Get the hash's bytes
+        byte[] bytes = digest.digest();
+
+        //This bytes[] has bytes in decimal format;
+        //Convert it to hexadecimal format
+        StringBuilder sb = new StringBuilder();
+        for(int i=0; i< bytes.length ;i++)
+        {
+            sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+        }
+
+        //return complete hash
+        return sb.toString();
     }
 
     /**
@@ -223,6 +267,21 @@ public class CrawlMain {
         http.disconnect();
         System.out.println("New Tutorial " + link);
         return id;
+    }
+
+    public static void addDownload(String sha256, byte[] bytes) throws IOException {
+        HttpPost httppost = new HttpPost("http://localhost:8085/api/file/add");
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        MultipartEntityBuilder multipartEntity = MultipartEntityBuilder.create()
+                .setMode(HttpMultipartMode.BROWSER_COMPATIBLE)
+                .addTextBody("title", sha256)
+                .addPart("file", new ByteArrayBody(bytes, ""));
+        httppost.setEntity(multipartEntity.build());
+        CloseableHttpResponse response = httpClient.execute(httppost);
+        HttpEntity entity = response.getEntity();
+        httpClient.close();
+        response.close();
+        System.out.println(entity.toString());
     }
 
     /**
@@ -341,15 +400,10 @@ public class CrawlMain {
 //        return hs;
 //    }
 
-    public static void main(String[] args) throws IOException {
-        String url = "https://exploit.in/";
-        String startDomain = new URL(url).getHost();
-        HashSet<String> hs = getPageLinks(url, startDomain, 0);
-        HashSet<String> otherLinks = new HashSet<>();
-        if (hs == null) return;
-        for (String string: hs) {
-            System.out.println(string);
-        }
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
+        String url = "https://docs.mongodb.com/manual/core/index-unique/#index-type-unique";
+        downloadFile(url);
+
     }
 
 }
