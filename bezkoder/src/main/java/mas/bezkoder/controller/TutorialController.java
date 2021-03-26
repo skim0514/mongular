@@ -274,6 +274,7 @@ public class TutorialController {
   @PostMapping("/websites")
   public ResponseEntity<?> postFileFromWebsite(@RequestParam("web") String website) throws IOException, JSONException, URISyntaxException {
     CrawlMain.run(website);
+    System.out.println("done");
     return new ResponseEntity<>(HttpStatus.OK);
   }
 }
