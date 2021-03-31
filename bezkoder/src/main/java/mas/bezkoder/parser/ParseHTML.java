@@ -192,7 +192,7 @@ public class ParseHTML extends HTMLExtractor {
     public static void main (String[] args) throws IOException, URISyntaxException, JSONException {
         System.setProperty("http.proxyHost", "127.0.0.1");
         System.setProperty("http.proxyPort", "8123");
-        Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
+//        Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
         String website = "http://3dell3phmthpcqw3w4lw5fbabrqpxh4ur5pnopspwx4ifeynufaynxid.onion/store/";
         String url = "";
         while (true) {
@@ -201,7 +201,7 @@ public class ParseHTML extends HTMLExtractor {
             else website = url;
         }
 
-        Document document = Jsoup.connect(website).timeout(100000).get();
+        Document document = Jsoup.connect(website).timeout(0).get();
         System.out.println(document.toString());
 //        Document document = Jsoup.connect(url).proxy(webProxy).get();
 //
