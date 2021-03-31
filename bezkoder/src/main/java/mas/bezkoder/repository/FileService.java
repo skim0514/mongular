@@ -2,6 +2,7 @@ package mas.bezkoder.repository;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.mongodb.MongoWriteException;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import mas.bezkoder.model.Storage;
 import org.bson.types.ObjectId;
@@ -28,8 +29,14 @@ public class FileService {
         DBObject metaData = new BasicDBObject();
         metaData.put("type", "file");
         metaData.put("title", sha256);
-        ObjectId id = gridFsTemplate.store(
-                file.getInputStream(), file.getName(), file.getContentType(), metaData);
+        ObjectId id;
+        try {
+            id = gridFsTemplate.store(
+                    file.getInputStream(), file.getName(), file.getContentType(), metaData);
+        } catch (MongoWriteException ex) {
+            System.out.println("catch error");
+            return null;
+        }
         return id.toString();
     }
 
