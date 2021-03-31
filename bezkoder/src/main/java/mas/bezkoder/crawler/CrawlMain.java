@@ -197,11 +197,8 @@ public class CrawlMain {
         String checksum = bytesToHex(sha256Hash);
         try {
             addDownload(checksum, bytes);
-        } catch (Error ex) {
+        } catch (Throwable ex) {
             System.out.println("File Already Exists");
-            return checksum;
-        } catch (Exception ex) {
-            System.out.println("Exception");
             return checksum;
         }
         return checksum;
