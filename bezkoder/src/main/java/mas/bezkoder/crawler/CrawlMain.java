@@ -201,8 +201,8 @@ public class CrawlMain {
             System.out.println("File Already Exists");
             return checksum;
         } catch (Exception ex) {
-            ex.printStackTrace();
-            return null;
+            System.out.println("Exception");
+            return checksum;
         }
         return checksum;
     }
