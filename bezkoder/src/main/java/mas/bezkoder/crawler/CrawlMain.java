@@ -46,7 +46,7 @@ public class CrawlMain {
 
     /**
      * main caller function
-     * @param url url of website to start at
+     * @param website url of website to start at
      * @throws JSONException issues building tutorials
      * @throws URISyntaxException badly built url
      * @throws IOException issues with url

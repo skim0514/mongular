@@ -145,7 +145,7 @@ public class CrawlHTML extends HTMLExtractor {
         System.setProperty("http.proxyHost", "127.0.0.1");
         System.setProperty("http.proxyPort", "8123");
         try {
-            Document document = Jsoup.connect(URL).get();
+            Document document = Jsoup.connect(URL).timeout(100000).get();
             crawler.setDocument(document);
             crawler.extractHtml();
             return crawler.getUrls();

@@ -201,7 +201,7 @@ public class ParseHTML extends HTMLExtractor {
             else website = url;
         }
 
-        Document document = Jsoup.connect(website).get();
+        Document document = Jsoup.connect(website).timeout(100000).get();
         System.out.println(document.toString());
 //        Document document = Jsoup.connect(url).proxy(webProxy).get();
 //
