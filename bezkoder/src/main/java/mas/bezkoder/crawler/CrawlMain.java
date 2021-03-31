@@ -175,8 +175,10 @@ public class CrawlMain {
      */
     public static String downloadFile(String url) throws IOException, NoSuchAlgorithmException {
         if (url.startsWith("https://href.li/?")) url = url.replace("https://href.li/?", "");
+        System.setProperty("http.proxyHost", "127.0.0.1");
+        System.setProperty("http.proxyPort", "8123");
         HttpURLConnection webProxyConnection
-                = (HttpURLConnection) new URL(url).openConnection(webProxy);
+                = (HttpURLConnection) new URL(url).openConnection();
 //        HttpURLConnection webProxyConnection
 //                = (HttpURLConnection) new URL(url).openConnection();
 
@@ -327,10 +329,12 @@ public class CrawlMain {
             System.out.println(link);
             return null;
         }
+        System.setProperty("http.proxyHost", "127.0.0.1");
+        System.setProperty("http.proxyPort", "8123");
         HttpURLConnection connection;
         try {
 //            connection = (HttpURLConnection) url.openConnection();
-            connection = (HttpURLConnection) url.openConnection(webProxy);
+            connection = (HttpURLConnection) url.openConnection();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
