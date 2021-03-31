@@ -51,7 +51,13 @@ public class CrawlMain {
      * @throws URISyntaxException badly built url
      * @throws IOException issues with url
      */
-    public static void crawlSite(String url) throws JSONException, URISyntaxException, IOException, NoSuchAlgorithmException {
+    public static void crawlSite(String website) throws JSONException, URISyntaxException, IOException, NoSuchAlgorithmException {
+        String url = "";
+        while (true) {
+            url = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
+            if (url.equals(website)) break;
+            else website = url;
+        }
         String startDomain = new URL(url).getHost();
         HashSet<String> hs = getPageLinks(url, startDomain, 0);
         HashSet<String> otherLinks = new HashSet<>();

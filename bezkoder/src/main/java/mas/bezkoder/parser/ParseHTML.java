@@ -190,10 +190,17 @@ public class ParseHTML extends HTMLExtractor {
     }
 
     public static void main (String[] args) throws IOException, URISyntaxException, JSONException {
-        String url = "https://freehacks.io/";
         Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
-        Document document = Jsoup.connect(url).get();
-        System.out.println(document.toString());
+        String website = "http%3A%2F%2F3dell3phmthpcqw3w4lw5fbabrqpxh4ur5pnopspwx4ifeynufaynxid.onion%2Fcommunity%2F%EC%84%9C%EB%B9%84%EC%8A%A4-%EC%9E%A5%EC%95%A0%EC%8B%A0%EA%B3%A0-%EC%84%9C%EB%B9%84%EC%8A%A4-%EC%9E%A5%EC%95%A0%EC%8B%A0%EA%B3%A0%2F";
+        String url = "";
+        while (true) {
+            url = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
+            if (url.equals(website)) break;
+            else website = url;
+        }
+        System.out.println(website);
+//        Document document = Jsoup.connect(url).proxy(webProxy).get();
+//        System.out.println(document.toString());
 
     }
 }
