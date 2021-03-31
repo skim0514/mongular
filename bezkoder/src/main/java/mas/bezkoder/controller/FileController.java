@@ -1,5 +1,6 @@
 package mas.bezkoder.controller;
 
+import com.mongodb.MongoWriteException;
 import mas.bezkoder.model.Storage;
 import mas.bezkoder.repository.FileService;
 import org.apache.commons.io.IOUtils;
@@ -31,7 +32,8 @@ public class FileController {
 
     @PostMapping("/file/add")
     public String addVideo(@RequestParam("title") String title,
-                           @RequestParam("file") MultipartFile file, Model model) throws IOException {
+                           @RequestParam("file") MultipartFile file, Model model) throws IOException, MongoWriteException {
+
         String id = fileService.addFile(title, file);
         return id;
     }

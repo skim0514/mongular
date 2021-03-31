@@ -300,7 +300,7 @@ public class CrawlMain {
         return new Tutorial(link, description, sha256, domain, filetype, contentType, encoding);
     }
 
-    public static void addDownload(String sha256, byte[] bytes) throws IOException {
+    public static void addDownload(String sha256, byte[] bytes) throws IOException, MongoWriteException {
         HttpPost httppost = new HttpPost("http://localhost:8085/api/file/add");
         CloseableHttpClient httpClient = HttpClients.createDefault();
         MultipartEntityBuilder multipartEntity = MultipartEntityBuilder.create()
