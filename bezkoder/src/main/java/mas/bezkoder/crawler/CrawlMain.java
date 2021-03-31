@@ -1,6 +1,5 @@
 package mas.bezkoder.crawler;
 
-import com.mongodb.DuplicateKeyException;
 import com.mongodb.MongoWriteException;
 import mas.bezkoder.model.Tutorial;
 import org.apache.commons.io.IOUtils;
@@ -198,9 +197,12 @@ public class CrawlMain {
         String checksum = bytesToHex(sha256Hash);
         try {
             addDownload(checksum, bytes);
+        } catch (Error ex) {
+            System.out.println("File Already Exists");
+            return checksum;
         } catch (Exception ex) {
             ex.printStackTrace();
-            return checksum;
+            return null;
         }
         return checksum;
     }
@@ -298,7 +300,7 @@ public class CrawlMain {
         return new Tutorial(link, description, sha256, domain, filetype, contentType, encoding);
     }
 
-    public static void addDownload(String sha256, byte[] bytes) throws IOException, DuplicateKeyException {
+    public static void addDownload(String sha256, byte[] bytes) throws IOException, MongoWriteException {
         HttpPost httppost = new HttpPost("http://localhost:8085/api/file/add");
         CloseableHttpClient httpClient = HttpClients.createDefault();
         MultipartEntityBuilder multipartEntity = MultipartEntityBuilder.create()
