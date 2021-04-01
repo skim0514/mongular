@@ -3,6 +3,10 @@ package mas.bezkoder.controller;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +17,8 @@ import mas.bezkoder.parser.ParseMain;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -22,6 +28,8 @@ import org.springframework.web.bind.annotation.*;
 import mas.bezkoder.model.Tutorial;
 import mas.bezkoder.repository.TutorialRepository;
 
+import static java.lang.Math.abs;
+import static java.time.temporal.ChronoUnit.HOURS;
 
 
 @CrossOrigin(origins = "http://localhost:8085")
@@ -131,7 +139,9 @@ public class TutorialController {
   }
 
   @GetMapping("/websites")
-  public ResponseEntity<?> getFileFromWebsite(@RequestParam("web") String website) throws IOException, URISyntaxException, JSONException {
+  public ResponseEntity<?> getFileFromWebsite(@RequestParam("web") String website, @RequestParam(name = "date", required = false) String date) throws IOException, URISyntaxException, JSONException {
+
+
     String url = "";
     try {
       while (true) {
@@ -145,7 +155,7 @@ public class TutorialController {
     }
     Tutorial tutorial;
     try {
-      tutorial = getTutorial(url);
+      tutorial = getTutorial(url, date);
       if (tutorial == null) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     } catch (Exception e) {
       e.printStackTrace();
@@ -161,7 +171,7 @@ public class TutorialController {
         e.printStackTrace();
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
       }
-      file = ParseMain.parseFile(file, tutorial);
+      file = ParseMain.parseFile(file, tutorial, date);
       byte[] byteArray = file.getBytes(tutorial.getContentEncoding());
       headers.set("content-type", tutorial.getContentType());
       return new ResponseEntity<>(byteArray, headers, HttpStatus.OK);
@@ -197,13 +207,22 @@ public class TutorialController {
     return IOUtils.toByteArray(in);
   }
 
-  public Tutorial getTutorial(String website) throws IOException {
+  public Tutorial getTutorial(String website, String dt) throws IOException {
     Tutorial tutorial;
 //    System.out.println("reached here" + website);
     website = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
 
     List<Tutorial> tutorials = new ArrayList<>();
     Tutorial toReturn = null;
+
+    LocalDateTime time;
+    int dif = Integer.MAX_VALUE;
+    if (dt == null) {
+      time = LocalDateTime.now();
+    } else {
+      LocalDate date = LocalDate.parse(dt, DateTimeFormatter.BASIC_ISO_DATE);
+      time = LocalDateTime.of(date, LocalTime.MIN);
+    }
 
     if (website != null) {
       tutorialRepository.findByTitleContaining(website).forEach(tutorials::add);
@@ -212,7 +231,8 @@ public class TutorialController {
       for (Tutorial t : tutorials) {
         if (t.getTitle().equals(website)) {
           if (toReturn == null) toReturn = t;
-          else if (toReturn.getDateTime().isBefore(t.getDateTime())) {
+          else if (abs((int) t.getDateTime().until(time, HOURS)) < dif) {
+            dif = abs((int) t.getDateTime().until(time, HOURS));
             toReturn = t;
           }
         }
@@ -230,6 +250,7 @@ public class TutorialController {
     if (tutorials.size() == 1) return tutorials.get(0);
     else if (tutorials.size() == 0) return null;
     else {
+      List<Tutorial> choices = new ArrayList<>();
       String[] queries = query.split("&");
       int count = 0;
       for (Tutorial t: tutorials) {
@@ -237,10 +258,20 @@ public class TutorialController {
         for (String q: queries) {
           if (queriesHold.contains(q)) count++;
         }
-        if (count > maxQ) {
-          maxTut = t;
+        if (count == maxQ) {
+          choices.add(t);
+        } else if (count > maxQ) {
           maxQ = count;
+          choices = new ArrayList<>();
+          choices.add(t);
         }
+      }
+      for (Tutorial t : choices) {
+          if (maxTut == null) maxTut = t;
+          else if (abs((int) t.getDateTime().until(time, HOURS)) < dif) {
+            dif = abs((int) t.getDateTime().until(time, HOURS));
+            maxTut = t;
+          }
       }
       return maxTut;
     }
@@ -276,6 +307,13 @@ public class TutorialController {
     CrawlMain.run(website);
     System.out.println("done");
     return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  public static void main (String[] args) throws IOException, URISyntaxException, JSONException {
+    LocalDate t = LocalDate.parse("20111203", DateTimeFormatter.BASIC_ISO_DATE);
+    LocalDateTime ti = LocalDateTime.of(t, LocalTime.MIDNIGHT);
+    LocalDateTime t2 = LocalDateTime.parse("2007-12-03T10:15:30");
+    System.out.print(Math.abs((int) ti.until(t2, HOURS)));
   }
 }
 

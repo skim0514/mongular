@@ -14,15 +14,15 @@ import java.util.regex.Matcher;
 import static mas.bezkoder.LinkExtractor.HTMLExtractor.replaceUrl;
 
 public class ParseCSS extends CSSExtractor {
-    private static final String client = "http://118.67.133.84:8085/api/websites?web=";
+    protected static final String clientStart = "http://118.67.133.84:8085/api/websites?";
 //    private static final String client = "http://localhost:8085/api/websites?web=";
 
-    public ParseCSS(String input, Tutorial tutorial) {
-        super(input, tutorial);
+    public ParseCSS(String input, Tutorial tutorial, String date) {
+        super(input, tutorial, date);
     }
 
-    public static String parseCSS(String input, Tutorial tutorial) throws JSONException, IOException, URISyntaxException {
-        ParseCSS css = new ParseCSS(input, tutorial);
+    public static String parseCSS(String input, Tutorial tutorial, String date) throws JSONException, IOException, URISyntaxException {
+        ParseCSS css = new ParseCSS(input, tutorial, date);
         css.extractCSS();
         return css.getInput();
     }
@@ -36,8 +36,8 @@ public class ParseCSS extends CSSExtractor {
             group = group.replaceAll("\"", "");
             group = group.replaceAll("'", "");
             if (group.startsWith("data:")) continue;
-            if (group.contains(client)) continue;
-            String newUrl = client + java.net.URLEncoder.encode(replaceUrl(group, tutorial.getTitle()), StandardCharsets.UTF_8.name());
+            if (group.contains(clientStart)) continue;
+            String newUrl = this.client + java.net.URLEncoder.encode(replaceUrl(group, tutorial.getTitle()), StandardCharsets.UTF_8.name());
             input = input.replace(group, newUrl);
         }
         setInput(input);
@@ -49,9 +49,9 @@ public class ParseCSS extends CSSExtractor {
         Tutorial tutorial = getTutorial();
         while (matcher.find()) {
             String group = matcher.group(0);
-            if (group.startsWith(client)) continue;
+            if (group.startsWith(clientStart)) continue;
             if (group.startsWith("data:")) continue;
-            String newUrl = client + java.net.URLEncoder.encode(replaceUrl(group, tutorial.getTitle()), StandardCharsets.UTF_8.name());
+            String newUrl = this.client + java.net.URLEncoder.encode(replaceUrl(group, tutorial.getTitle()), StandardCharsets.UTF_8.name());
             try {
                 input = input.replace("'" + group, "'" + newUrl);
                 input = input.replace("\"" + group, "\"" + newUrl);

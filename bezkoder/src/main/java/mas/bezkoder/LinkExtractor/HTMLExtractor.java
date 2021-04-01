@@ -16,7 +16,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class HTMLExtractor {
-    private static final String client = "http://118.67.133.84:8085/api/websites?web=";
+    protected static final String clientStart = "http://118.67.133.84:8085/api/websites?";
+    protected String client = "http://118.67.133.84:8085/api/websites?web=";
     private static final String otherRegex = "https?://([^{}<>\"'\\s)]*)";
     private static final String style ="<style([\\s\\S]+?)</style>";
     private String url;
@@ -24,6 +25,7 @@ public abstract class HTMLExtractor {
     private Document document;
     private Tutorial tutorial;
     private String input;
+    protected String date;
     private int depth;
 
     public HTMLExtractor(String url, HashSet<String> hs, int depth) {
@@ -32,9 +34,14 @@ public abstract class HTMLExtractor {
         this.depth = depth;
     }
 
-    public HTMLExtractor(Document document, Tutorial tutorial) {
+    public HTMLExtractor(Document document, Tutorial tutorial, String date) {
         this.tutorial = tutorial;
         this.document = document;
+        this.date = date;
+        if (date != null) {
+            client = "http://118.67.133.84:8085/api/websites?date=" + date + "&web=";
+
+        }
     }
 
     public void extractHtml() throws IOException, URISyntaxException, JSONException {
@@ -124,7 +131,7 @@ public abstract class HTMLExtractor {
      */
 
     public static String replaceUrl(String url, String string) throws URISyntaxException, MalformedURLException {
-        if (url.contains(client)) return url;
+        if (url.contains(clientStart)) return url;
         String strFind = "../";
         int count = 0, fromIndex = 0;
         while ((fromIndex = url.indexOf(strFind, fromIndex)) != -1 ){

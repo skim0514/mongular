@@ -20,31 +20,32 @@ import static mas.bezkoder.parser.ParseCSS.parseCSS;
 public class ParseHTML extends HTMLExtractor {
 
 //    private static final String client = "http://localhost:8085/api/websites?web=";
-    private static final String client = "http://118.67.133.84:8085/api/websites?web=";
+//    private static final String client = "http://118.67.133.84:8085/api/websites?web=";
     private static final String CSSRegex = "url\\((.*?)\\)";
-    private static final String otherRegex = "https?://([^{}<>\"'\\s)]*)";
+    private static final String regex = "https?://([^{}<>\"'\\s)]*)";
 
-    public ParseHTML(Document document, Tutorial tutorial) {
-        super(document, tutorial);
+    public ParseHTML(Document document, Tutorial tutorial, String date) {
+        super(document, tutorial, date);
     }
 
     /**
      * function to parse if document is html
      * @param input String input of entire document
      * @param tutorial gives document information
+     * @param date
      * @return parsed string input of html
      * @throws IOException if something is missing
      * @throws URISyntaxException if parsed url is unusual
      */
-    public static String parseHtml(String input, Tutorial tutorial) throws IOException, URISyntaxException, JSONException {
+    public static String parseHtml(String input, Tutorial tutorial, String date) throws IOException, URISyntaxException, JSONException {
 
         Document document = Jsoup.parse(input);
-        ParseHTML parser = new ParseHTML(document, tutorial);
+        ParseHTML parser = new ParseHTML(document, tutorial, date);
         parser.extractHtml();
         return parser.getInput();
     }
 
-    public static String setHelp(String hold, Tutorial tutorial) throws UnsupportedEncodingException, URISyntaxException, MalformedURLException {
+    public static String setHelp(String hold, String client, Tutorial tutorial) throws UnsupportedEncodingException, URISyntaxException, MalformedURLException {
         String rs = hold;
         String[] strings;
         strings = hold.split(", ");
@@ -64,15 +65,15 @@ public class ParseHTML extends HTMLExtractor {
      * @throws URISyntaxException if urls found have issues
      * @throws UnsupportedEncodingException if encoding of text is unusual
      */
-    public static String otherRegex(String input, Tutorial tutorial) throws URISyntaxException, UnsupportedEncodingException, MalformedURLException {
+    public static String otherRegex(String input, String client, Tutorial tutorial) throws URISyntaxException, UnsupportedEncodingException, MalformedURLException {
         Pattern pattern;
         Matcher matcher;
 
-        pattern = Pattern.compile(otherRegex);
+        pattern = Pattern.compile(regex);
         matcher = pattern.matcher(input);
         while (matcher.find()) {
             String group = matcher.group(0);
-            if (group.startsWith(client)) continue;
+            if (group.startsWith(clientStart)) continue;
             if (group.startsWith("data:")) continue;
             String newUrl = client + java.net.URLEncoder.encode(replaceUrl(group, tutorial.getTitle()), StandardCharsets.UTF_8.name());
             try {
@@ -88,12 +89,15 @@ public class ParseHTML extends HTMLExtractor {
      * parser if file is javascript
      * @param input full string input document
      * @param tutorial document information
+     * @param date
      * @return parsed string javascript document
      * @throws UnsupportedEncodingException if encoding is not functional
      * @throws URISyntaxException if urls to parse is unusual
      */
-    public static String parseJs(String input, Tutorial tutorial) throws UnsupportedEncodingException, URISyntaxException, MalformedURLException {
-        return otherRegex(input, tutorial);
+    public static String parseJs(String input, Tutorial tutorial, String date) throws UnsupportedEncodingException, URISyntaxException, MalformedURLException {
+        String client = "http://118.67.133.84:8085/api/websites?web=";
+        if (date != null) client = "http://118.67.133.84:8085/api/websites?date=" + date + "&web=";
+        return otherRegex(input, client, tutorial);
     }
 
     /**
@@ -107,7 +111,7 @@ public class ParseHTML extends HTMLExtractor {
         if (srcSets == null) return;
         for (Element srcset : srcSets) {
             String hold = srcset.attr("srcset");
-            String replace = setHelp(hold, getTutorial());
+            String replace = setHelp(hold, this.client, getTutorial());
             srcset.attr("srcset", replace);
         }
     }
@@ -123,8 +127,8 @@ public class ParseHTML extends HTMLExtractor {
         if (srcs == null) return;
         for (Element src : srcs) {
             String hold = src.attr("src");
-            if (!hold.startsWith("data:image") && !hold.startsWith(client))
-                src.attr("src", client + java.net.URLEncoder.encode(replaceUrl(hold, getTutorial().getTitle()), StandardCharsets.UTF_8.name()));
+            if (!hold.startsWith("data:image") && !hold.startsWith(this.client))
+                src.attr("src", this.client + java.net.URLEncoder.encode(replaceUrl(hold, getTutorial().getTitle()), StandardCharsets.UTF_8.name()));
         }
     }
 
@@ -133,7 +137,7 @@ public class ParseHTML extends HTMLExtractor {
         for (Element b : background) {
             String hold = b.attr("background");
             if (!hold.startsWith("data:image") && !hold.startsWith(client))
-                b.attr("background", client + java.net.URLEncoder.encode(replaceUrl(hold, getTutorial().getTitle()), StandardCharsets.UTF_8.name()));
+                b.attr("background", this.client + java.net.URLEncoder.encode(replaceUrl(hold, getTutorial().getTitle()), StandardCharsets.UTF_8.name()));
         }
     }
 
@@ -148,7 +152,7 @@ public class ParseHTML extends HTMLExtractor {
         if (hrefs == null) return;
         for (Element href : hrefs) {
             String hold = href.attr("href");
-            href.attr("href", client + java.net.URLEncoder.encode(replaceUrl(hold, getTutorial().getTitle()), StandardCharsets.UTF_8.name()));
+            href.attr("href", this.client + java.net.URLEncoder.encode(replaceUrl(hold, getTutorial().getTitle()), StandardCharsets.UTF_8.name()));
         }
     }
 
@@ -156,14 +160,14 @@ public class ParseHTML extends HTMLExtractor {
         if (hrefs == null) return;
         for (Element href : hrefs) {
             String hold = href.attr("href");
-            href.attr("href", client + java.net.URLEncoder.encode(replaceUrl(hold, getTutorial().getTitle()), StandardCharsets.UTF_8.name()));
+            href.attr("href", this.client + java.net.URLEncoder.encode(replaceUrl(hold, getTutorial().getTitle()), StandardCharsets.UTF_8.name()));
         }
     }
     public void parseStyle(Elements style) throws JSONException, IOException, URISyntaxException {
         if (style == null) return;
         for (Element css: style) {
             String hold = css.attr("style");
-            String replace = parseCSS(hold, getTutorial());
+            String replace = parseCSS(hold, getTutorial(), this.date);
             css.attr("style", replace);
         }
     }
@@ -172,7 +176,7 @@ public class ParseHTML extends HTMLExtractor {
         String input = getInput();
         while (matcher.find()) {
             String group = matcher.group(0);
-            group = parseCSS(group, getTutorial());
+            group = parseCSS(group, getTutorial(), this.date);
             input = input.replace(matcher.group(0), group);
         }
         setInput(input);
@@ -183,7 +187,7 @@ public class ParseHTML extends HTMLExtractor {
         String input = getInput();
         while (matcher.find()) {
             String group = matcher.group(0);
-            group = otherRegex(group, getTutorial());
+            group = otherRegex(group, this.client, getTutorial());
             input = input.replace(matcher.group(0), group);
         }
         setInput(input);
