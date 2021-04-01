@@ -197,7 +197,7 @@ public class ParseHTML extends HTMLExtractor {
         System.setProperty("http.proxyHost", "127.0.0.1");
         System.setProperty("http.proxyPort", "8123");
 //        Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
-        String website = "http://3dell3phmthpcqw3w4lw5fbabrqpxh4ur5pnopspwx4ifeynufaynxid.onion/store/";
+        String website = "http://crdclub4wraumez4.onion/";
         String url = "";
         while (true) {
             url = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());

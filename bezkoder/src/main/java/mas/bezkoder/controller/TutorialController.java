@@ -242,44 +242,46 @@ public class TutorialController {
       System.out.println(toReturn.getId());
       return toReturn;
     }
-    tutorials = new ArrayList<>();
-    URL url = new URL(website);
-    String query = url.getQuery();
-    if (query == null) return null;
-    String begin = website.substring(0, website.indexOf(query) - 1);
-    tutorialRepository.findByTitleContaining(begin).forEach(tutorials::add);
-    int maxQ = -1;
-    Tutorial maxTut = null;
-    if (tutorials.size() == 1) return tutorials.get(0);
-    else if (tutorials.size() == 0) return null;
-    else {
-      List<Tutorial> choices = new ArrayList<>();
-      String[] queries = query.split("&");
-      int count = 0;
-      for (Tutorial t: tutorials) {
-        Set<String> queriesHold = Set.of((new URL(t.getTitle())).getQuery().split("&"));
-        for (String q: queries) {
-          if (queriesHold.contains(q)) count++;
-        }
-        if (count == maxQ) {
-          choices.add(t);
-        } else if (count > maxQ) {
-          maxQ = count;
-          choices = new ArrayList<>();
-          choices.add(t);
-        }
-      }
-      for (Tutorial t : choices) {
-          if (maxTut == null) maxTut = t;
-          else if (abs((int) t.getDateTime().until(time, HOURS)) < dif) {
-            dif = abs((int) t.getDateTime().until(time, HOURS));
-            maxTut = t;
-          }
-      }
-      assert maxTut != null;
-      System.out.println(maxTut.getId());
-      return maxTut;
-    }
+    return null;
+
+//    tutorials = new ArrayList<>();
+//    URL url = new URL(website);
+//    String query = url.getQuery();
+//    if (query == null) return null;
+//    String begin = website.substring(0, website.indexOf(query) - 1);
+//    tutorialRepository.findByTitleContaining(begin).forEach(tutorials::add);
+//    int maxQ = -1;
+//    Tutorial maxTut = null;
+//    if (tutorials.size() == 1) return tutorials.get(0);
+//    else if (tutorials.size() == 0) return null;
+//    else {
+//      List<Tutorial> choices = new ArrayList<>();
+//      String[] queries = query.split("&");
+//      int count = 0;
+//      for (Tutorial t: tutorials) {
+//        Set<String> queriesHold = Set.of((new URL(t.getTitle())).getQuery().split("&"));
+//        for (String q: queries) {
+//          if (queriesHold.contains(q)) count++;
+//        }
+//        if (count == maxQ) {
+//          choices.add(t);
+//        } else if (count > maxQ) {
+//          maxQ = count;
+//          choices = new ArrayList<>();
+//          choices.add(t);
+//        }
+//      }
+//      for (Tutorial t : choices) {
+//          if (maxTut == null) maxTut = t;
+//          else if (abs((int) t.getDateTime().until(time, HOURS)) < dif) {
+//            dif = abs((int) t.getDateTime().until(time, HOURS));
+//            maxTut = t;
+//          }
+//      }
+//      assert maxTut != null;
+//      System.out.println(maxTut.getId());
+//      return maxTut;
+
   }
 
   public static String getTextFile(Tutorial tutorial) throws IOException {
