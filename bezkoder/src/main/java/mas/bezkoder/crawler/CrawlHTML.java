@@ -15,7 +15,7 @@ import java.util.regex.Matcher;
 import static mas.bezkoder.crawler.CrawlCSS.crawlCSS;
 
 public class CrawlHTML extends HTMLExtractor {
-    private static final int MAX_DEPTH = 3;
+    private static final int MAX_DEPTH = 5;
     private static final Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
     private String domain;
 
