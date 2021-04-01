@@ -238,7 +238,10 @@ public class TutorialController {
         }
       }
     }
-    if (toReturn != null) return toReturn;
+    if (toReturn != null) {
+      System.out.println(toReturn.getId());
+      return toReturn;
+    }
     tutorials = new ArrayList<>();
     URL url = new URL(website);
     String query = url.getQuery();
@@ -273,6 +276,8 @@ public class TutorialController {
             maxTut = t;
           }
       }
+      assert maxTut != null;
+      System.out.println(maxTut.getId());
       return maxTut;
     }
   }
