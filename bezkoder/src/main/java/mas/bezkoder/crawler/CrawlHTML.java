@@ -24,13 +24,9 @@ public class CrawlHTML extends HTMLExtractor {
     private static final Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
     private String domain;
 
-    public CrawlHTML(String domain, int depth) {
-        super(domain, new HashSet<>(), depth);
-        this.domain = domain;
-    }
 
-    public CrawlHTML(String url, String domain, int depth) {
-        super(url, new HashSet<>(), depth);
+    public CrawlHTML(String url, String domain, int depth, HashSet<String> visited) {
+        super(url, new HashSet<>(), depth, visited);
         this.domain = domain;
     }
 
@@ -129,21 +125,22 @@ public class CrawlHTML extends HTMLExtractor {
     @Override
     public void parseALink(Elements hrefs) throws IOException, URISyntaxException{
         HashSet<String> links = getUrls();
+        HashSet<String> visited = getVisited();
         String current = getUrl();
         for (Element page : hrefs) {
             String alink = page.attr("href");
             alink = replaceUrl(alink, current);
             if(!alink.contains(this.domain)) continue;
-            if(links.contains(alink)) continue;
-            HashSet<String> hold = getPageLinks(alink, this.domain, getDepth() + 1);
+            if(visited.contains(alink)) continue;
+            HashSet<String> hold = getPageLinks(alink, this.domain, getDepth() + 1, visited);
             if (hold != null) links.addAll(hold);
         }
         setUrls(links);
     }
 
-    public static HashSet<String> getPageLinks(String URL, String domain, int depth) {
+    public static HashSet<String> getPageLinks(String URL, String domain, int depth, HashSet<String> visited) {
         if (depth == MAX_DEPTH) return null;
-        CrawlHTML crawler = new CrawlHTML(URL, domain, depth);
+        CrawlHTML crawler = new CrawlHTML(URL, domain, depth, visited);
         HashSet<String> hs = crawler.getUrls();
         crawler.setUrls(hs);
         System.setProperty("http.proxyHost", "127.0.0.1");
@@ -184,6 +181,7 @@ public class CrawlHTML extends HTMLExtractor {
             Document document = Jsoup.parse(content);
             crawler.setDocument(document);
             crawler.extractHtml();
+            visited.add(URL);
             return crawler.getUrls();
         } catch (Exception ex) {
             System.err.println("For '" + URL + "': " + ex.getMessage());

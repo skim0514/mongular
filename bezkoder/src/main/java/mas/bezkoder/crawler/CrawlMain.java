@@ -59,7 +59,8 @@ public class CrawlMain {
             else website = url;
         }
         String startDomain = new URL(url).getHost();
-        HashSet<String> hs = getPageLinks(url, startDomain, 0);
+        HashSet<String> visited = new HashSet<>();
+        HashSet<String> hs = getPageLinks(url, startDomain, 0, visited);
         HashSet<String> otherLinks = new HashSet<>();
         int count = 1;
         if (hs == null) return;
