@@ -64,7 +64,8 @@ public class CrawlMain {
         }
         String startDomain = new URL(url).getHost();
         HashSet<String> visited = new HashSet<>();
-        HashSet<String> hs = getPageLinks(url, startDomain, 0, visited);
+        HashSet<String> checksums = new HashSet<>();
+        HashSet<String> hs = getPageLinks(url, startDomain, 0, visited, checksums);
         HashSet<String> otherLinks = new HashSet<>();
         int count = 1;
         if (hs == null) return;
@@ -90,13 +91,15 @@ public class CrawlMain {
                 extension = MimeTypes.getDefaultExt(filetype);
             }
             Tutorial tut;
+            String success;
             try {
-                String success = downloadFile(string);
+                success = downloadFile(string);
                 if (success == null) continue;
-                tut = addTutorial(string, extension, success, extension, contentType);
+
             } catch (IOException | IllegalArgumentException e) {
                 continue;
             }
+            tut = addTutorial(string, extension, success, extension, contentType);
             if (count % 10 == 0) System.out.println("Done with " + count + "/" + hs.size());
             count++;
             String content;
@@ -219,35 +222,6 @@ public class CrawlMain {
             hexString.append(hex);
         }
         return hexString.toString();
-    }
-
-    private static String getFileChecksum(MessageDigest digest, InputStream fis) throws IOException
-    {
-        //Get file input stream for reading the file content
-
-        //Create byte array to read data in chunks
-        byte[] byteArray = new byte[1024];
-        int bytesCount = 0;
-
-        //Read file data and update in message digest
-        while ((bytesCount = fis.read(byteArray)) != -1) {
-            digest.update(byteArray, 0, bytesCount);
-        }
-        //close the stream; We don't need it now.
-        fis.close();
-
-        //Get the hash's bytes
-        byte[] bytes = digest.digest();
-
-        //This bytes[] has bytes in decimal format;
-        //Convert it to hexadecimal format
-        StringBuilder sb = new StringBuilder();
-        for (byte aByte : bytes) {
-            sb.append(Integer.toString((aByte & 0xff) + 0x100, 16).substring(1));
-        }
-
-        //return complete hash
-        return sb.toString();
     }
 
     /**
@@ -447,11 +421,11 @@ public class CrawlMain {
             else website = url;
         }
         Document doc = Jsoup.connect(url).get();
-        Elements links = doc.select("a[href]");
+        Elements links = doc.select("[src]");
         HashSet<String> iterate = new HashSet<>();
         for (Element i: links) {
-            iterate.add(i.attr("href"));
-            System.out.println(i.attr("href"));
+            iterate.add(i.attr("src"));
+//            System.out.println(i.attr("src"));
         }
 
         System.out.println(iterate.size());

@@ -25,8 +25,8 @@ public class CrawlHTML extends HTMLExtractor {
     private String domain;
 
 
-    public CrawlHTML(String url, String domain, int depth, HashSet<String> visited) {
-        super(url, new HashSet<>(), depth, visited);
+    public CrawlHTML(String url, String domain, int depth, HashSet<String> visited, HashSet<String> checksums) {
+        super(url, new HashSet<>(), depth, visited, checksums);
         this.domain = domain;
     }
 
@@ -126,22 +126,24 @@ public class CrawlHTML extends HTMLExtractor {
     public void parseALink(Elements hrefs) throws IOException, URISyntaxException{
         HashSet<String> links = getUrls();
         HashSet<String> visited = getVisited();
+        HashSet<String> checksums = getChecksums();
         String current = getUrl();
         for (Element page : hrefs) {
             String alink = page.attr("href");
             alink = replaceUrl(alink, current);
             if(!alink.contains(this.domain)) continue;
             if(visited.contains(alink)) continue;
-            HashSet<String> hold = getPageLinks(alink, this.domain, getDepth() + 1, visited);
+            HashSet<String> hold = getPageLinks(alink, this.domain, getDepth() + 1, visited, checksums);
             if (hold != null) links.addAll(hold);
         }
         setVisited(visited);
+        setChecksums(checksums);
         setUrls(links);
     }
 
-    public static HashSet<String> getPageLinks(String URL, String domain, int depth, HashSet<String> visited) {
+    public static HashSet<String> getPageLinks(String URL, String domain, int depth, HashSet<String> visited, HashSet<String> checksums) {
         if (depth == MAX_DEPTH) return null;
-        CrawlHTML crawler = new CrawlHTML(URL, domain, depth, visited);
+        CrawlHTML crawler = new CrawlHTML(URL, domain, depth, visited, checksums);
         HashSet<String> hs = crawler.getUrls();
         crawler.setUrls(hs);
         visited.add(URL);
@@ -166,13 +168,16 @@ public class CrawlHTML extends HTMLExtractor {
             extension = MimeTypes.getDefaultExt(filetype);
         }
         Tutorial tut;
+        boolean added;
         try {
             String success = downloadFile(URL);
             if (success == null) return null;
             tut = addTutorial(URL, extension, success, extension, contentType);
+            added = checksums.add(success);
         } catch (IOException | IllegalArgumentException | NoSuchAlgorithmException | JSONException e) {
             return null;
         }
+        if (!added) return null;
         String content;
         try {
             content = getTextFile(tut);

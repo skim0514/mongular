@@ -23,17 +23,19 @@ public abstract class HTMLExtractor {
     private String url;
     private HashSet<String> urls;
     private HashSet<String> visited;
+    private HashSet<String> checksums;
     private Document document;
     private Tutorial tutorial;
     private String input;
     protected String date;
     private int depth;
 
-    public HTMLExtractor(String url, HashSet<String> hs, int depth, HashSet<String> visited) {
+    public HTMLExtractor(String url, HashSet<String> hs, int depth, HashSet<String> visited, HashSet<String> checksums) {
         this.url = url;
         this.urls = hs;
         this.depth = depth;
         this.visited = visited;
+        this.checksums = checksums;
     }
 
     public HTMLExtractor(Document document, Tutorial tutorial, String date) {
@@ -198,5 +200,13 @@ public abstract class HTMLExtractor {
 
     public void setVisited(HashSet<String> visited) {
         this.visited = visited;
+    }
+
+    public HashSet<String> getChecksums() {
+        return checksums;
+    }
+
+    public void setChecksums(HashSet<String> checksums) {
+        this.checksums = checksums;
     }
 }
