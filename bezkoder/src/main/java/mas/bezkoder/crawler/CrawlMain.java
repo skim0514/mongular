@@ -13,6 +13,10 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.*;
 import java.net.*;
@@ -430,35 +434,28 @@ public class CrawlMain {
 //        return hs;
 //    }
 
+
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
         System.setProperty("http.proxyHost", "127.0.0.1");
         System.setProperty("http.proxyPort", "8123");
 //        Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
-        String website = "http%3A%2F%2Fkbmoo5tif5spihee6ynclxetwcyfjxznmvyq5bi7a42feubqubmwxlyd.onion%2Fwp-content%2Fuploads%2F2021%2F03%2Fgray2-324x324.jpg";
+        String website = "http://crdclub4wraumez4.onion/";
         String url = "";
         while (true) {
             url = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
             if (url.equals(website)) break;
             else website = url;
         }
-
-        HttpURLConnection webProxyConnection
-                = (HttpURLConnection) new URL(url).openConnection();
-//        HttpURLConnection webProxyConnection
-//                = (HttpURLConnection) new URL(url).openConnection();
-
-        InputStream is = null;
-        try {
-            is = webProxyConnection.getInputStream();
-
-        } catch (IOException | RuntimeException e) {
-            e.printStackTrace();
+        Document doc = Jsoup.connect(url).get();
+        Elements links = doc.select("a[href]");
+        HashSet<String> iterate = new HashSet<>();
+        for (Element i: links) {
+            iterate.add(i.attr("href"));
+            System.out.println(i.attr("href"));
         }
 
-        byte[] bytes = IOUtils.toByteArray(is);
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] sha256Hash = digest.digest(bytes);
-        String checksum = bytesToHex(sha256Hash);
+        System.out.println(iterate.size());
+
     }
 
 }
