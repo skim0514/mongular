@@ -1,6 +1,7 @@
 package mas.bezkoder.crawler;
 
 import mas.bezkoder.LinkExtractor.HTMLExtractor;
+import mas.bezkoder.model.Tutorial;
 import org.json.JSONException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -9,10 +10,14 @@ import org.jsoup.select.Elements;
 
 import java.io.*;
 import java.net.*;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.regex.Matcher;
 
+import static mas.bezkoder.controller.TutorialController.getTextFile;
 import static mas.bezkoder.crawler.CrawlCSS.crawlCSS;
+import static mas.bezkoder.crawler.CrawlMain.addTutorial;
+import static mas.bezkoder.crawler.CrawlMain.downloadFile;
 
 public class CrawlHTML extends HTMLExtractor {
     private static final int MAX_DEPTH = 5;
@@ -140,12 +145,43 @@ public class CrawlHTML extends HTMLExtractor {
         if (depth == MAX_DEPTH) return null;
         CrawlHTML crawler = new CrawlHTML(URL, domain, depth);
         HashSet<String> hs = crawler.getUrls();
-        hs.add(URL);
         crawler.setUrls(hs);
         System.setProperty("http.proxyHost", "127.0.0.1");
         System.setProperty("http.proxyPort", "8123");
         try {
-            Document document = Jsoup.connect(URL).timeout(100000).get();
+            URL = CrawlMain.decode(URL);
+        } catch (IOException | IllegalArgumentException e) {
+            return null;
+        }
+        if (!URL.startsWith("http")) {
+            System.out.println(URL + " fail");
+            return null;
+        }
+        String extension;
+        String contentType = CrawlMain.getContentType(URL);
+        String filetype;
+        if (contentType == null) return null;
+        else {
+            filetype = contentType.split(";")[0];
+            extension = MimeTypes.getDefaultExt(filetype);
+        }
+        Tutorial tut;
+        try {
+            String success = downloadFile(URL);
+            if (success == null) return null;
+            tut = addTutorial(URL, extension, success, extension, contentType);
+        } catch (IOException | IllegalArgumentException | NoSuchAlgorithmException | JSONException e) {
+            return null;
+        }
+        String content;
+        try {
+            content = getTextFile(tut);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        try {
+            Document document = Jsoup.parse(content);
             crawler.setDocument(document);
             crawler.extractHtml();
             return crawler.getUrls();
