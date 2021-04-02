@@ -197,7 +197,7 @@ public class ParseHTML extends HTMLExtractor {
         System.setProperty("http.proxyHost", "127.0.0.1");
         System.setProperty("http.proxyPort", "8123");
 //        Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
-        String website = "http://crdclub4wraumez4.onion/";
+        String website = "http%3A%2F%2F3dell3phmthpcqw3w4lw5fbabrqpxh4ur5pnopspwx4ifeynufaynxid.onion%2Fwp-content%2Fuploads%2F2021%2F02%2Fshroom-324x324.png";
         String url = "";
         while (true) {
             url = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
@@ -205,8 +205,9 @@ public class ParseHTML extends HTMLExtractor {
             else website = url;
         }
 
-        Document document = Jsoup.connect(website).timeout(0).get();
-        System.out.println(document.toString());
+
+//        Document document = Jsoup.connect(website).timeout(0).get();
+//        System.out.println(document.toString());
 //        Document document = Jsoup.connect(url).proxy(webProxy).get();
 //
 

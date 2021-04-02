@@ -22,16 +22,18 @@ public abstract class HTMLExtractor {
     private static final String style ="<style([\\s\\S]+?)</style>";
     private String url;
     private HashSet<String> urls;
+    private HashSet<String> visited;
     private Document document;
     private Tutorial tutorial;
     private String input;
     protected String date;
     private int depth;
 
-    public HTMLExtractor(String url, HashSet<String> hs, int depth) {
+    public HTMLExtractor(String url, HashSet<String> hs, int depth, HashSet<String> visited) {
         this.url = url;
         this.urls = hs;
         this.depth = depth;
+        this.visited = visited;
     }
 
     public HTMLExtractor(Document document, Tutorial tutorial, String date) {
@@ -40,7 +42,6 @@ public abstract class HTMLExtractor {
         this.date = date;
         if (date != null) {
             client = "http://118.67.133.84:8085/api/websites?date=" + date + "&web=";
-
         }
     }
 
@@ -189,5 +190,13 @@ public abstract class HTMLExtractor {
                     parent.toString() + "/" + url;
         }
         return newUrl;
+    }
+
+    public HashSet<String> getVisited() {
+        return visited;
+    }
+
+    public void setVisited(HashSet<String> visited) {
+        this.visited = visited;
     }
 }

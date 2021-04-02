@@ -59,7 +59,8 @@ public class CrawlMain {
             else website = url;
         }
         String startDomain = new URL(url).getHost();
-        HashSet<String> hs = getPageLinks(url, startDomain, 0);
+        HashSet<String> visited = new HashSet<>();
+        HashSet<String> hs = getPageLinks(url, startDomain, 0, visited);
         HashSet<String> otherLinks = new HashSet<>();
         int count = 1;
         if (hs == null) return;
@@ -430,9 +431,34 @@ public class CrawlMain {
 //    }
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
-        String url = "https://www.s2wlab.com/contact.html";
-        System.out.print(downloadFile(url));
+        System.setProperty("http.proxyHost", "127.0.0.1");
+        System.setProperty("http.proxyPort", "8123");
+//        Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
+        String website = "http%3A%2F%2Fkbmoo5tif5spihee6ynclxetwcyfjxznmvyq5bi7a42feubqubmwxlyd.onion%2Fwp-content%2Fuploads%2F2021%2F03%2Fgray2-324x324.jpg";
+        String url = "";
+        while (true) {
+            url = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
+            if (url.equals(website)) break;
+            else website = url;
+        }
 
+        HttpURLConnection webProxyConnection
+                = (HttpURLConnection) new URL(url).openConnection();
+//        HttpURLConnection webProxyConnection
+//                = (HttpURLConnection) new URL(url).openConnection();
+
+        InputStream is = null;
+        try {
+            is = webProxyConnection.getInputStream();
+
+        } catch (IOException | RuntimeException e) {
+            e.printStackTrace();
+        }
+
+        byte[] bytes = IOUtils.toByteArray(is);
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] sha256Hash = digest.digest(bytes);
+        String checksum = bytesToHex(sha256Hash);
     }
 
 }
