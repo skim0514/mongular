@@ -144,6 +144,8 @@ public class CrawlHTML extends HTMLExtractor {
         CrawlHTML crawler = new CrawlHTML(URL, domain, depth, visited);
         HashSet<String> hs = crawler.getUrls();
         crawler.setUrls(hs);
+        visited.add(URL);
+        System.out.println(visited.size());
         System.setProperty("http.proxyHost", "127.0.0.1");
         System.setProperty("http.proxyPort", "8123");
         try {
@@ -182,7 +184,6 @@ public class CrawlHTML extends HTMLExtractor {
             Document document = Jsoup.parse(content);
             crawler.setDocument(document);
             crawler.extractHtml();
-            visited.add(URL);
             return crawler.getUrls();
         } catch (Exception ex) {
             System.err.println("For '" + URL + "': " + ex.getMessage());
