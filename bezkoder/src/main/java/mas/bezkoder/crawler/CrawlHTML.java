@@ -135,6 +135,7 @@ public class CrawlHTML extends HTMLExtractor {
             HashSet<String> hold = getPageLinks(alink, this.domain, getDepth() + 1, visited);
             if (hold != null) links.addAll(hold);
         }
+        setVisited(visited);
         setUrls(links);
     }
 
