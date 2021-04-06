@@ -75,7 +75,9 @@ public class ParseHTML extends HTMLExtractor {
             String group = matcher.group(0);
             if (group.startsWith(clientStart)) continue;
             if (group.startsWith("data:")) continue;
-            String newUrl = client + java.net.URLEncoder.encode(replaceUrl(group, tutorial.getTitle()), StandardCharsets.UTF_8.name());
+            String replacement = replaceUrl(group, tutorial.getTitle());
+            if (replacement == null) continue;
+            String newUrl = client + java.net.URLEncoder.encode(replacement, StandardCharsets.UTF_8.name());
             try {
                 input = input.replace("'" + group, "'" + newUrl);
                 input = input.replace("\"" + group, "\"" + newUrl);
@@ -127,8 +129,25 @@ public class ParseHTML extends HTMLExtractor {
         if (srcs == null) return;
         for (Element src : srcs) {
             String hold = src.attr("src");
-            if (!hold.startsWith("data:image") && !hold.startsWith(this.client))
-                src.attr("src", this.client + java.net.URLEncoder.encode(replaceUrl(hold, getTutorial().getTitle()), StandardCharsets.UTF_8.name()));
+            if (!hold.startsWith("data:image") && !hold.startsWith(this.client)){
+                String newUrl = replaceUrl(hold, getTutorial().getTitle());
+                if (newUrl == null) continue;
+                src.attr("src", this.client + java.net.URLEncoder.encode(newUrl, StandardCharsets.UTF_8.name()));
+            }
+
+        }
+    }
+
+    public void parsedsrc(Elements srcs) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+        if (srcs == null) return;
+        for (Element src : srcs) {
+            String hold = src.attr("data-src");
+            if (!hold.startsWith("data:image") && !hold.startsWith(this.client)) {
+                String newUrl = replaceUrl(hold, getTutorial().getTitle());
+                if (newUrl == null) continue;
+                src.attr("data-src", this.client + java.net.URLEncoder.encode(newUrl, StandardCharsets.UTF_8.name()));
+            }
+
         }
     }
 
@@ -136,8 +155,11 @@ public class ParseHTML extends HTMLExtractor {
         if (background == null) return;
         for (Element b : background) {
             String hold = b.attr("background");
-            if (!hold.startsWith("data:image") && !hold.startsWith(client))
-                b.attr("background", this.client + java.net.URLEncoder.encode(replaceUrl(hold, getTutorial().getTitle()), StandardCharsets.UTF_8.name()));
+            if (!hold.startsWith("data:image") && !hold.startsWith(this.client)) {
+                String newUrl = replaceUrl(hold, getTutorial().getTitle());
+                if (newUrl == null) continue;
+                b.attr("background", this.client + java.net.URLEncoder.encode(newUrl, StandardCharsets.UTF_8.name()));
+            }
         }
     }
 
@@ -146,23 +168,29 @@ public class ParseHTML extends HTMLExtractor {
      * @param hrefs href elements to replace
      * @throws UnsupportedEncodingException if encoding is unusual
      * @throws MalformedURLException if url is unusual
-     * @throws URISyntaxException incorrectly built url
      */
-    public void parseLinkLink(Elements hrefs) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+    public void parseLinkLink(Elements hrefs) throws UnsupportedEncodingException, MalformedURLException {
         if (hrefs == null) return;
         for (Element href : hrefs) {
             String hold = href.attr("href");
-            href.attr("href", this.client + java.net.URLEncoder.encode(replaceUrl(hold, getTutorial().getTitle()), StandardCharsets.UTF_8.name()));
+            if (hold.startsWith(this.client)) continue;
+            String newUrl = replaceUrl(hold, getTutorial().getTitle());
+            if (newUrl == null) continue;
+            href.attr("href", this.client + java.net.URLEncoder.encode(newUrl, StandardCharsets.UTF_8.name()));
         }
     }
 
-    public void parseALink(Elements hrefs) throws IOException, URISyntaxException {
+    public void parseALink(Elements hrefs) throws IOException {
         if (hrefs == null) return;
         for (Element href : hrefs) {
             String hold = href.attr("href");
-            href.attr("href", this.client + java.net.URLEncoder.encode(replaceUrl(hold, getTutorial().getTitle()), StandardCharsets.UTF_8.name()));
+            if (hold.startsWith(this.client)) continue;
+            String newUrl = replaceUrl(hold, getTutorial().getTitle());
+            if (newUrl == null) continue;
+            href.attr("href", this.client + java.net.URLEncoder.encode(newUrl, StandardCharsets.UTF_8.name()));
         }
     }
+
     public void parseStyle(Elements style) throws JSONException, IOException, URISyntaxException {
         if (style == null) return;
         for (Element css: style) {
@@ -171,6 +199,7 @@ public class ParseHTML extends HTMLExtractor {
             css.attr("style", replace);
         }
     }
+
     public void parseOtherStyle(Matcher matcher) throws IOException, URISyntaxException, JSONException {
         if (matcher == null) return;
         String input = getInput();

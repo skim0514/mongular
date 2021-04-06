@@ -65,6 +65,22 @@ public class CrawlHTML extends HTMLExtractor {
     }
 
     @Override
+    public void parsedsrc(Elements dsrc) {
+        HashSet<String> links = getUrls();
+        String current = getUrl();
+        for (Element s : dsrc) {
+            String slink = s.attr("data-src");
+            if (!slink.startsWith("data:image")) {
+                slink = replaceUrl(slink, current);
+                if (slink == null) continue;
+                links.add(slink);
+                System.out.println(">> Depth: " + getDepth() + " [" + slink + "]");
+            }
+        }
+        setUrls(links);
+    }
+
+    @Override
     public void parseBackground(Elements background) throws MalformedURLException, URISyntaxException {
         HashSet<String> links = getUrls();
         String current = getUrl();

@@ -409,21 +409,23 @@ public class CrawlMain {
 //    }
 
 
-    public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException, URISyntaxException {
         System.setProperty("http.proxyHost", "127.0.0.1");
         System.setProperty("http.proxyPort", "8123");
 //        Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
         String website = "http://crdclub4wraumez4.onion/banners/sponsor_Wall_Street..gif";
-        URL url = new URL(website);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("HEAD");
-        if (isRedirect(connection.getResponseCode())) {
-            String newUrl = connection.getHeaderField("Location"); // get redirect url from "location" header field
-//            logger.warn("Original request URL: '{}' redirected to: '{}'", urlString, newUrl);
-            System.out.println(getContentType(newUrl));
-        }
-        String contentType = connection.getContentType();
-        System.out.println(contentType);
+        String second = "http://abasdfasdfw2eerqweg";
+        System.out.println(replaceUrl(website, second));
+//        URL url = new URL(website);
+//        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+//        connection.setRequestMethod("HEAD");
+//        if (isRedirect(connection.getResponseCode())) {
+//            String newUrl = connection.getHeaderField("Location"); // get redirect url from "location" header field
+////            logger.warn("Original request URL: '{}' redirected to: '{}'", urlString, newUrl);
+//            System.out.println(getContentType(newUrl));
+//        }
+//        String contentType = connection.getContentType();
+//        System.out.println(contentType);
 
 //        System.out.println(iterate.size());
 
