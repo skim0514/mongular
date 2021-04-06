@@ -40,6 +40,7 @@ public class CrawlHTML extends HTMLExtractor {
             for (String s: strings) {
                 String[] urls = s.split(" ");
                 String newurl = replaceUrl(urls[0], current);
+                if (newurl == null) continue;
                 links.add(newurl);
                 System.out.println(">> Depth: " + getDepth() + " [" + newurl + "]");
             }
@@ -55,6 +56,7 @@ public class CrawlHTML extends HTMLExtractor {
             String slink = s.attr("src");
             if (!slink.startsWith("data:image")) {
                 slink = replaceUrl(slink, current);
+                if (slink == null) continue;
                 links.add(slink);
                 System.out.println(">> Depth: " + getDepth() + " [" + slink + "]");
             }
@@ -70,6 +72,7 @@ public class CrawlHTML extends HTMLExtractor {
             String blink = b.attr("background");
             if (!blink.startsWith("data:image")) {
                 blink = replaceUrl(blink, current);
+                if (blink == null) continue;
                 links.add(blink);
                 System.out.println(">> Depth: " + getDepth() + " [" + blink + "]");
             }
@@ -84,6 +87,7 @@ public class CrawlHTML extends HTMLExtractor {
         for (Element l : link) {
             String llink = l.attr("href");
             llink = replaceUrl(llink, current);
+            if (llink == null) continue;
             links.add(llink);
             System.out.println(">> Depth: " + getDepth() + " [" + llink + "]");
         }
@@ -131,6 +135,7 @@ public class CrawlHTML extends HTMLExtractor {
         for (Element page : hrefs) {
             String alink = page.attr("href");
             alink = replaceUrl(alink, current);
+            if (alink == null) continue;
             if(!alink.contains(this.domain)) continue;
             if(visited.contains(alink)) continue;
             HashSet<String> hold = getPageLinks(alink, this.domain, getDepth() + 1, visited, checksums);
@@ -178,6 +183,7 @@ public class CrawlHTML extends HTMLExtractor {
             return null;
         }
         if (!added) return null;
+        crawler.setChecksums(checksums);
         String content;
         try {
             content = getTextFile(tut);

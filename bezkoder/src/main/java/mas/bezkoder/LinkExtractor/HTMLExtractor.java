@@ -135,17 +135,7 @@ public abstract class HTMLExtractor {
 
     public static String replaceUrl(String url, String string) throws URISyntaxException, MalformedURLException {
         if (url.contains(clientStart)) return url;
-        String strFind = "../";
-        int count = 0, fromIndex = 0;
-        while ((fromIndex = url.indexOf(strFind, fromIndex)) != -1 ){
-            count++;
-            fromIndex++;
-        }
-        String newUrl;
-
-        //fixing paths
-        newUrl = getUrlFromPath(url, string, count);
-        return newUrl;
+        return getAbsoluteURL(url, string);
     }
 
     /**
@@ -192,6 +182,32 @@ public abstract class HTMLExtractor {
                     parent.toString() + "/" + url;
         }
         return newUrl;
+    }
+
+    private static String removeDots(String url) {
+        if (url == null) return null;
+        while (url.contains("/../")) {
+            url = url.replace("/../", "/");
+        }
+        while (url.contains("/./")) {
+            url = url.replace("/./", "/");
+        }
+        if (url.endsWith("/.")) url = url.substring(0, url.length()-1);
+
+        return url;
+    }
+
+    public static String getAbsoluteURL(String baseurl, String relurl) {
+        try {
+            URL base = new URL(baseurl);
+            return removeDots(new URL(base, relurl).toString());
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+//            logger.error(String.format("%s, %s", baseurl, relurl));
+
+        }
+        return null;
     }
 
     public HashSet<String> getVisited() {

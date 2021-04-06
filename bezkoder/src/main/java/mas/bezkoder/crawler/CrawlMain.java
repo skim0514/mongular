@@ -413,22 +413,19 @@ public class CrawlMain {
         System.setProperty("http.proxyHost", "127.0.0.1");
         System.setProperty("http.proxyPort", "8123");
 //        Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
-        String website = "http://crdclub4wraumez4.onion/";
-        String url = "";
-        while (true) {
-            url = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
-            if (url.equals(website)) break;
-            else website = url;
+        String website = "http://crdclub4wraumez4.onion/banners/sponsor_Wall_Street..gif";
+        URL url = new URL(website);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("HEAD");
+        if (isRedirect(connection.getResponseCode())) {
+            String newUrl = connection.getHeaderField("Location"); // get redirect url from "location" header field
+//            logger.warn("Original request URL: '{}' redirected to: '{}'", urlString, newUrl);
+            System.out.println(getContentType(newUrl));
         }
-        Document doc = Jsoup.connect(url).get();
-        Elements links = doc.select("[src]");
-        HashSet<String> iterate = new HashSet<>();
-        for (Element i: links) {
-            iterate.add(i.attr("src"));
-//            System.out.println(i.attr("src"));
-        }
+        String contentType = connection.getContentType();
+        System.out.println(contentType);
 
-        System.out.println(iterate.size());
+//        System.out.println(iterate.size());
 
     }
 

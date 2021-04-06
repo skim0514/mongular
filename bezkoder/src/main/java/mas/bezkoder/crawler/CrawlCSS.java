@@ -35,6 +35,7 @@ public class CrawlCSS extends CSSExtractor {
             group = group.replaceAll("'", "");
             if (group.startsWith("data:")) continue;
             String newUrl = replaceUrl(group, url);
+            if (newUrl == null) continue;
             hs.add(newUrl);
         }
         setUrls(hs);
@@ -49,6 +50,7 @@ public class CrawlCSS extends CSSExtractor {
             System.out.println("other " + group);
             if (group.startsWith("data:")) continue;
             String newUrl = replaceUrl(group, url);
+            if (newUrl == null) continue;
             hs.add(newUrl);
         }
         setUrls(hs);
