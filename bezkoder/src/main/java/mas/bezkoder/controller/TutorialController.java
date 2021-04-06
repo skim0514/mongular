@@ -167,12 +167,11 @@ public class TutorialController {
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
       }
       file = ParseMain.parseFile(file, tutorial, date);
-      byteArray = file.getBytes();
-//      byteArray = file.getBytes(tutorial.getContentEncoding());
+      byteArray = file.getBytes(tutorial.getContentEncoding());
     } else {
       byteArray = IOUtils.toByteArray(is);
     }
-    return new ResponseEntity<>(byteArray, HttpStatus.OK);
+    return new ResponseEntity<>(byteArray, headers, HttpStatus.OK);
   }
 
   public static InputStream getInputStream (Tutorial tutorial) throws IOException {
