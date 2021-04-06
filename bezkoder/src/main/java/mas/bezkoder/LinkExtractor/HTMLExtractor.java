@@ -139,6 +139,8 @@ public abstract class HTMLExtractor {
 
     public static String replaceUrl(String url, String string) {
         if (url.contains(clientStart)) return url;
+        System.out.println(url);
+        System.out.println(string);
         return getAbsoluteURL(url, string);
     }
 
