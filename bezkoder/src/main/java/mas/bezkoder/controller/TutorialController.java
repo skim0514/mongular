@@ -184,7 +184,7 @@ public class TutorialController {
     }
     HttpURLConnection con = (HttpURLConnection) url.openConnection();
     con.setRequestMethod("GET");
-    con.setRequestProperty("content-type", tutorial.getContentType());
+//    con.setRequestProperty("content-type", tutorial.getContentType());
     return con.getInputStream();
   }
 
