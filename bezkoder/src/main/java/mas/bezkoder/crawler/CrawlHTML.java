@@ -198,7 +198,10 @@ public class CrawlHTML extends HTMLExtractor {
         } catch (IOException | IllegalArgumentException | NoSuchAlgorithmException | JSONException e) {
             return null;
         }
-        if (!added) return null;
+        if (!added) {
+            System.out.println("website already crawled");
+            return null;
+        }
         crawler.setChecksums(checksums);
         String content;
         try {
