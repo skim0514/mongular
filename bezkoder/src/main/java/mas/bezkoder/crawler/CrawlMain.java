@@ -374,11 +374,29 @@ public class CrawlMain {
         System.setProperty("http.proxyHost", "127.0.0.1");
         System.setProperty("http.proxyPort", "8123");
 //        Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
-        String website = "http://crdclub4wraumez4.onion/";
+        String url = "https://bitcointalk.org/";
+        HttpURLConnection webProxyConnection
+                = (HttpURLConnection) new URL(url).openConnection();
+        InputStream is = webProxyConnection.getInputStream();
+        byte[] bytes = IOUtils.toByteArray(is);
+
+        InputStream targetStream = new ByteArrayInputStream(bytes);
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(targetStream, "ISO-8859-1"));
+
+        String inputLine;
+        StringBuffer content = new StringBuffer();
+        while ((inputLine = in.readLine()) != null) {
+            content.append(inputLine);
+        }
+        in.close();
+        System.out.println(content.toString());
+
+
+
 //        String second = "http://abasdfasdfw2eerqweg";
 //        System.out.println(replaceUrl(website, second));
 //        URL url = new URL(website);
-        Document doc = Jsoup.connect(website).get();
 
 //        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 //        connection.setRequestMethod("HEAD");
