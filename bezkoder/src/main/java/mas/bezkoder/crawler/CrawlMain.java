@@ -1,6 +1,7 @@
 package mas.bezkoder.crawler;
 
 import com.mongodb.MongoWriteException;
+import mas.bezkoder.controller.TutorialController;
 import mas.bezkoder.model.Tutorial;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -15,15 +16,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.io.*;
 import java.net.*;
-import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -36,9 +32,7 @@ import static mas.bezkoder.crawler.CrawlCSS.crawlCSS;
 import static mas.bezkoder.crawler.CrawlHTML.getPageLinks;
 
 public class CrawlMain {
-    private static final String CSSRegex = "url\\((.*?)\\)";
     private static final String otherRegex = "https?://([^{}<>\"'\\s)]*)";
-    private static final Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
 
     public static void run(String link) throws IOException, JSONException, URISyntaxException {
         try {
@@ -56,7 +50,7 @@ public class CrawlMain {
      * @throws IOException issues with url
      */
     public static void crawlSite(String website) throws JSONException, URISyntaxException, IOException, NoSuchAlgorithmException {
-        String url = "";
+        String url;
         while (true) {
             url = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
             if (url.equals(website)) break;
@@ -104,7 +98,8 @@ public class CrawlMain {
             count++;
             String content;
             try {
-                content = getTextFile(tut);
+                InputStream is = TutorialController.getInputStream(tut);
+                content = getTextFile(is, tut);
             } catch (Exception ex) {
                 ex.printStackTrace();
                 continue;
@@ -187,8 +182,6 @@ public class CrawlMain {
         System.setProperty("http.proxyPort", "8123");
         HttpURLConnection webProxyConnection
                 = (HttpURLConnection) new URL(url).openConnection();
-//        HttpURLConnection webProxyConnection
-//                = (HttpURLConnection) new URL(url).openConnection();
 
         InputStream is = null;
         try {
@@ -296,6 +289,9 @@ public class CrawlMain {
      * @return content type information
      */
     public static String getContentType(String link) {
+        System.setProperty("http.proxyHost", "127.0.0.1");
+        System.setProperty("http.proxyPort", "8123");
+
         if (link.startsWith("https://href.li/?")) link = link.replace("https://href.li/?", "");
         URL url;
         try {
@@ -305,11 +301,8 @@ public class CrawlMain {
             System.out.println(link);
             return null;
         }
-        System.setProperty("http.proxyHost", "127.0.0.1");
-        System.setProperty("http.proxyPort", "8123");
         HttpURLConnection connection;
         try {
-//            connection = (HttpURLConnection) url.openConnection();
             connection = (HttpURLConnection) url.openConnection();
         } catch (Exception e) {
             e.printStackTrace();
@@ -376,47 +369,17 @@ public class CrawlMain {
         return false;
     }
 
-//    /**
-//     * searches css for urls
-//     * @param input input css string
-//     * @param string our given domain for our website
-//     * @return hashset of urls that are in the css
-//     * @throws IOException issues with our url information.
-//     * @throws URISyntaxException badly built url
-//     * @throws JSONException issues building tutorial of website link
-//     */
-//    public static HashSet<String> searchCss(String input, String string) throws IOException, URISyntaxException, JSONException {
-//        HashSet<String> hs = new HashSet<>();
-//        Pattern pattern = Pattern.compile(CSSRegex);
-//        Matcher matcher = pattern.matcher(input);
-//        while (matcher.find()) {
-//            String group = matcher.group(1);
-//            group = group.replaceAll("\"", "");
-//            group = group.replaceAll("'", "");
-//            if (group.startsWith("data:")) continue;
-//            String newUrl = replaceUrl(group, string);
-//            hs.add(newUrl);
-//        }
-//        pattern = Pattern.compile(otherRegex);
-//        matcher = pattern.matcher(input);
-//        while (matcher.find()) {
-//            String group = matcher.group(0);
-//            if (group.startsWith("data:")) continue;
-//            String newUrl = replaceUrl(group, string);
-//            hs.add(newUrl);
-//        }
-//        return hs;
-//    }
-
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException, URISyntaxException {
         System.setProperty("http.proxyHost", "127.0.0.1");
         System.setProperty("http.proxyPort", "8123");
 //        Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
-        String website = "http://crdclub4wraumez4.onion/banners/sponsor_Wall_Street..gif";
-        String second = "http://abasdfasdfw2eerqweg";
-        System.out.println(replaceUrl(website, second));
+        String website = "http://crdclub4wraumez4.onion/";
+//        String second = "http://abasdfasdfw2eerqweg";
+//        System.out.println(replaceUrl(website, second));
 //        URL url = new URL(website);
+        Document doc = Jsoup.connect(website).get();
+
 //        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 //        connection.setRequestMethod("HEAD");
 //        if (isRedirect(connection.getResponseCode())) {

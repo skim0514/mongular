@@ -10,15 +10,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import mas.bezkoder.crawler.CrawlMain;
 import mas.bezkoder.parser.ParseMain;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -39,14 +36,11 @@ public class TutorialController {
 
   @Autowired
   TutorialRepository tutorialRepository;
-  private static String files = "http://localhost:8082/";
-//  private static String client = "http://118.67.133.84:8085/api/websites?web=";
-  private static String client = "http://localhost:8085/api/websites?web=";
-//  private static String client = "http://localhost:8085/api/tutorials";
+
   @GetMapping("/tutorials")
   public ResponseEntity<List<Tutorial>> getAllTutorials(@RequestParam(required = false) String title) {
     try {
-      List<Tutorial> tutorials = new ArrayList<Tutorial>();
+      List<Tutorial> tutorials = new ArrayList<>();
       if (title == null)
         tutorialRepository.findAll().forEach(tutorials::add);
       else
@@ -63,11 +57,8 @@ public class TutorialController {
   @GetMapping("/tutorials/id/{id}")
   public ResponseEntity<Tutorial> getTutorialById(@PathVariable("id") String id) {
     Optional<Tutorial> tutorialData = tutorialRepository.findById(id);
-    if (tutorialData.isPresent()) {
-      return new ResponseEntity<>(tutorialData.get(), HttpStatus.OK);
-    } else {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
+    return tutorialData.map(tutorial -> new ResponseEntity<>(tutorial, HttpStatus.OK))
+            .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
   }
 
   @PostMapping("/tutorials")
@@ -109,16 +100,14 @@ public class TutorialController {
   @DeleteMapping("/websites")
   public ResponseEntity<HttpStatus> deleteWebsite(@RequestParam("web") String website) {
     try {
-      String url = "";
+      String url;
       while (true) {
           url = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
           if (url.equals(website)) break;
           else website = url;
       }
       List<Tutorial> tutorials = new ArrayList<>();
-      if (website != null) {
-        tutorialRepository.findByTitleContaining(website).forEach(tutorials::add);
-      } else return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+      tutorialRepository.findByTitleContaining(website).forEach(tutorials::add);
       for (Tutorial tutorial: tutorials) {
         deleteTutorial(tutorial.getId());
       }
@@ -139,9 +128,8 @@ public class TutorialController {
   }
 
   @GetMapping("/websites")
-  public ResponseEntity<?> getFileFromWebsite(@RequestParam("web") String website, @RequestParam(name = "date", required = false) String date) throws IOException, URISyntaxException, JSONException {
-
-
+  public ResponseEntity<?> getFileFromWebsite(@RequestParam("web") String website, @RequestParam(name = "date",
+          required = false) String date) throws IOException, URISyntaxException, JSONException {
     String url = "";
     try {
       while (true) {
@@ -163,53 +151,45 @@ public class TutorialController {
     }
 
     HttpHeaders headers = new HttpHeaders();
-    if (Filetype.getDescription(tutorial.getFiletype()).equals("string")) {
+    headers.set("content-type", tutorial.getContentType());
+    InputStream is = getInputStream(tutorial);
+    byte[] byteArray;
+    if (is == null) {
+      return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+    }
+
+    if (tutorial.getFiletype().equals("html") || tutorial.getFiletype().equals("css") || tutorial.getFiletype().equals("js")) {
       String file;
       try {
-        file = getTextFile(tutorial);
+        file = getTextFile(is, tutorial);
       } catch (IOException e) {
         e.printStackTrace();
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
       }
       file = ParseMain.parseFile(file, tutorial, date);
-      byte[] byteArray = file.getBytes(tutorial.getContentEncoding());
-      headers.set("content-type", tutorial.getContentType());
-      return new ResponseEntity<>(byteArray, headers, HttpStatus.OK);
-    } else if (Filetype.getDescription(tutorial.getFiletype()).equals("image")) {
-      byte[] image;
-      headers.set("content-type", tutorial.getContentType());
-      image = getImageFile(tutorial);
-      return new ResponseEntity<>(image, headers, HttpStatus.OK);
+      byteArray = file.getBytes(tutorial.getContentEncoding());
     } else {
-      String file;
-      try {
-        file = getTextFile(tutorial);
-      } catch (IOException e) {
-        e.printStackTrace();
-        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-      }
-      headers.set("content-type", tutorial.getContentType());
-      return new ResponseEntity<>(file, headers, HttpStatus.OK);
+      byteArray = IOUtils.toByteArray(is);
     }
+    return new ResponseEntity<>(byteArray, headers, HttpStatus.OK);
   }
 
-  private byte[] getImageFile(Tutorial tutorial) throws IOException {
-    URL url = null;
+  public static InputStream getInputStream (Tutorial tutorial) throws IOException {
+    URL url;
     try {
       url = new URL("http://localhost:8085/api/file/" + tutorial.getSha());
     } catch (MalformedURLException e) {
       e.printStackTrace();
+      return null;
     }
     HttpURLConnection con = (HttpURLConnection) url.openConnection();
     con.setRequestMethod("GET");
     con.setRequestProperty("content-type", tutorial.getContentType());
-    InputStream in = con.getInputStream();
-    return IOUtils.toByteArray(in);
+    return con.getInputStream();
   }
 
   public Tutorial getTutorial(String website, String dt) throws IOException {
-    Tutorial tutorial;
-//    System.out.println("reached here" + website);
+
     website = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
 
     List<Tutorial> tutorials = new ArrayList<>();
@@ -243,70 +223,27 @@ public class TutorialController {
       return toReturn;
     }
     return null;
-
-//    tutorials = new ArrayList<>();
-//    URL url = new URL(website);
-//    String query = url.getQuery();
-//    if (query == null) return null;
-//    String begin = website.substring(0, website.indexOf(query) - 1);
-//    tutorialRepository.findByTitleContaining(begin).forEach(tutorials::add);
-//    int maxQ = -1;
-//    Tutorial maxTut = null;
-//    if (tutorials.size() == 1) return tutorials.get(0);
-//    else if (tutorials.size() == 0) return null;
-//    else {
-//      List<Tutorial> choices = new ArrayList<>();
-//      String[] queries = query.split("&");
-//      int count = 0;
-//      for (Tutorial t: tutorials) {
-//        Set<String> queriesHold = Set.of((new URL(t.getTitle())).getQuery().split("&"));
-//        for (String q: queries) {
-//          if (queriesHold.contains(q)) count++;
-//        }
-//        if (count == maxQ) {
-//          choices.add(t);
-//        } else if (count > maxQ) {
-//          maxQ = count;
-//          choices = new ArrayList<>();
-//          choices.add(t);
-//        }
-//      }
-//      for (Tutorial t : choices) {
-//          if (maxTut == null) maxTut = t;
-//          else if (abs((int) t.getDateTime().until(time, HOURS)) < dif) {
-//            dif = abs((int) t.getDateTime().until(time, HOURS));
-//            maxTut = t;
-//          }
-//      }
-//      assert maxTut != null;
-//      System.out.println(maxTut.getId());
-//      return maxTut;
-
   }
 
-  public static String getTextFile(Tutorial tutorial) throws IOException {
-    URL url = null;
-    try {
-      url = new URL("http://localhost:8085/api/file/" + tutorial.getSha());
-    } catch (MalformedURLException e) {
-      e.printStackTrace();
-    }
-    HttpURLConnection con = (HttpURLConnection) url.openConnection();
-    con.setRequestMethod("GET");
-    con.setRequestProperty("content-type", tutorial.getContentType());
-    int status = con.getResponseCode();
+
+  /**
+   * getting content of text file from the input stream and the tutorial
+   * @param inputstream file content in InputStream format
+   * @param tutorial metadata about incoming stream
+   * @return decoded content of text style file
+   * @throws IOException if badly build input stream or tutorial is inputed
+   */
+  public static String getTextFile(InputStream inputstream, Tutorial tutorial) throws IOException {
+
     BufferedReader in = new BufferedReader(
-            new InputStreamReader(con.getInputStream(), tutorial.getContentEncoding().toUpperCase()));
+            new InputStreamReader(inputstream, tutorial.getContentEncoding().toUpperCase()));
     String inputLine;
     StringBuffer content = new StringBuffer();
     while ((inputLine = in.readLine()) != null) {
       content.append(inputLine);
     }
     in.close();
-    con.disconnect();
-    String rv = content.toString();
-    //currently decoded
-    return rv;
+    return content.toString();
   }
 
   @PostMapping("/websites")

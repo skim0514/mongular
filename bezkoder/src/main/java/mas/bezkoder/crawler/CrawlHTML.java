@@ -1,6 +1,7 @@
 package mas.bezkoder.crawler;
 
 import mas.bezkoder.LinkExtractor.HTMLExtractor;
+import mas.bezkoder.controller.TutorialController;
 import mas.bezkoder.model.Tutorial;
 import org.json.JSONException;
 import org.jsoup.Jsoup;
@@ -14,6 +15,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.regex.Matcher;
 
+import static mas.bezkoder.controller.TutorialController.getInputStream;
 import static mas.bezkoder.controller.TutorialController.getTextFile;
 import static mas.bezkoder.crawler.CrawlCSS.crawlCSS;
 import static mas.bezkoder.crawler.CrawlMain.addTutorial;
@@ -21,7 +23,6 @@ import static mas.bezkoder.crawler.CrawlMain.downloadFile;
 
 public class CrawlHTML extends HTMLExtractor {
     private static final int MAX_DEPTH = 2;
-    private static final Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
     private String domain;
 
 
@@ -81,7 +82,7 @@ public class CrawlHTML extends HTMLExtractor {
     }
 
     @Override
-    public void parseBackground(Elements background) throws MalformedURLException, URISyntaxException {
+    public void parseBackground(Elements background) {
         HashSet<String> links = getUrls();
         String current = getUrl();
         for (Element b : background) {
@@ -143,7 +144,7 @@ public class CrawlHTML extends HTMLExtractor {
     }
 
     @Override
-    public void parseALink(Elements hrefs) throws IOException, URISyntaxException{
+    public void parseALink(Elements hrefs) {
         HashSet<String> links = getUrls();
         HashSet<String> visited = getVisited();
         HashSet<String> checksums = getChecksums();
@@ -163,23 +164,24 @@ public class CrawlHTML extends HTMLExtractor {
     }
 
     public static HashSet<String> getPageLinks(String URL, String domain, int depth, HashSet<String> visited, HashSet<String> checksums) {
-        if (depth == MAX_DEPTH) return null;
-        CrawlHTML crawler = new CrawlHTML(URL, domain, depth, visited, checksums);
-        HashSet<String> hs = crawler.getUrls();
-        crawler.setUrls(hs);
-        visited.add(URL);
-        System.out.println(visited.size());
         System.setProperty("http.proxyHost", "127.0.0.1");
         System.setProperty("http.proxyPort", "8123");
+
+        if (depth == MAX_DEPTH) return null;
+        if (!URL.startsWith("http")) {
+            System.out.println(URL + " fail");
+            return null;
+        }
         try {
             URL = CrawlMain.decode(URL);
         } catch (IOException | IllegalArgumentException e) {
             return null;
         }
-        if (!URL.startsWith("http")) {
-            System.out.println(URL + " fail");
-            return null;
-        }
+
+        CrawlHTML crawler = new CrawlHTML(URL, domain, depth, visited, checksums);
+        visited.add(URL);
+        System.out.println(visited.size());
+
         String extension;
         String contentType = CrawlMain.getContentType(URL);
         String filetype;
@@ -205,7 +207,8 @@ public class CrawlHTML extends HTMLExtractor {
         crawler.setChecksums(checksums);
         String content;
         try {
-            content = getTextFile(tut);
+            InputStream is = getInputStream(tut);
+            content = getTextFile(is, tut);
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;

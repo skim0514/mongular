@@ -25,10 +25,4 @@ public enum Filetype {
         }
         return "other";
     }
-    public static boolean contains(String filetype) {
-        for (Filetype ft: Filetype.values()) {
-            if (ft.name().equalsIgnoreCase(filetype)) return true;
-        }
-        return false;
-    }
 }

@@ -15,7 +15,7 @@ public class ParseMain {
      * overall file parsing function
      * @param input string input of file
      * @param tutorial file information
-     * @param date
+     * @param date date to search for
      * @return String of parsed file
      * @throws URISyntaxException if helper take incorrect urls
      * @throws IOException if information is missing

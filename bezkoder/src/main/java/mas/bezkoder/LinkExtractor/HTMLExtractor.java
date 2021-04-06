@@ -8,7 +8,6 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashSet;
@@ -139,8 +138,6 @@ public abstract class HTMLExtractor {
 
     public static String replaceUrl(String url, String string) {
         if (url.contains(clientStart)) return url;
-//        System.out.println(url);
-//        System.out.println(string);
         return getAbsoluteURL(string, url);
     }
 

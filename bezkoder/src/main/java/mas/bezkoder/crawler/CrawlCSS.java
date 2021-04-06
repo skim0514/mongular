@@ -25,7 +25,7 @@ public class CrawlCSS extends CSSExtractor {
     }
 
     @Override
-    public void parseURL(Matcher matcher) throws IOException, URISyntaxException {
+    public void parseURL(Matcher matcher) {
         String url = getUrl();
         HashSet<String> hs = getUrls();
         while (matcher.find()) {

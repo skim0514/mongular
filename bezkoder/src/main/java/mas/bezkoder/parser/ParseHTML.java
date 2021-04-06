@@ -18,10 +18,6 @@ import java.util.regex.Pattern;
 import static mas.bezkoder.parser.ParseCSS.parseCSS;
 
 public class ParseHTML extends HTMLExtractor {
-
-//    private static final String client = "http://localhost:8085/api/websites?web=";
-//    private static final String client = "http://118.67.133.84:8085/api/websites?web=";
-    private static final String CSSRegex = "url\\((.*?)\\)";
     private static final String regex = "https?://([^{}<>\"'\\s)]*)";
 
     public ParseHTML(Document document, Tutorial tutorial, String date) {
@@ -32,7 +28,7 @@ public class ParseHTML extends HTMLExtractor {
      * function to parse if document is html
      * @param input String input of entire document
      * @param tutorial gives document information
-     * @param date
+     * @param date if date is contained, gives date in string format
      * @return parsed string input of html
      * @throws IOException if something is missing
      * @throws URISyntaxException if parsed url is unusual
@@ -45,7 +41,7 @@ public class ParseHTML extends HTMLExtractor {
         return parser.getInput();
     }
 
-    public static String setHelp(String hold, String client, Tutorial tutorial) throws UnsupportedEncodingException, URISyntaxException, MalformedURLException {
+    public static String setHelp(String hold, String client, Tutorial tutorial) throws UnsupportedEncodingException {
         String rs = hold;
         String[] strings;
         strings = hold.split(", ");
@@ -62,10 +58,9 @@ public class ParseHTML extends HTMLExtractor {
      * @param input string input
      * @param tutorial information about link
      * @return parsed output
-     * @throws URISyntaxException if urls found have issues
      * @throws UnsupportedEncodingException if encoding of text is unusual
      */
-    public static String otherRegex(String input, String client, Tutorial tutorial) throws URISyntaxException, UnsupportedEncodingException, MalformedURLException {
+    public static String otherRegex(String input, String client, Tutorial tutorial) throws UnsupportedEncodingException {
         Pattern pattern;
         Matcher matcher;
 
@@ -91,7 +86,7 @@ public class ParseHTML extends HTMLExtractor {
      * parser if file is javascript
      * @param input full string input document
      * @param tutorial document information
-     * @param date
+     * @param date date to search for
      * @return parsed string javascript document
      * @throws UnsupportedEncodingException if encoding is not functional
      * @throws URISyntaxException if urls to parse is unusual
@@ -138,6 +133,14 @@ public class ParseHTML extends HTMLExtractor {
         }
     }
 
+
+    /**
+     * implementation of parse data-src for LinkExtractor
+     * @param srcs types of data-src elements to replace
+     * @throws UnsupportedEncodingException will not be thrown
+     * @throws MalformedURLException badly build url
+     * @throws URISyntaxException problems in syntax
+     */
     public void parsedsrc(Elements srcs) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
         if (srcs == null) return;
         for (Element src : srcs) {
@@ -147,11 +150,15 @@ public class ParseHTML extends HTMLExtractor {
                 if (newUrl == null) continue;
                 src.attr("data-src", this.client + java.net.URLEncoder.encode(newUrl, StandardCharsets.UTF_8.name()));
             }
-
         }
     }
 
-    public void parseBackground(Elements background) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+    /**
+     * implementation of parse background for LinkExtractor - needed for older links
+     * @param background src of the background
+     * @throws UnsupportedEncodingException will not be thrown
+     */
+    public void parseBackground(Elements background) throws UnsupportedEncodingException {
         if (background == null) return;
         for (Element b : background) {
             String hold = b.attr("background");
@@ -180,7 +187,12 @@ public class ParseHTML extends HTMLExtractor {
         }
     }
 
-    public void parseALink(Elements hrefs) throws IOException {
+    /**
+     * implementation of replacement of A links
+     * @param hrefs elements to replace
+     * @throws UnsupportedEncodingException if encoding is unusal not thrown
+     */
+    public void parseALink(Elements hrefs) throws UnsupportedEncodingException {
         if (hrefs == null) return;
         for (Element href : hrefs) {
             String hold = href.attr("href");
@@ -191,6 +203,13 @@ public class ParseHTML extends HTMLExtractor {
         }
     }
 
+    /**
+     * Replaying style tags in html files
+     * @param style elements to parse
+     * @throws JSONException adding tutorial
+     * @throws IOException issues with link
+     * @throws URISyntaxException error in url
+     */
     public void parseStyle(Elements style) throws JSONException, IOException, URISyntaxException {
         if (style == null) return;
         for (Element css: style) {
@@ -200,6 +219,13 @@ public class ParseHTML extends HTMLExtractor {
         }
     }
 
+    /**
+     * Replacing other type of style tags
+     * @param matcher elements to parse
+     * @throws JSONException adding tutorial
+     * @throws IOException issues with link
+     * @throws URISyntaxException error in url
+     */
     public void parseOtherStyle(Matcher matcher) throws IOException, URISyntaxException, JSONException {
         if (matcher == null) return;
         String input = getInput();
@@ -211,6 +237,13 @@ public class ParseHTML extends HTMLExtractor {
         setInput(input);
     }
 
+    /**
+     * Finding other HTML links to rebuild
+     * @param matcher replacing http links found
+     * @throws UnsupportedEncodingException Encoding is not working
+     * @throws MalformedURLException badly build url
+     * @throws URISyntaxException problems in syntax
+     */
     public void parseOther(Matcher matcher) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
         if (matcher == null) return;
         String input = getInput();
@@ -227,7 +260,7 @@ public class ParseHTML extends HTMLExtractor {
         System.setProperty("http.proxyPort", "8123");
 //        Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
         String website = "http%3A%2F%2F3dell3phmthpcqw3w4lw5fbabrqpxh4ur5pnopspwx4ifeynufaynxid.onion%2Fwp-content%2Fuploads%2F2021%2F02%2Fshroom-324x324.png";
-        String url = "";
+        String url;
         while (true) {
             url = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
             if (url.equals(website)) break;
