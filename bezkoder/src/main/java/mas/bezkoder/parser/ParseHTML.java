@@ -272,32 +272,38 @@ public class ParseHTML extends HTMLExtractor {
         System.setProperty("http.proxyHost", "127.0.0.1");
         System.setProperty("http.proxyPort", "8123");
 //        Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
-        String url = "This is a url http://abcdefg.com";
-        url = replaceUrl("http://abc.com", url);
-//        String website = "http://3dell3phmthpcqw3w4lw5fbabrqpxh4ur5pnopspwx4ifeynufaynxid.onion/product/%ea%b7%b8%eb%a6%ac%ec%8a%a4%eb%aa%bd%ed%82%a4/";
-//        String url;
-//        while (true) {
-//            url = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
-//            if (url.equals(website)) break;
-//            else website = url;
-//        }
-//
-//        System.out.println(url);
-//
-//
-//        Document document = Jsoup.connect(website).timeout(0).get();
-////        System.out.println(document.toString());
-//
-////        Tutorial tutorial = new Tutorial(website, "html", "123456", "http://3dell3phmthpcqw3w4lw5fbabrqpxh4ur5pnopspwx4ifeynufaynxid.onion/", "html", "text/html", "UTF-8");
-////        String newHtml = parseHtml(document.toString(), tutorial, null);
-//
-//        Elements dsrc = document.select("[^data-]");
-//        for (Element dsr: dsrc) {
-//            for (Attribute att : dsr.attributes().asList()) {
-////                att.set
-//                System.out.println(att);
-//            }
-//        }
+//        String url = "This is a url http://abcdefg.com";
+//        url = replaceUrl("http://abc.com", url);
+        String website = "http://3dell3phmthpcqw3w4lw5fbabrqpxh4ur5pnopspwx4ifeynufaynxid.onion/product/%ea%b7%b8%eb%a6%ac%ec%8a%a4%eb%aa%bd%ed%82%a4/";
+        String url;
+        while (true) {
+            url = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
+            if (url.equals(website)) break;
+            else website = url;
+        }
+
+        System.out.println(url);
+
+
+        Document document = Jsoup.connect(website).timeout(0).get();
+//        System.out.println(document.toString());
+
+        Tutorial tutorial = new Tutorial(website, "html", "123456", "http://3dell3phmthpcqw3w4lw5fbabrqpxh4ur5pnopspwx4ifeynufaynxid.onion/", "html", "text/html", "UTF-8");
+//        String newHtml = parseHtml(document.toString(), tutorial, null);
+
+        Elements dsrc = document.select("[^data-]");
+        for (Element dsr: dsrc) {
+            for (Attribute att : dsr.attributes().asList()) {
+//                att.set
+                if (att.getKey().contains("data-") && !att.getKey().equals("data-src")) {
+                    String curr = att.getValue();
+                    if (Pattern.compile(regex).matcher(curr).find()) {
+                        String newUrl = replaceUrl(curr, tutorial.getTitle());
+                        System.out.println(att.getKey() + newUrl);
+                    }
+                }
+            }
+        }
 //        System.out.println(document.toString());
 //        System.out.println(newHtml);
 //        Document document = Jsoup.connect(url).proxy(webProxy).get();
