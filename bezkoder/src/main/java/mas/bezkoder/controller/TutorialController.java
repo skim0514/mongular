@@ -244,7 +244,6 @@ public class TutorialController {
       content.append(inputLine);
     }
     in.close();
-    System.out.println(content.toString());
     return content.toString();
   }
 

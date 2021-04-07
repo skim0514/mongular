@@ -58,7 +58,7 @@ public abstract class HTMLExtractor {
         parsedsrc(dsrc);
 
         Elements data = document.select("[^data-]");
-        parseData(dsrc);
+        parseData(data);
 
         Elements background = document.select("[background]");
         parseBackground(background);
