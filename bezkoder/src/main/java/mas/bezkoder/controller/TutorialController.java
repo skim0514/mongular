@@ -151,7 +151,7 @@ public class TutorialController {
     }
 
     HttpHeaders headers = new HttpHeaders();
-//    headers.set("content-type", tutorial.getContentType());
+    headers.set("content-type", tutorial.getContentType());
     InputStream is = getInputStream(tutorial);
     byte[] byteArray;
     if (is == null) {
@@ -172,8 +172,8 @@ public class TutorialController {
     } else {
       byteArray = IOUtils.toByteArray(is);
     }
-//    return new ResponseEntity<>(byteArray, headers, HttpStatus.OK);
-    return new ResponseEntity<>(byteArray, HttpStatus.OK);
+    return new ResponseEntity<>(byteArray, headers, HttpStatus.OK);
+//    return new ResponseEntity<>(byteArray, HttpStatus.OK);
   }
 
   public static InputStream getInputStream (Tutorial tutorial) throws IOException {
