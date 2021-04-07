@@ -151,7 +151,8 @@ public class TutorialController {
     }
 
     HttpHeaders headers = new HttpHeaders();
-    headers.set("content-type", "text/html; charset=UTF-8 ");
+    String filetype = tutorial.getContentType().split(";")[0];
+    headers.set("content-type", filetype + "; charset=UTF-8");
     InputStream is = getInputStream(tutorial);
     byte[] byteArray;
     if (is == null) {
