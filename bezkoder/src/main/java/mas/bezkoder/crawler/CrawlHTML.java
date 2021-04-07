@@ -5,15 +5,18 @@ import mas.bezkoder.controller.TutorialController;
 import mas.bezkoder.model.Tutorial;
 import org.json.JSONException;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static mas.bezkoder.controller.TutorialController.getInputStream;
 import static mas.bezkoder.controller.TutorialController.getTextFile;
@@ -60,6 +63,25 @@ public class CrawlHTML extends HTMLExtractor {
                 if (slink == null) continue;
                 links.add(slink);
                 System.out.println(">> Depth: " + getDepth() + " [" + slink + "]");
+            }
+        }
+        setUrls(links);
+    }
+
+    @Override
+    public void parseData(Elements data) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+        HashSet<String> links = getUrls();
+        String current = getUrl();
+        for (Element d : data) {
+            for (Attribute att : d.attributes().asList()) {
+                if (att.getKey().contains("data-") && !att.getKey().equals("data-src")) {
+                    String curr = att.getValue();
+                    String newUrl = replaceUrl(curr, current);
+                    if (newUrl != null) {
+                        links.add(newUrl);
+                        System.out.println(">> Depth: " + getDepth() + " [" + newUrl + "]");
+                    }
+                }
             }
         }
         setUrls(links);
@@ -129,16 +151,6 @@ public class CrawlHTML extends HTMLExtractor {
         while (matcher.find()) {
             String group = matcher.group(0);
             links.addAll(crawlCSS(group, current));
-        }
-        setUrls(links);
-    }
-
-    @Override
-    public void parseOther(Matcher matcher) {
-        HashSet<String> links = getUrls();
-        while (matcher.find()) {
-            String group = matcher.group(0);
-            links.add(group);
         }
         setUrls(links);
     }

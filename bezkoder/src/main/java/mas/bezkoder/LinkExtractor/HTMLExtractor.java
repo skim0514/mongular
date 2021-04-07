@@ -57,6 +57,9 @@ public abstract class HTMLExtractor {
         Elements dsrc = document.select("[data-src]");
         parsedsrc(dsrc);
 
+        Elements data = document.select("[^data-]");
+        parseData(dsrc);
+
         Elements background = document.select("[background]");
         parseBackground(background);
 
@@ -75,11 +78,9 @@ public abstract class HTMLExtractor {
         Pattern pattern = Pattern.compile(style);
         Matcher matcher = pattern.matcher(this.input);
         parseOtherStyle(matcher);
-
-        pattern = Pattern.compile(otherRegex);
-        matcher = pattern.matcher(this.input);
-        parseOther(matcher);
     }
+
+    public abstract void parseData(Elements dsrc) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException;
 
     public abstract void parsedsrc(Elements dsrc) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException;
 
@@ -90,7 +91,6 @@ public abstract class HTMLExtractor {
     public abstract void parseALink(Elements hrefs) throws IOException, URISyntaxException, JSONException;
     public abstract void parseStyle(Elements style) throws JSONException, IOException, URISyntaxException;
     public abstract void parseOtherStyle(Matcher matcher) throws JSONException, IOException, URISyntaxException;
-    public abstract void parseOther(Matcher matcher) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException;
 
     public String getUrl() {
         return url;

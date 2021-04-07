@@ -4,6 +4,7 @@ import mas.bezkoder.LinkExtractor.HTMLExtractor;
 import mas.bezkoder.model.Tutorial;
 import org.json.JSONException;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -154,6 +155,35 @@ public class ParseHTML extends HTMLExtractor {
     }
 
     /**
+     * implementation of parse data-src for LinkExtractor
+     * @param data types of data- elements to replace
+     * @throws UnsupportedEncodingException will not be thrown
+     * @throws MalformedURLException badly build url
+     * @throws URISyntaxException problems in syntax
+     */
+    public void parseData(Elements data) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+        if (data == null) return;
+        for (Element d : data) {
+            for (Attribute att : d.attributes().asList()) {
+                if (att.getKey().contains("data-") && !att.getKey().equals("data-src")) {
+                    String curr = att.getValue();
+                    if (Pattern.compile(regex).matcher(curr).find() && !curr.startsWith(this.client)) {
+                        String newUrl = replaceUrl(curr, getTutorial().getTitle());
+                        if (newUrl != null)
+                            att.setValue(this.client + java.net.URLEncoder.encode(newUrl, StandardCharsets.UTF_8.name()));
+                    }
+                }
+            }
+//            String hold = src.attr("data-src");
+//            if (!hold.startsWith("data:image") && !hold.startsWith(this.client)) {
+//                String newUrl = replaceUrl(hold, getTutorial().getTitle());
+//                if (newUrl == null) continue;
+//                src.attr("data-src", this.client + java.net.URLEncoder.encode(newUrl, StandardCharsets.UTF_8.name()));
+
+        }
+    }
+
+    /**
      * implementation of parse background for LinkExtractor - needed for older links
      * @param background src of the background
      * @throws UnsupportedEncodingException will not be thrown
@@ -237,39 +267,39 @@ public class ParseHTML extends HTMLExtractor {
         setInput(input);
     }
 
-    /**
-     * Finding other HTML links to rebuild
-     * @param matcher replacing http links found
-     * @throws UnsupportedEncodingException Encoding is not working
-     * @throws MalformedURLException badly build url
-     * @throws URISyntaxException problems in syntax
-     */
-    public void parseOther(Matcher matcher) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
-        if (matcher == null) return;
-        String input = getInput();
-        while (matcher.find()) {
-            String group = matcher.group(0);
-            group = otherRegex(group, this.client, getTutorial());
-            input = input.replace(matcher.group(0), group);
-        }
-        setInput(input);
-    }
 
     public static void main (String[] args) throws IOException, URISyntaxException, JSONException {
         System.setProperty("http.proxyHost", "127.0.0.1");
         System.setProperty("http.proxyPort", "8123");
 //        Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
-        String website = "http%3A%2F%2F3dell3phmthpcqw3w4lw5fbabrqpxh4ur5pnopspwx4ifeynufaynxid.onion%2Fwp-content%2Fuploads%2F2021%2F02%2Fshroom-324x324.png";
-        String url;
-        while (true) {
-            url = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
-            if (url.equals(website)) break;
-            else website = url;
-        }
-
-
+        String url = "This is a url http://abcdefg.com";
+        url = replaceUrl("http://abc.com", url);
+//        String website = "http://3dell3phmthpcqw3w4lw5fbabrqpxh4ur5pnopspwx4ifeynufaynxid.onion/product/%ea%b7%b8%eb%a6%ac%ec%8a%a4%eb%aa%bd%ed%82%a4/";
+//        String url;
+//        while (true) {
+//            url = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
+//            if (url.equals(website)) break;
+//            else website = url;
+//        }
+//
+//        System.out.println(url);
+//
+//
 //        Document document = Jsoup.connect(website).timeout(0).get();
+////        System.out.println(document.toString());
+//
+////        Tutorial tutorial = new Tutorial(website, "html", "123456", "http://3dell3phmthpcqw3w4lw5fbabrqpxh4ur5pnopspwx4ifeynufaynxid.onion/", "html", "text/html", "UTF-8");
+////        String newHtml = parseHtml(document.toString(), tutorial, null);
+//
+//        Elements dsrc = document.select("[^data-]");
+//        for (Element dsr: dsrc) {
+//            for (Attribute att : dsr.attributes().asList()) {
+////                att.set
+//                System.out.println(att);
+//            }
+//        }
 //        System.out.println(document.toString());
+//        System.out.println(newHtml);
 //        Document document = Jsoup.connect(url).proxy(webProxy).get();
 //
 
