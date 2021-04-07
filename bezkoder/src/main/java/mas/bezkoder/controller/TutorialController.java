@@ -151,7 +151,7 @@ public class TutorialController {
     }
 
     HttpHeaders headers = new HttpHeaders();
-    headers.set("content-type", "text/html; charset=UTF-8");
+    headers.set("content-type", "text/html; charset=UTF-8 ");
     InputStream is = getInputStream(tutorial);
     byte[] byteArray;
     if (is == null) {
@@ -167,8 +167,8 @@ public class TutorialController {
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
       }
       file = ParseMain.parseFile(file, tutorial, date);
-      byteArray = file.getBytes(tutorial.getContentEncoding());
-//      byteArray = file.getBytes();
+//      byteArray = file.getBytes(tutorial.getContentEncoding());
+      byteArray = file.getBytes();
     } else {
       byteArray = IOUtils.toByteArray(is);
     }
