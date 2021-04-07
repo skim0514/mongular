@@ -151,7 +151,7 @@ public class TutorialController {
     }
 
     HttpHeaders headers = new HttpHeaders();
-//    headers.set("content-type", tutorial.getContentType());
+    headers.set("content-type", tutorial.getContentType());
     InputStream is = getInputStream(tutorial);
     byte[] byteArray;
     if (is == null) {
