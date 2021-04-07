@@ -167,8 +167,8 @@ public class TutorialController {
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
       }
       file = ParseMain.parseFile(file, tutorial, date);
-      byteArray = file.getBytes(tutorial.getContentEncoding());
-//      byteArray = file.getBytes();
+//      byteArray = file.getBytes(tutorial.getContentEncoding());
+      byteArray = file.getBytes();
     } else {
       byteArray = IOUtils.toByteArray(is);
     }
