@@ -172,7 +172,8 @@ public class TutorialController {
     } else {
       byteArray = IOUtils.toByteArray(is);
     }
-    return new ResponseEntity<>(byteArray, headers, HttpStatus.OK);
+//    return new ResponseEntity<>(byteArray, headers, HttpStatus.OK);
+    return new ResponseEntity<>(byteArray, HttpStatus.OK);
   }
 
   public static InputStream getInputStream (Tutorial tutorial) throws IOException {
