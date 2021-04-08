@@ -181,18 +181,20 @@ public class TutorialController {
     Document doc = Jsoup.parse(tf1);
     Document rep = Jsoup.parse(file);
     doc.body().replaceWith(rep.body());
+    String rs = doc.toString();
+    rs = ParseMain.parseFile(rs, tutorial1, prev);
+
+    doc = Jsoup.parse(rs);
     Element rephead = rep.head();
     Elements css = rephead.select("link[href]");
     for (Element cssHold: css) {
       String diff = css.attr("href");
       cssHold.attr("href", "http://118.67.133.84:8082/" + diff);
     }
-
     rephead.appendTo(doc.head());
-    String rs = doc.toString();
-    rs = ParseMain.parseFile(rs, tutorial1, prev);
 
-    return new ResponseEntity<>(rs, HttpStatus.OK);
+
+    return new ResponseEntity<>(doc.toString(), HttpStatus.OK);
   }
 
   @GetMapping("/websites")
