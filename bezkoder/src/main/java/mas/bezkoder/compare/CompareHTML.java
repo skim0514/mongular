@@ -11,9 +11,13 @@ import java.util.List;
 public class CompareHTML {
     private String path;
     private Document file1;
+    private String file1S;
     private Document file2;
+    private String file2S;
 
     public CompareHTML(String file1, String file2) {
+        this.file1S = file1;
+        this.file2S = file2;
         this.file1 = Jsoup.parse(file1);
         this.file2 = Jsoup.parse(file2);
     }
@@ -27,9 +31,8 @@ public class CompareHTML {
                 continue;
             }
             if (e.tagName().equals("script")) continue;
-            if (!elements2.contains(e)) {
+            if (!this.file2S.contains(e.toString())) {
                 elementsHold.add(e);
-                System.out.println(e);
             }
         }
 
@@ -65,5 +68,21 @@ public class CompareHTML {
 
     public void setFile2(Document file2) {
         this.file2 = file2;
+    }
+
+    public String getFile1S() {
+        return file1S;
+    }
+
+    public void setFile1S(String file1S) {
+        this.file1S = file1S;
+    }
+
+    public Document getFile2S() {
+        return file2S;
+    }
+
+    public void setFile2S(Document file2S) {
+        this.file2S = file2S;
     }
 }
