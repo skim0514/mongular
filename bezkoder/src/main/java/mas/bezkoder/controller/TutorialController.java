@@ -3,8 +3,6 @@ package mas.bezkoder.controller;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -14,11 +12,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import mas.bezkoder.compare.CompareHTML;
 import mas.bezkoder.crawler.CrawlMain;
 import mas.bezkoder.parser.ParseMain;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
+import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -147,20 +147,10 @@ public class TutorialController {
     ResponseEntity<?> second = getFileFromWebsite(website, next);
     String fr = new String((byte[]) Objects.requireNonNull(first.getBody()), StandardCharsets.UTF_8);
     String sr = new String((byte[]) Objects.requireNonNull(second.getBody()), StandardCharsets.UTF_8);
-    BufferedWriter writer = new BufferedWriter(new FileWriter("firstFile.html"));
-    writer.write(fr);
-    writer.close();
-
-    writer = new BufferedWriter(new FileWriter("secondFile.html"));
-    writer.write(sr);
-    writer.close();
-
-    Process p = Runtime.getRuntime().exec("java -jar daisydiff.jar firstFile.html secondFile.html");
-    int exitVal = p.waitFor();
-
-    Path fileName = Path.of("daisydiff.htm");
-    String file = Files.readString(fileName);
-    return new ResponseEntity<>(file, HttpStatus.OK);
+    CompareHTML cm = new CompareHTML(fr, sr);
+    cm.runCompare();
+    Document file = cm.getFile1();
+    return new ResponseEntity<>(file.toString(), HttpStatus.OK);
   }
 
   @GetMapping("/websites")

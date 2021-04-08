@@ -291,18 +291,10 @@ public class ParseHTML extends HTMLExtractor {
         Tutorial tutorial = new Tutorial(website, "html", "123456", "http://3dell3phmthpcqw3w4lw5fbabrqpxh4ur5pnopspwx4ifeynufaynxid.onion/", "html", "text/html", "UTF-8");
 //        String newHtml = parseHtml(document.toString(), tutorial, null);
 
-        Elements dsrc = document.select("[^data-]");
+        Elements dsrc = document.select("*");
         for (Element dsr: dsrc) {
-            for (Attribute att : dsr.attributes().asList()) {
-//                att.set
-                if (att.getKey().contains("data-") && !att.getKey().equals("data-src")) {
-                    String curr = att.getValue();
-                    if (Pattern.compile(regex).matcher(curr).find()) {
-                        String newUrl = replaceUrl(curr, tutorial.getTitle());
-                        System.out.println(att.getKey() + newUrl);
-                    }
-                }
-            }
+            String a = dsr.attr("style");
+            System.out.println(dsr);
         }
 //        System.out.println(document.toString());
 //        System.out.println(newHtml);
