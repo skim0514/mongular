@@ -17,7 +17,7 @@ public class CompareHTML {
 
     public void runCompare() {
         Elements elements1 = this.file1.body().getAllElements();
-        Elements elements2 = this.file1.body().getAllElements();
+        Elements elements2 = this.file2.body().getAllElements();
         for (Element e: elements1) {
             if (e.tagName().equals("div") || e.tagName().equals("script")) continue;
             if (!elements2.contains(e)) {
