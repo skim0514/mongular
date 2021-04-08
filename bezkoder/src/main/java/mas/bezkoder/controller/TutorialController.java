@@ -131,7 +131,7 @@ public class TutorialController {
 
   @GetMapping("/comparison")
   public ResponseEntity<?> getComparison(@RequestParam("web") String website, @RequestParam("prev") String prev,
-                                         @RequestParam(name = "next", required = false) String next) throws JSONException, IOException, URISyntaxException {
+                                         @RequestParam(name = "next", required = false) String next) throws JSONException, IOException, URISyntaxException, InterruptedException {
     String url = "";
     try {
       while (true) {
@@ -154,7 +154,9 @@ public class TutorialController {
     writer.write(sr);
     writer.close();
 
-    Runtime.getRuntime().exec("java -jar daisydiff.jar firstFile.html secondFile.html");
+    Process p = Runtime.getRuntime().exec("java -jar daisydiff.jar firstFile.html secondFile.html");
+    int exitVal = p.waitFor();
+
     Path fileName = Path.of("daisydiff.htm");
     String file = Files.readString(fileName);
     return new ResponseEntity<>(file, HttpStatus.OK);
