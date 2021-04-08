@@ -143,14 +143,28 @@ public class TutorialController {
     } catch (UnsupportedEncodingException e) {
       // not going to happen - value came from JDK's own StandardCharsets
     }
-    ResponseEntity<?> first = getFileFromWebsite(website, prev);
-    ResponseEntity<?> second = getFileFromWebsite(website, next);
-    String fr = new String((byte[]) Objects.requireNonNull(first.getBody()), StandardCharsets.UTF_8);
-    String sr = new String((byte[]) Objects.requireNonNull(second.getBody()), StandardCharsets.UTF_8);
-    CompareHTML cm = new CompareHTML(fr, sr);
+    Tutorial tutorial1;
+    Tutorial tutorial2;
+    try {
+      tutorial1 = getTutorial(url, prev);
+      tutorial2 = getTutorial(url, next);
+      if (tutorial1 == null || tutorial2 == null) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    } catch (Exception e) {
+      e.printStackTrace();
+      return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    InputStream is1 = getInputStream(tutorial1);
+    InputStream is2 = getInputStream(tutorial2);
+    String tf1 = getTextFile(is1, tutorial1);
+    String tf2 = getTextFile(is2, tutorial2);
+
+    CompareHTML cm = new CompareHTML(tf1, tf2);
     cm.runCompare();
     Document file = cm.getFile1();
-    return new ResponseEntity<>(file.toString(), HttpStatus.OK);
+    String newFile = file.toString();
+    String parsed = ParseMain.parseFile(newFile, tutorial1, prev);
+    return new ResponseEntity<>(parsed, HttpStatus.OK);
   }
 
   @GetMapping("/websites")
