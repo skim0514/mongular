@@ -25,7 +25,7 @@ public class CompareHTML {
     public void runCompare() {
         List<Element> elementsHold = new ArrayList<>();
         Elements elements1 = this.file1.body().getAllElements();
-        Elements elements2 = this.file2.body().getAllElements();
+//        Elements elements2 = this.file2.body().getAllElements();
         for (Element e: elements1) {
             if (e.children().size() > 0) {
                 continue;
@@ -33,6 +33,7 @@ public class CompareHTML {
             if (e.tagName().equals("script")) continue;
             if (!this.file2S.contains(e.toString())) {
                 elementsHold.add(e);
+                System.out.println(e);
             }
         }
 
@@ -78,11 +79,11 @@ public class CompareHTML {
         this.file1S = file1S;
     }
 
-    public Document getFile2S() {
+    public String getFile2S() {
         return file2S;
     }
 
-    public void setFile2S(Document file2S) {
+    public void setFile2S(String file2S) {
         this.file2S = file2S;
     }
 }
