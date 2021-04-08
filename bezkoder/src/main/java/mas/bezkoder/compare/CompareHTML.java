@@ -32,15 +32,6 @@ public class CompareHTML {
             }
         }
 
-        for (Element e: elements2) {
-            if (e.children().size() > 0) {
-                continue;
-            }
-            if (e.tagName().equals("script")) continue;
-            if (!elements1.contains(e)) {
-                elementsHold.add(e);
-            }
-        }
         for (Element e: elementsHold) {
             String a = e.attr("style");
             if (a.length() == 0) {
