@@ -5,6 +5,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CompareHTML {
     private String path;
     private Document file1;
@@ -16,6 +19,7 @@ public class CompareHTML {
     }
 
     public void runCompare() {
+        List<Element> elementsHold = new ArrayList<>();
         Elements elements1 = this.file1.body().getAllElements();
         Elements elements2 = this.file2.body().getAllElements();
         for (Element e: elements1) {
@@ -24,12 +28,7 @@ public class CompareHTML {
             }
             if (e.tagName().equals("script")) continue;
             if (!elements2.contains(e)) {
-                String a = e.attr("style");
-                if (a.length() == 0) {
-                    e.attr("style", "background-color: #FFFF00");
-                } else {
-                    e.attr("style", a + "; background-color: #FFFF00");
-                }
+                elementsHold.add(e);
             }
         }
 
@@ -39,12 +38,15 @@ public class CompareHTML {
             }
             if (e.tagName().equals("script")) continue;
             if (!elements1.contains(e)) {
-                String a = e.attr("style");
-                if (a.length() == 0) {
-                    e.attr("style", "background-color: #0000FF");
-                } else {
-                    e.attr("style", a + "; background-color: #0000FF");
-                }
+                elementsHold.add(e);
+            }
+        }
+        for (Element e: elementsHold) {
+            String a = e.attr("style");
+            if (a.length() == 0) {
+                e.attr("style", "background-color: #0000FF");
+            } else {
+                e.attr("style", a + "; background-color: #0000FF");
             }
         }
     }
