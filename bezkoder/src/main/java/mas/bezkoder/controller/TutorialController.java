@@ -167,6 +167,8 @@ public class TutorialController {
     Document doc = Jsoup.parse(fr);
     Document rep = Jsoup.parse(file);
     doc.body().replaceWith(rep.body());
+    Element rephead = rep.head();
+    rephead.appendTo(doc.head());
     return new ResponseEntity<>(doc.toString(), HttpStatus.OK);
   }
 
