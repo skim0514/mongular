@@ -172,7 +172,7 @@ public class TutorialController {
     Elements css = rephead.select("link[href]");
     for (Element cssHold: css) {
       String diff = css.attr("href");
-      cssHold.attr("href", "http://localhost:8082/" + diff);
+      cssHold.attr("href", "http://118.67.133.84:8082/" + diff);
     }
 
     rephead.appendTo(doc.head());
