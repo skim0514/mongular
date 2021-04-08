@@ -11,6 +11,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import mas.bezkoder.crawler.CrawlMain;
@@ -144,8 +145,8 @@ public class TutorialController {
     }
     ResponseEntity<?> first = getFileFromWebsite(website, prev);
     ResponseEntity<?> second = getFileFromWebsite(website, next);
-    String fr = first.toString();
-    String sr = second.toString();
+    String fr = new String((byte[]) Objects.requireNonNull(first.getBody()), StandardCharsets.UTF_8);
+    String sr = new String((byte[]) Objects.requireNonNull(second.getBody()), StandardCharsets.UTF_8);
     BufferedWriter writer = new BufferedWriter(new FileWriter("firstFile.html"));
     writer.write(fr);
     writer.close();
