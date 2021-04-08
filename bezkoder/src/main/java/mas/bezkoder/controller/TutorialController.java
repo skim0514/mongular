@@ -3,6 +3,8 @@ package mas.bezkoder.controller;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -125,6 +127,37 @@ public class TutorialController {
     } catch (Exception e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  @GetMapping("/comparison")
+  public ResponseEntity<?> getComparison(@RequestParam("web") String website, @RequestParam("prev") String prev,
+                                         @RequestParam(name = "next", required = false) String next) throws JSONException, IOException, URISyntaxException {
+    String url = "";
+    try {
+      while (true) {
+        url = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
+        if (url.equals(website)) break;
+        else website = url;
+      }
+    } catch (UnsupportedEncodingException e) {
+      // not going to happen - value came from JDK's own StandardCharsets
+    }
+    ResponseEntity<?> first = getFileFromWebsite(website, prev);
+    ResponseEntity<?> second = getFileFromWebsite(website, next);
+    String fr = first.toString();
+    String sr = second.toString();
+    BufferedWriter writer = new BufferedWriter(new FileWriter("firstFile.html"));
+    writer.write(fr);
+    writer.close();
+
+    writer = new BufferedWriter(new FileWriter("secondFile.html"));
+    writer.write(sr);
+    writer.close();
+
+    Runtime.getRuntime().exec("java -jar daisydiff.jar firstFile.html secondFile.html");
+    Path fileName = Path.of("daisydiff.htm");
+    String file = Files.readString(fileName);
+    return new ResponseEntity<>(file, HttpStatus.OK);
   }
 
   @GetMapping("/websites")
