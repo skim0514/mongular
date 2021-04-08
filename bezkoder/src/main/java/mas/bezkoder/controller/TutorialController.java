@@ -20,7 +20,9 @@ import mas.bezkoder.parser.ParseMain;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -162,7 +164,11 @@ public class TutorialController {
 
     Path fileName = Path.of("daisydiff.htm");
     String file = Files.readString(fileName);
-    return new ResponseEntity<>(file, HttpStatus.OK);
+    Document doc = Jsoup.parse(fr);
+    Document rep = Jsoup.parse(file);
+    Element e = doc.body();
+    e = rep.body();
+    return new ResponseEntity<>(doc.toString(), HttpStatus.OK);
   }
 
   @GetMapping("/websites")
