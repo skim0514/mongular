@@ -147,8 +147,8 @@ public class TutorialController {
     }
     ResponseEntity<?> first = getFileFromWebsite(website, prev);
     ResponseEntity<?> second = getFileFromWebsite(website, next);
-    String fr = first.toString();
-    String sr = second.toString();
+    String fr = new String((byte[]) Objects.requireNonNull(first.getBody()), StandardCharsets.UTF_8);
+    String sr = new String((byte[]) Objects.requireNonNull(second.getBody()), StandardCharsets.UTF_8);
     BufferedWriter writer = new BufferedWriter(new FileWriter("firstFile.html"));
     writer.write(fr);
     writer.close();
