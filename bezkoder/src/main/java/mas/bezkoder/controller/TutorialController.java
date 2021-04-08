@@ -148,16 +148,29 @@ public class TutorialController {
     } catch (UnsupportedEncodingException e) {
       // not going to happen - value came from JDK's own StandardCharsets
     }
-    ResponseEntity<?> first = getFileFromWebsite(website, prev);
-    ResponseEntity<?> second = getFileFromWebsite(website, next);
-    String fr = new String((byte[]) Objects.requireNonNull(first.getBody()), StandardCharsets.UTF_8);
-    String sr = new String((byte[]) Objects.requireNonNull(second.getBody()), StandardCharsets.UTF_8);
+    Tutorial tutorial1;
+    Tutorial tutorial2;
+    try {
+      tutorial1 = getTutorial(url, prev);
+      tutorial2 = getTutorial(url, next);
+      if (tutorial1 == null || tutorial2 == null) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    } catch (Exception e) {
+      e.printStackTrace();
+      return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    InputStream is1 = getInputStream(tutorial1);
+    InputStream is2 = getInputStream(tutorial2);
+    String tf1 = getTextFile(is1, tutorial1);
+    String tf2 = getTextFile(is2, tutorial2);
+
+
     BufferedWriter writer = new BufferedWriter(new FileWriter("firstFile.html"));
-    writer.write(fr);
+    writer.write(tf1);
     writer.close();
 
     writer = new BufferedWriter(new FileWriter("secondFile.html"));
-    writer.write(sr);
+    writer.write(tf2);
     writer.close();
 
     Process p = Runtime.getRuntime().exec("java -jar daisydiff-1.2-NX5-SNAPSHOT-jar-with-dependencies.jar firstFile.html secondFile.html");
@@ -165,7 +178,7 @@ public class TutorialController {
 
     Path fileName = Path.of("daisydiff.htm");
     String file = Files.readString(fileName);
-    Document doc = Jsoup.parse(fr);
+    Document doc = Jsoup.parse(tf1);
     Document rep = Jsoup.parse(file);
     doc.body().replaceWith(rep.body());
     Element rephead = rep.head();
@@ -176,7 +189,10 @@ public class TutorialController {
     }
 
     rephead.appendTo(doc.head());
-    return new ResponseEntity<>(doc.toString(), HttpStatus.OK);
+    String rs = doc.toString();
+    rs = ParseMain.parseFile(rs, tutorial1, prev);
+
+    return new ResponseEntity<>(rs, HttpStatus.OK);
   }
 
   @GetMapping("/websites")
