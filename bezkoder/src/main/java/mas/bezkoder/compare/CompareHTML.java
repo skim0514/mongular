@@ -23,6 +23,15 @@ public class CompareHTML {
         Elements elements1 = this.file1.body().getAllElements();
         Elements elements2 = this.file2.body().getAllElements();
         for (Element e: elements1) {
+            System.out.println(e);
+        }
+
+        for (Element e: elements2) {
+            System.out.println(e);
+        }
+
+        System.out.println(elements2);
+        for (Element e: elements1) {
             if (e.children().size() > 0) {
                 continue;
             }
