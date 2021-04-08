@@ -19,7 +19,10 @@ public class CompareHTML {
         Elements elements1 = this.file1.body().getAllElements();
         Elements elements2 = this.file2.body().getAllElements();
         for (Element e: elements1) {
-            if (e.tagName().equals("div") || e.tagName().equals("script")) continue;
+            if (e.children().size() > 0) {
+                continue;
+            }
+            if (e.tagName().equals("script")) continue;
             if (!elements2.contains(e)) {
                 String a = e.attr("style");
                 if (a.length() == 0) {
@@ -31,7 +34,10 @@ public class CompareHTML {
         }
 
         for (Element e: elements2) {
-            if (e.tagName().equals("div") || e.tagName().equals("script")) continue;
+            if (e.children().size() > 0) {
+                continue;
+            }
+            if (e.tagName().equals("script")) continue;
             if (!elements1.contains(e)) {
                 String a = e.attr("style");
                 if (a.length() == 0) {

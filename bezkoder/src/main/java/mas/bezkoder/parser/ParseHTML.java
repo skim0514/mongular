@@ -277,7 +277,7 @@ public class ParseHTML extends HTMLExtractor {
         String website = "http://3dell3phmthpcqw3w4lw5fbabrqpxh4ur5pnopspwx4ifeynufaynxid.onion/product/%ea%b7%b8%eb%a6%ac%ec%8a%a4%eb%aa%bd%ed%82%a4/";
         String url;
         while (true) {
-            url = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
+            url = URLDecoder.decode(website, StandardCharsets.UTF_8.name());
             if (url.equals(website)) break;
             else website = url;
         }
@@ -293,8 +293,11 @@ public class ParseHTML extends HTMLExtractor {
 
         Elements dsrc = document.select("*");
         for (Element dsr: dsrc) {
-            String a = dsr.attr("style");
-            System.out.println(dsr);
+//            String a = dsr.attr("style");
+            if (dsr.children().size() == 0) {
+                System.out.println(dsr);
+            }
+//            System.out.println(dsr);
         }
 //        System.out.println(document.toString());
 //        System.out.println(newHtml);
