@@ -190,8 +190,8 @@ public class TutorialController {
     for (Element cssHold: css) {
       String diff = css.attr("href");
       cssHold.attr("href", "http://localhost:8082/" + diff);
+      cssHold.appendTo(doc.head());
     }
-    rephead.appendTo(doc.head());
 
 
     return new ResponseEntity<>(doc.toString(), HttpStatus.OK);
