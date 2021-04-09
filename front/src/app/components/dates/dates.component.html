@@ -12,13 +12,12 @@
   </button>
   <div class="col-md-6">
     <h4>Tutorials List</h4>
-    <ul class="list-group">
-      <li
-        class="list-group-item"
-        *ngFor="let date of dates"
-      >
-        {{ date }}
-      </li>
-    </ul>
+    <mat-form-field appearance="fill">
+      <mat-label>Select an option</mat-label>
+      <mat-select [(value)]="baseDate">
+        <mat-option>None</mat-option>
+        <mat-option *ngFor="date of dates">{{date}}</mat-option>
+      </mat-select>
+    </mat-form-field>
   </div>
 </div>

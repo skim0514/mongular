@@ -7,6 +7,10 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { DatesComponent } from './components/dates/dates.component';
 import { CompareComponent } from './components/compare/compare.component';
+import {MatButtonModule} from "@angular/material/button";
+import {MatSelectModule} from "@angular/material/select";
+import {MatCheckboxModule} from "@angular/material/checkbox";
+import {MatOptionModule} from "@angular/material/core";
 
 @NgModule({
   declarations: [
@@ -19,6 +23,9 @@ import { CompareComponent } from './components/compare/compare.component';
     FormsModule,
     HttpClientModule,
     AppRoutingModule,
+    MatSelectModule,
+    MatButtonModule, MatCheckboxModule, MatOptionModule
+
   ],
   providers: [],
   bootstrap: [AppComponent]
