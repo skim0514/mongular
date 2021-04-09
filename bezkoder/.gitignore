@@ -32,7 +32,9 @@ build/
 ### VS Code ###
 .vscode/
 
-
+bezkoder/daisydiff.htm
+bezkoder/firstFile.html
+bezkoder/secondFile.html
 
 # Created by https://www.toptal.com/developers/gitignore/api/angular
 # Edit at https://www.toptal.com/developers/gitignore?templates=angular
@@ -67,5 +69,7 @@ e2e/*.map
 
 # System Files
 .DS_Store/
+
+
 
 # End of https://www.toptal.com/developers/gitignore/api/angular
