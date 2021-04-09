@@ -1,6 +1,9 @@
 **/files
 .DS_Store
 
+bezkoder/daisydiff.htm
+bezkoder/firstFile.html
+bezkoder/secondFile.html
 
 # Created by https://www.toptal.com/developers/gitignore/api/intellij,git,maven
 # Edit at https://www.toptal.com/developers/gitignore?templates=intellij,git,maven
