@@ -15,17 +15,21 @@ export class CompareComponent implements OnInit {
   content1?: string;
   content2?: string;
 
-  constructor(@Inject('date1') date1: string, @Inject('website') website: string,
-              @Inject('dates') dates: string[], private websitesService: WebsitesService) {
-    this.dates = dates;
-    this.date1 = date1.replace(/-/g,"");
-    this.website = website;
+  constructor(private websitesService: WebsitesService) {
   }
 
   ngOnInit(): void {
   }
 
-  activateSecondWebsite(date2: string) {
+  setDates(dates: string[]) {
+    this.dates = dates;
+  }
+
+  setDate1(date1: string) {
+    this.date1 = date1.replace(/-/g,"");
+  }
+
+  setDate2(date2: string) {
     this.date2 = date2.replace(/-/g,"");
   }
 
