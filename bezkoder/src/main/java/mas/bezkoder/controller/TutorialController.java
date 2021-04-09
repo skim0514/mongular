@@ -324,6 +324,21 @@ public class TutorialController {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
+  @GetMapping("/websites/dates")
+  public ResponseEntity<?> getDatesFromWebsite(@RequestParam("web") String website) throws IOException, JSONException, URISyntaxException {
+    List<String> tutorials = new ArrayList<>();
+    if (website != null) {
+      List<Tutorial> tuts = tutorialRepository.findByTitleContaining(website);
+      if (tuts.size() == 0) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+      for (Tutorial tut: tuts) {
+        if (tut.getTitle().equals(website)) {
+          tutorials.add(tut.getDateTime().toLocalDate().toString());
+        }
+      }
+    }
+    return new ResponseEntity<>(tutorials, HttpStatus.OK);
+  }
+
   public static void main (String[] args) throws IOException, URISyntaxException, JSONException {
     LocalDate t = LocalDate.parse("20111203", DateTimeFormatter.BASIC_ISO_DATE);
     LocalDateTime ti = LocalDateTime.of(t, LocalTime.MIDNIGHT);
