@@ -182,7 +182,7 @@ public class TutorialController {
     Document rep = Jsoup.parse(file);
     doc.body().replaceWith(rep.body());
     String rs = doc.toString();
-    rs = ParseMain.parseFile(rs, tutorial1, prev);
+    rs = ParseMain.parseFile(rs, tutorial2, prev);
 
     doc = Jsoup.parse(rs);
     Element rephead = rep.head();
