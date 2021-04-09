@@ -7,7 +7,7 @@ import { WebsitesService} from "../../services/websites.service";
   styleUrls: ['./dates.component.css']
 })
 export class DatesComponent implements OnInit {
-  dates?: any;
+  dates?: string[];
   website?: string;
 
   constructor(private websitesService: WebsitesService) { }
@@ -21,6 +21,11 @@ export class DatesComponent implements OnInit {
   }
 
   setDates() {
-    this.dates = this.websitesService.getDates(this.website)
+    this.websitesService.getDates(this.website).subscribe(
+      data => {
+        this.dates = data as string[];
+        console.log(data);
+      },
+    )
   }
 }
