@@ -1,1 +1,24 @@
-<p>dates works!</p>
+<div class="list row">
+  <input
+    type="text"
+    class="form-control"
+    placeholder="Get Dates From Title"
+    [(ngModel)]="website"
+  />
+  <button
+    type="button"
+    (click) = "setDates()"
+    >Find Dates
+  </button>
+  <div class="col-md-6">
+    <h4>Tutorials List</h4>
+    <ul class="list-group">
+      <li
+        class="list-group-item"
+        *ngFor="let date of dates"
+      >
+        {{ date }}
+      </li>
+    </ul>
+  </div>
+</div>

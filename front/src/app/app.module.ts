@@ -6,11 +6,13 @@ import { FormsModule } from '@angular/forms';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { DatesComponent } from './components/dates/dates.component';
+import { CompareComponent } from './components/compare/compare.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    DatesComponent
+    DatesComponent,
+    CompareComponent
   ],
   imports: [
     BrowserModule,
