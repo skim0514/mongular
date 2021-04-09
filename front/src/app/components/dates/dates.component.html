@@ -10,15 +10,61 @@
     (click) = "setDates()"
     >Find Dates
   </button>
+  <button
+    type="button"
+    (click) = "reset()"
+  >Reset
+  </button>
+
+  <p *ngIf="dates==null">
+    Enter New Link
+  </p>
   <div class="col-md-6">
-    <h4>Tutorials List</h4>
-    <ul class="list-group">
-      <li
-        class="list-group-item"
-        *ngFor="let date of dates"
-      >
-        {{ date }}
-      </li>
-    </ul>
+    <div>
+      <h4>Pick Date to Compare</h4>
+      <select [(ngModel)]="date1">
+        <option [value]="null">None</option>
+        <option *ngFor="let date of dates" [value]="date">{{date}}</option>
+      </select>
+
+      <button
+        type="button"
+        (click) = "getChanges()"
+      >Get Compared Document
+      </button>
+    </div>
+    <div *ngIf="date1 == null"
+         class="alert alert-danger">
+      <div *ngIf="date1==null">
+        Pick Date 1
+      </div>
+    </div>
+
+
+    <div>
+      <select [(ngModel)]="date1">
+        <option [value]="null">None</option>
+        <option *ngFor="let date of dates" [value]="date">{{date}}</option>
+      </select>
+      <button
+        type="button"
+        (click) = "getComparison()"
+      >Compare 2 Documents
+      </button>
+      <div *ngIf="date2 == null"
+           class="alert alert-danger">
+        <div *ngIf="date2==null">
+          Pick Date 2
+        </div>
+      </div>
+
+
+    </div>
   </div>
+
+  <iframe *ngIf="activated && !double">{{this.content1}}</iframe>
+
+  <iframe *ngIf="activated && double">{{this.content2}}</iframe>
+
+
 </div>

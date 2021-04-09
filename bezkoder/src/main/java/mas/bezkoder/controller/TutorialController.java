@@ -37,7 +37,7 @@ import static java.lang.Math.abs;
 import static java.time.temporal.ChronoUnit.HOURS;
 
 
-@CrossOrigin(origins = "http://localhost:8085")
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/api")
 public class TutorialController {
@@ -182,7 +182,7 @@ public class TutorialController {
     Document rep = Jsoup.parse(file);
     doc.body().replaceWith(rep.body());
     String rs = doc.toString();
-    rs = ParseMain.parseFile(rs, tutorial1, prev);
+    rs = ParseMain.parseFile(rs, tutorial2, prev);
 
     doc = Jsoup.parse(rs);
     Element rephead = rep.head();
@@ -190,8 +190,8 @@ public class TutorialController {
     for (Element cssHold: css) {
       String diff = css.attr("href");
       cssHold.attr("href", "http://localhost:8082/" + diff);
+      cssHold.appendTo(doc.head());
     }
-    rephead.appendTo(doc.head());
 
 
     return new ResponseEntity<>(doc.toString(), HttpStatus.OK);
