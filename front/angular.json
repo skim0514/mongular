@@ -12,7 +12,7 @@
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
-          "proxyConfig": "./proxy.conf.json",
+          "proxyConfig": "src/proxy.conf.json",
           "options": {
             "outputPath": "dist/front",
             "index": "src/index.html",
