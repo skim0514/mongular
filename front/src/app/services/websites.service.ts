@@ -12,15 +12,15 @@ export class WebsitesService {
   constructor(private http: HttpClient) { }
 
   getDates(website: any): Observable<any> {
-    return this.http.get(`${baseUrl}/websites/dates/web?${website}`);
+    return this.http.get(`${baseUrl}/websites/dates?web=${website}`);
   }
 
   getComparison(website: any, prev: any, next: any): Observable<any> {
-    return this.http.get(`${baseUrl}/comparison?${website}&${prev}&${next}`);
+    return this.http.get(`${baseUrl}/comparison?web=${website}&prev=${prev}&next=${next}`);
   }
 
   getChanges(website: any, prev: any): Observable<any> {
-    return this.http.get(`${baseUrl}/comparison?${website}&${prev}`);
+    return this.http.get(`${baseUrl}/comparison?web=${website}&prev=${prev}`);
   }
 
 }
