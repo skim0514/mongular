@@ -32,11 +32,11 @@ export class DatesComponent implements OnInit {
   }
 
   getDate1(): string {
-    return date1.replace(/-/g,"");
+    return this.date1.replace(/-/g,"");
   }
 
-  getDate2(date2: string): string{
-    return date2.replace(/-/g,"");
+  getDate2(): string{
+    return this.date2.replace(/-/g,"");
   }
 
   setDates(): void {
