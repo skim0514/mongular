@@ -19,7 +19,7 @@ export class WebsitesService {
     return this.http.get(`${baseUrl}/comparison?web=${website}&prev=${prev}&next=${next}`);
   }
 
-  getChanges(website: any, prev: any): Observable<string> {
+  getChanges(website: any, prev: any): Observable<any> {
     return this.http.get(`${baseUrl}/comparison?web=${website}&prev=${prev}`);
   }
 
