@@ -73,13 +73,5 @@ export class DatesComponent implements OnInit {
 
     this.activated = true;
     this.double = true;
-    this.websitesService.getComparison(this.website, this.date1, this.date2).subscribe(
-      data => {
-        this.content1 = data;
-      })
-    this.websitesService.getComparison(this.website, this.date2, this.date1).subscribe(
-      data => {
-        this.content2 = data;
-      })
   }
 }
