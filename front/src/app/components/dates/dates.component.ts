@@ -40,7 +40,9 @@ export class DatesComponent implements OnInit {
   }
 
   getDate2(): string{
-    return this.date2.replace(/-/g,"");
+    if (this.date2 == null) console.log("HELOPPPPPPPP")
+    var url = "http://118.67.133.84:8085/api/comparison?web=http://crdclub4wraumez4.onion/&prev=" + this.date2.replace(/-/g,"");;
+    return url as string;
   }
 
   setDates(): void {
