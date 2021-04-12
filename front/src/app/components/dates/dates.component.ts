@@ -57,6 +57,7 @@ export class DatesComponent implements OnInit {
     this.activated = true;
     this.double = false;
     this.content1 = this.websitesService.getChanges(this.website, this.date1)
+    console.log(this.content1)
   }
 
   getComparison(): void {
