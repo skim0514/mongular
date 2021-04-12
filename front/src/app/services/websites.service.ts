@@ -20,7 +20,7 @@ export class WebsitesService {
   }
 
   getChanges(website: any, prev: any): Observable<string> {
-    return this.http.get<string>(`${baseUrl}/comparison?web=${website}&prev=${prev}`, {responseType: 'text'});
+    return this.http.get(`${baseUrl}/comparison?web=${website}&prev=${prev}`, {responseType: 'text'});
   }
 
 }
