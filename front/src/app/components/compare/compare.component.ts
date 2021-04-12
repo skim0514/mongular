@@ -1,5 +1,6 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {WebsitesService} from "../../services/websites.service";
+import {DatesComponent} from "../dates/dates.component";
 
 @Component({
   selector: 'app-compare',
@@ -40,6 +41,10 @@ export class CompareComponent implements OnInit {
   //       this.content1 = data;
   //   })
   // }
+
+  setContent1() {
+    this.content1 = DatesComponent.getContent1();
+  }
 
   getComparison(): void {
     this.double = true;

@@ -79,4 +79,8 @@ export class DatesComponent implements OnInit {
         this.content2 = data;
       })
   }
+
+  public getContent1(): string {
+    return this.content1;
+  }
 }
