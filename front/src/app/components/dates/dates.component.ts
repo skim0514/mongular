@@ -56,10 +56,7 @@ export class DatesComponent implements OnInit {
     this.setDate1(this.date1);
     this.activated = true;
     this.double = false;
-    this.websitesService.getChanges(this.website, this.date1).subscribe(
-      data => {
-        this.content1 = data;
-      })
+    this.content1 = this.websitesService.getChanges(this.website, this.date1)
   }
 
   getComparison(): void {
