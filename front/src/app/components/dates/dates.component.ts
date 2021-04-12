@@ -31,12 +31,12 @@ export class DatesComponent implements OnInit {
     this.date2 = null;
   }
 
-  setDate1(date1: string) {
-    this.date1 = date1.replace(/-/g,"");
+  getDate1(): string {
+    return date1.replace(/-/g,"");
   }
 
-  setDate2(date2: string) {
-    this.date2 = date2.replace(/-/g,"");
+  getDate2(date2: string): string{
+    return date2.replace(/-/g,"");
   }
 
   setDates(): void {
@@ -53,15 +53,14 @@ export class DatesComponent implements OnInit {
 
   getChanges(): void {
     if(this.date1 == null) return;
-    this.setDate1(this.date1);
+
     this.activated = true;
     this.double = false;
   }
 
   getComparison(): void {
     if(this.date1 == null || this.date2 == null) return;
-    this.setDate1(this.date1);
-    this.setDate2(this.date2);
+
     this.activated = true;
     this.double = true;
     this.websitesService.getComparison(this.website, this.date1, this.date2).subscribe(
@@ -74,7 +73,7 @@ export class DatesComponent implements OnInit {
       })
   }
 
-  public getContent1(): string {
+  public getDate1(): string {
     return this.content1;
   }
 }
