@@ -1,7 +1,0 @@
-{
-  "/api/*": {
-    "target": "https://118.67.133.84:8085",
-    "secure": false,
-    "logLevel": "debug"
-  }
-}
