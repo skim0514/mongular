@@ -64,7 +64,6 @@ export class DatesComponent implements OnInit {
     this.websitesService.getDates(this.website).subscribe(
       data => {
         this.dates = data as string[];
-        this.date2 = this.dates[this.dates.length - 1]
       },
     )
   }
