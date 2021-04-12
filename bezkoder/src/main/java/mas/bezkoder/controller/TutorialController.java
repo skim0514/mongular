@@ -37,7 +37,7 @@ import static java.lang.Math.abs;
 import static java.time.temporal.ChronoUnit.HOURS;
 
 
-@CrossOrigin(origins = "http://118.67.133.84:4200")
+@CrossOrigin(origins = {"http://118.67.133.84:4200", "http://localhost:4200"})
 @RestController
 @RequestMapping("/api")
 public class TutorialController {
