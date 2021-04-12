@@ -37,7 +37,7 @@ import static java.lang.Math.abs;
 import static java.time.temporal.ChronoUnit.HOURS;
 
 
-@CrossOrigin(origins = {"http://118.67.133.84:4200", "http://localhost:4200"})
+@CrossOrigin(origins = {"http://118.67.133.84:4200", "http://localhost:4200", "http://0.0.0.0:4200"})
 @RestController
 @RequestMapping("/api")
 public class TutorialController {
@@ -324,7 +324,6 @@ public class TutorialController {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  @CrossOrigin(origins = {"http://118.67.133.84:4200", "http://localhost:4200", "http://0.0.0.0:4200"})
   @GetMapping("/websites/dates")
   public ResponseEntity<?> getDatesFromWebsite(@RequestParam("web") String website) throws IOException, JSONException, URISyntaxException {
     List<String> tutorials = new ArrayList<>();
