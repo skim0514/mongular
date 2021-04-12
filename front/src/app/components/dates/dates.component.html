@@ -63,7 +63,9 @@
   </div>
 
   <iframe *ngIf="activated && !double">
-    [innerHtml]="this.content1"
+    <div>
+      [innerHtml]="this.content1"
+    </div>
   </iframe>
 
   <iframe *ngIf="activated && double">{{this.content2}}</iframe>
