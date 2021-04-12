@@ -66,8 +66,8 @@
     <h1>Testing</h1>
   </div>
 
-  <iframe *ngIf="activated && !double" src="http://118.67.133.84:8085/api/comparison?web=http://crdclub4wraumez4.onion/&prev={{this.date1}}"
-          width="100%" height="100%">
+  <iframe *ngIf="activated && !double" width="100%" height="100%" src="http://118.67.133.84:8085/api/comparison?web=http://crdclub4wraumez4.onion/&prev={{this.date1}}">
+    {{this.date1}}
   </iframe>
 
   <iframe *ngIf="activated && double" src="http://118.67.133.84:8085/api/comparison?web=http://crdclub4wraumez4.onion/&prev={{this.date1}}">
