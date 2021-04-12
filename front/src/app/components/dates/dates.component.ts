@@ -50,12 +50,12 @@ export class DatesComponent implements OnInit {
   }
 
   getDate2(): string{
-    if (this.date2 == null) console.log("HELOPPPPPPPP")
-    var url = "http://118.67.133.84:8085/api/comparison?web=http://crdclub4wraumez4.onion/&prev=" + this.date2.replace(/-/g,"")
+    if (this.date2 == null) return
+    var sec = "http://118.67.133.84:8085/api/comparison?web=http://crdclub4wraumez4.onion/&prev=" + this.date2.replace(/-/g,"")
     + "&next=" + this.date1.replace(/-/g,"");
 
-    console.log(url);
-    return url as string;
+    console.log(sec);
+    return sec as string;
   }
 
   setDates(): void {
