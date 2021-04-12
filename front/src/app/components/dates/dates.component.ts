@@ -37,7 +37,7 @@ export class DatesComponent implements OnInit {
     this.date1 = this.date1.replace(/-/g,"");
     console.log(this.date1)
     var url = "http://118.67.133.84:8085/api/comparison?web=http://crdclub4wraumez4.onion/&prev=" + this.date1;
-    return this.sanitizer.bypassSecurityTrustHtml(url);
+    return this.sanitizer.bypassSecurityTrustHtml(url) as string;
   }
 
   getDate2(): string{
