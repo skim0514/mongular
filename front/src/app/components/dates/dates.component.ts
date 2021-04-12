@@ -38,7 +38,7 @@ export class DatesComponent implements OnInit {
     console.log(this.date1)
     var url = "http://118.67.133.84:8085/api/comparison?web=http://crdclub4wraumez4.onion/&prev=" + this.date1;
     console.log(url);
-    return this.sanitizer.bypassSecurityTrustHtml(url) as string;
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url) as string;
   }
 
   getDate2(): string{
