@@ -33,13 +33,13 @@ export class CompareComponent implements OnInit {
     this.date2 = date2.replace(/-/g,"");
   }
 
-  getChanges(): void {
-    this.double = false;
-    this.websitesService.getChanges(this.website, this.date1).subscribe(
-      data => {
-        this.content1 = data;
-    })
-  }
+  // getChanges(): void {
+  //   this.double = false;
+  //   this.websitesService.getChanges(this.website, this.date1).subscribe(
+  //     data => {
+  //       this.content1 = data;
+  //   })
+  // }
 
   getComparison(): void {
     this.double = true;
