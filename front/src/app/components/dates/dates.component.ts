@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { WebsitesService} from "../../services/websites.service";
 import {CompareComponent} from "../compare/compare.component";
 import {FormControl, Validators} from "@angular/forms";
+import {DomSanitizer} from "@angular/platform-browser";
 
 
 @Component({
@@ -19,7 +20,7 @@ export class DatesComponent implements OnInit {
   dates?: string[];
   website?: string;
 
-  constructor(private websitesService: WebsitesService) { }
+  constructor(private websitesService: WebsitesService, private sanitizer: DomSanitizer) { }
 
   ngOnInit(): void {
   }
@@ -32,8 +33,9 @@ export class DatesComponent implements OnInit {
   }
 
   getDate1(): string {
-    return "http://118.67.133.84:8085/api/comparison?web=http://crdclub4wraumez4.onion/&prev=" +
+    var url = "http://118.67.133.84:8085/api/comparison?web=http://crdclub4wraumez4.onion/&prev=" +
       this.date1.replace(/-/g,"");
+    return <string>this.sanitizer.bypassSecurityTrustHtml(url);
   }
 
   getDate2(): string{
