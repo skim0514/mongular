@@ -75,4 +75,10 @@
   <iframe *ngIf="activated && double" [src]="this.getDate2() | safe" height="768" width="49%" align="right">
   </iframe>
 
+  <p *ngIf="activated && double">
+    {{this.getComp1()}}
+
+    {{this.getDate2()}}
+  </p>
+
 </div>
