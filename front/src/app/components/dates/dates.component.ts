@@ -50,20 +50,10 @@ export class DatesComponent implements OnInit {
     )
   }
 
-  getWebsite(): void {
-    this.websitesService.getChanges(this.website, this.date1).subscribe(
-      data => {
-        this.content1 = data;
-        console.log(data);
-      })
-  }
 
   getChanges(): void {
     if(this.date1 == null) return;
     this.setDate1(this.date1);
-    this.getWebsite();
-
-
     this.activated = true;
     this.double = false;
   }
