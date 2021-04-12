@@ -19,8 +19,8 @@ export class WebsitesService {
     return this.http.get(`${baseUrl}/comparison?web=${website}&prev=${prev}&next=${next}`);
   }
 
-  getChanges(website: any, prev: any): Observable<any> {
-    return this.http.get(`${baseUrl}/comparison?web=${website}&prev=${prev}`);
+  getChanges(website: any, prev: any): Observable<string> {
+    return this.http.get<string>(`${baseUrl}/comparison?web=${website}&prev=${prev}`);
   }
 
 }
