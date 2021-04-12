@@ -59,6 +59,7 @@ export class DatesComponent implements OnInit {
     this.websitesService.getChanges(this.website, this.date1).subscribe(
       data => {
         this.content1 = data as string;
+        console.log(data);
       })
   }
 
