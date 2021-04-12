@@ -11,12 +11,14 @@ import {MatButtonModule} from "@angular/material/button";
 import {MatSelectModule} from "@angular/material/select";
 import {MatCheckboxModule} from "@angular/material/checkbox";
 import {MatOptionModule} from "@angular/material/core";
+import {SafePipe} from "./safe.pipe";
 
 @NgModule({
   declarations: [
     AppComponent,
     DatesComponent,
-    CompareComponent
+    CompareComponent,
+    SafePipe
   ],
   imports: [
     BrowserModule,
