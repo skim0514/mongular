@@ -62,7 +62,7 @@
     </div>
   </div>
 
-  <iframe *ngIf="activated && !double">{{this.content1}}</iframe>
+  <iframe *ngIf="activated && !double">[this.content1]="htmlToAdd"</iframe>
 
   <iframe *ngIf="activated && double">{{this.content2}}</iframe>
 
