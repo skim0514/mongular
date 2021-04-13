@@ -107,9 +107,11 @@
 			<artifactId>runtime</artifactId>
 			<version>3.10.0-v20140318-2214</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.cyberneko/com.springsource.org.cyberneko.html -->
 		<dependency>
 			<groupId>org.cyberneko</groupId>
-			<artifactId>html</artifactId>
+			<artifactId>com.springsource.org.cyberneko.html</artifactId>
+			<version>0.9.5</version>
 		</dependency>
 		<dependency>
 			<groupId>com.syncthemall</groupId>
