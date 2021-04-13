@@ -160,23 +160,21 @@ public class TutorialController {
     }
 
     InputStream is1 = getInputStream(tutorial1);
-    InputStream is2 = getInputStream(tutorial2);
     String tf1 = getTextFile(is1, tutorial1);
-    String tf2 = getTextFile(is2, tutorial2);
 
 
-    BufferedWriter writer = new BufferedWriter(new FileWriter("firstFile.html"));
-    writer.write(tf1);
-    writer.close();
+    String f1 = "http://118.67.133.84:8085/api/websites?web=" + website + "&date=" + prev;
+    String f2 = "http://118.67.133.84:8085/api/websites?web=" + website;
+    if (next != null){
+      f2 = f2 + "&date=" + next;
+    }
 
-    writer = new BufferedWriter(new FileWriter("secondFile.html"));
-    writer.write(tf2);
-    writer.close();
 
-    Process p = Runtime.getRuntime().exec("java -jar daisydiff-1.2-NX5-SNAPSHOT-jar-with-dependencies.jar firstFile.html secondFile.html");
+    Process p = Runtime.getRuntime().exec("java -jar daisydiff-1.2-NX5-SNAPSHOT-jar-with-dependencies.jar " + f1 + " " + f2);
     int exitVal = p.waitFor();
 
-    Path fileName = Path.of("daisydiff.htm");
+    Path fileName = Path.of(prev+ "daisydiff.htm");
+
     String file = Files.readString(fileName);
     Document doc = Jsoup.parse(tf1);
     Document rep = Jsoup.parse(file);
