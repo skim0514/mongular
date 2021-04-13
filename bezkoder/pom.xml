@@ -108,11 +108,11 @@
 			<scope>compile</scope>
 		</dependency>
 
-<!--		<dependency>-->
-<!--			<groupId>org.cyberneko</groupId>-->
-<!--			<artifactId>html</artifactId>-->
-<!--			<version>1.9.8</version>-->
-<!--		</dependency>-->
+		<dependency>
+			<groupId>org.cyberneko</groupId>
+			<artifactId>html</artifactId>
+			<version>1.9.8</version>
+		</dependency>
 		<dependency>
 			<groupId>org.eclipse.core.runtime</groupId>
 			<artifactId>eclipse-core-runtime</artifactId>
