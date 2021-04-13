@@ -170,9 +170,6 @@ public class TutorialController {
     InputStream is2 = getInputStream(tutorial2);
     String tf1 = getTextFile(is1, tutorial1);
     String tf2 = getTextFile(is2, tutorial2);
-    if (next != null){
-      f2 = f2 + "&date=" + next;
-    }
 
 
     BufferedWriter writer = new BufferedWriter(new FileWriter(f1));
@@ -182,10 +179,6 @@ public class TutorialController {
     writer = new BufferedWriter(new FileWriter(f2));
     writer.write(tf2);
     writer.close();
-
-
-
-
 
     Process p = Runtime.getRuntime().exec("java -jar daisydiff-1.2-NX5-SNAPSHOT-jar-with-dependencies.jar " + f1 + " " + f2 + " --file=" + f1 + f2);
     int exitVal = p.waitFor();
