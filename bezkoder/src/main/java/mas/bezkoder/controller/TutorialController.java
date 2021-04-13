@@ -34,6 +34,7 @@ import mas.bezkoder.repository.TutorialRepository;
 import static java.lang.Math.abs;
 import static java.nio.file.Files.deleteIfExists;
 import static java.time.temporal.ChronoUnit.HOURS;
+import static org.outerj.daisy.diff.Main.main2;
 
 
 @CrossOrigin(origins = {"http://118.67.133.84:4200", "http://localhost:4200", "http://0.0.0.0:4200"})
@@ -158,36 +159,15 @@ public class TutorialController {
       return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    Random rand = new Random();
-    String f1 = String.valueOf(rand.nextInt(100));
-
-    String f2 = String.valueOf(rand.nextInt(100));
-
     InputStream is1 = getInputStream(tutorial1);
     InputStream is2 = getInputStream(tutorial2);
     String tf1 = getTextFile(is1, tutorial1);
-    String tf2 = getTextFile(is2, tutorial2);
 
-
-    BufferedWriter writer = new BufferedWriter(new FileWriter(f1));
-    writer.write(tf1);
-    writer.close();
-
-    writer = new BufferedWriter(new FileWriter(f2));
-    writer.write(tf2);
-    writer.close();
-
-    Process p = Runtime.getRuntime().exec("java -jar daisydiff-1.2-NX5-SNAPSHOT-jar-with-dependencies.jar " + f1 + " " + f2 + " --file=" + f1 + f2);
-    int exitVal = p.waitFor();
-
-    Path fileName = Path.of(f1 + f2);
-
-    String file = Files.readString(fileName);
-    deleteIfExists(fileName);
-    deleteIfExists(Path.of(f1));
-    deleteIfExists(Path.of(f2));
     Document doc = Jsoup.parse(tf1);
-    Document rep = Jsoup.parse(file);
+
+    String result = main2(is1, is2);
+
+    Document rep = Jsoup.parse(result);
     doc.body().replaceWith(rep.body());
     String rs = doc.toString();
     rs = ParseMain.parseFile(rs, tutorial2, next);
@@ -200,7 +180,6 @@ public class TutorialController {
       cssHold.attr("href", "http://localhost:8082/" + diff);
       cssHold.appendTo(doc.head());
     }
-
 
     return new ResponseEntity<>(doc.toString(), HttpStatus.OK);
   }
