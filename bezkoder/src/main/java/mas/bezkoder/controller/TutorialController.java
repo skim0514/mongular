@@ -2,6 +2,7 @@ package mas.bezkoder.controller;
 
 import java.io.*;
 import java.net.*;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,10 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import mas.bezkoder.compare.CompareHTML;
 import mas.bezkoder.crawler.CrawlMain;
@@ -160,23 +158,44 @@ public class TutorialController {
       return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    byte[] array = new byte[7]; // length is bounded by 7
+    new Random().nextBytes(array);
+    String f1 = new String(array, StandardCharsets.UTF_8);
+
+    array = new byte[7]; // length is bounded by 7
+    new Random().nextBytes(array);
+    String f2 = new String(array, StandardCharsets.UTF_8);
+
     InputStream is1 = getInputStream(tutorial1);
+    InputStream is2 = getInputStream(tutorial2);
     String tf1 = getTextFile(is1, tutorial1);
-
-
-    String f1 = "http://118.67.133.84:8085/api/websites?web=" + website + "&date=" + prev;
-    String f2 = "http://118.67.133.84:8085/api/websites?web=" + website;
+    String tf2 = getTextFile(is2, tutorial2);
     if (next != null){
       f2 = f2 + "&date=" + next;
     }
 
 
-    Process p = Runtime.getRuntime().exec("java -jar daisydiff-1.2-NX5-SNAPSHOT-jar-with-dependencies.jar " + f1 + " " + f2);
+    BufferedWriter writer = new BufferedWriter(new FileWriter(f1));
+    writer.write(tf1);
+    writer.close();
+
+    writer = new BufferedWriter(new FileWriter(f2));
+    writer.write(tf2);
+    writer.close();
+
+
+
+
+
+    Process p = Runtime.getRuntime().exec("java -jar daisydiff-1.2-NX5-SNAPSHOT-jar-with-dependencies.jar " + f1 + " " + f2 + " --file=" + f1 + f2);
     int exitVal = p.waitFor();
 
-    Path fileName = Path.of(prev+ "daisydiff.htm");
+    Path fileName = Path.of(f1 + f2);
 
     String file = Files.readString(fileName);
+    deleteIfExists(fileName);
+    deleteIfExists(Path.of(f1));
+    deleteIfExists(Path.of(f2));
     Document doc = Jsoup.parse(tf1);
     Document rep = Jsoup.parse(file);
     doc.body().replaceWith(rep.body());
@@ -191,7 +210,6 @@ public class TutorialController {
       cssHold.attr("href", "http://localhost:8082/" + diff);
       cssHold.appendTo(doc.head());
     }
-    deleteIfExists(fileName);
 
 
     return new ResponseEntity<>(doc.toString(), HttpStatus.OK);
