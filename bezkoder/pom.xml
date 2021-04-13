@@ -95,17 +95,6 @@
 			<version>0.0.20131108.vaadin1</version>
 			<scope>compile</scope>
 		</dependency>
-
-		<dependency>
-			<groupId>org.cyberneko</groupId>
-			<artifactId>html</artifactId>
-			<version>1.9.8</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.core.runtime</groupId>
-			<artifactId>eclipse-core-runtime</artifactId>
-			<version>20070801</version>
-		</dependency>
 		<dependency>
 			<groupId>com.syncthemall</groupId>
 			<artifactId>boilerpipe</artifactId>
