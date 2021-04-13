@@ -34,6 +34,7 @@ import mas.bezkoder.model.Tutorial;
 import mas.bezkoder.repository.TutorialRepository;
 
 import static java.lang.Math.abs;
+import static java.nio.file.Files.deleteIfExists;
 import static java.time.temporal.ChronoUnit.HOURS;
 
 
@@ -190,6 +191,7 @@ public class TutorialController {
       cssHold.attr("href", "http://localhost:8082/" + diff);
       cssHold.appendTo(doc.head());
     }
+    deleteIfExists(fileName);
 
 
     return new ResponseEntity<>(doc.toString(), HttpStatus.OK);
