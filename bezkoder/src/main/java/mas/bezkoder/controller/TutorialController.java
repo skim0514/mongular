@@ -158,13 +158,10 @@ public class TutorialController {
       return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    byte[] array = new byte[7]; // length is bounded by 7
-    new Random().nextBytes(array);
-    String f1 = new String(array, StandardCharsets.UTF_8);
+    Random rand = new Random();
+    String f1 = String.valueOf(rand.nextInt(100));
 
-    array = new byte[7]; // length is bounded by 7
-    new Random().nextBytes(array);
-    String f2 = new String(array, StandardCharsets.UTF_8);
+    String f2 = String.valueOf(rand.nextInt(100));
 
     InputStream is1 = getInputStream(tutorial1);
     InputStream is2 = getInputStream(tutorial2);
