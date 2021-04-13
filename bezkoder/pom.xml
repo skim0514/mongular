@@ -103,8 +103,9 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.eclipse.core.runtime</groupId>
-			<artifactId>eclipse-core-runtime</artifactId>
+			<groupId>org.eclipse.core</groupId>
+			<artifactId>runtime</artifactId>
+			<version>3.10.0-v20140318-2214</version>
 		</dependency>
 		<dependency>
 			<groupId>xerces</groupId>
