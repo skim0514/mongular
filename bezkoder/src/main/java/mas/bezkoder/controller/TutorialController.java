@@ -158,8 +158,8 @@ public class TutorialController {
     ResponseEntity<?> re1 = getFileFromWebsite(website, prev);
     ResponseEntity<?> re2 = getFileFromWebsite(website, next);
 
-    InputStream is1 = new ByteArrayInputStream((byte[]) Objects.requireNonNull(re1.getBody()));
-    InputStream is2 = new ByteArrayInputStream((byte[]) Objects.requireNonNull(re2.getBody()));
+    InputStream is1 = getInputStream(tutorial1);
+    InputStream is2 = getInputStream(tutorial2);
 
     InputStream is3 = getInputStream(tutorial1);
 
