@@ -135,7 +135,7 @@ public class HTMLDiffer implements Differ{
 //                rightComparator.markAsDeleted(d.leftStart(), d.leftEnd(),
 //                        leftComparator, d.rightStart(), d.rightEnd());
 //            }
-//            rightComparator.markAsNew(d.rightStart(), d.rightEnd());
+            rightComparator.markAsNew(d.rightStart(), d.rightEnd());
 
             currentIndexLeft = d.leftEnd();
             currentIndexRight = d.rightEnd();
