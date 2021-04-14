@@ -159,11 +159,9 @@ public class TutorialController {
       return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    ResponseEntity<?> re1 = getFileFromWebsite(website, prev);
-    ResponseEntity<?> re2 = getFileFromWebsite(website, next);
+    InputStream is1 = getInputStream(tutorial1);
+    InputStream is2 = getInputStream(tutorial2);
 
-    InputStream is1 = new ByteArrayInputStream((byte[]) Objects.requireNonNull(re1.getBody()));
-    InputStream is2 = new ByteArrayInputStream((byte[]) Objects.requireNonNull(re2.getBody()));
     String result = main2(is1, is2);
 
     String tf1 = IOUtils.toString(is1, StandardCharsets.UTF_8.name());
@@ -238,7 +236,7 @@ public class TutorialController {
   public static InputStream getInputStream (Tutorial tutorial) throws IOException {
     URL url;
     try {
-      url = new URL("http://localhost:8085/api/file/" + tutorial.getSha());
+      url = new URL("http://118.67.133.84:8085/api/file/" + tutorial.getSha());
     } catch (MalformedURLException e) {
       e.printStackTrace();
       return null;
