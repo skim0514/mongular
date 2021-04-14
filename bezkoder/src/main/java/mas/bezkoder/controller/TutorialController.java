@@ -161,11 +161,14 @@ public class TutorialController {
 
     InputStream is1 = getInputStream(tutorial1);
     InputStream is2 = getInputStream(tutorial2);
+    String result = main2(is1, is2);
+
+
     String tf1 = getTextFile(is1, tutorial1);
 
     Document doc = Jsoup.parse(tf1);
 
-    String result = main2(is1, is2);
+
 
     Document rep = Jsoup.parse(result);
     doc.body().replaceWith(rep.body());
