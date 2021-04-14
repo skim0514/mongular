@@ -133,7 +133,7 @@ public class TutorialController {
 
   @GetMapping("/comparison")
   public ResponseEntity<?> getComparison(@RequestParam("web") String website, @RequestParam("prev") String prev,
-                                         @RequestParam(name = "next", required = false) String next) throws JSONException, IOException, URISyntaxException, InterruptedException {
+                                         @RequestParam(name = "next", required = false) String next) throws JSONException, IOException, URISyntaxException {
     String url = "";
     try {
       while (true) {
@@ -310,7 +310,7 @@ public class TutorialController {
   }
 
   @GetMapping("/websites/dates")
-  public ResponseEntity<?> getDatesFromWebsite(@RequestParam("web") String website) throws IOException, JSONException, URISyntaxException {
+  public ResponseEntity<?> getDatesFromWebsite(@RequestParam("web") String website) {
     List<String> tutorials = new ArrayList<>();
     if (website != null) {
       List<Tutorial> tuts = tutorialRepository.findByTitleContaining(website);

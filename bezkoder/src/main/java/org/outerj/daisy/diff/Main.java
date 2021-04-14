@@ -21,7 +21,7 @@ import java.util.Locale;
 
 public class Main {
   static boolean quietMode = false;
-    public static String compareStreams(InputStream is1, InputStream is2) throws URISyntaxException, IOException {
+    public static String compareStreams(InputStream is1, InputStream is2) throws IOException {
         File outputFile = null;
 
         boolean htmlDiff = true;
