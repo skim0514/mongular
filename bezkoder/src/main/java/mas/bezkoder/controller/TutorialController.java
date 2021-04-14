@@ -155,9 +155,6 @@ public class TutorialController {
       return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    ResponseEntity<?> re1 = getFileFromWebsite(website, prev);
-    ResponseEntity<?> re2 = getFileFromWebsite(website, next);
-
     InputStream is1 = getInputStream(tutorial1);
     InputStream is2 = getInputStream(tutorial2);
 
@@ -166,6 +163,7 @@ public class TutorialController {
     String result = compareStreams(is1, is2);
     String tf1 = getTextFile(is3, tutorial1);
     tf1 = ParseMain.parseFile(tf1, tutorial1, prev);
+    result = ParseMain.parseFile(result, tutorial1, prev);
 
     Document doc = Jsoup.parse(tf1);
     Document rep = Jsoup.parse(result);
@@ -179,7 +177,7 @@ public class TutorialController {
       cssHold.appendTo(doc.head());
     }
 
-    return new ResponseEntity<>(doc.toString(), re1.getHeaders(), HttpStatus.OK);
+    return new ResponseEntity<>(doc.toString(), HttpStatus.OK);
   }
 
   @GetMapping("/websites")
