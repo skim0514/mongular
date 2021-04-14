@@ -32,7 +32,12 @@ import static java.time.temporal.ChronoUnit.HOURS;
 import static org.outerj.daisy.diff.Main.compareStreams;
 
 
-
+/**
+ * Controller for Spring Backend
+ * Command: mvn spring-boot:run
+ * Dependencies in pom.xml
+ * dbconfig in application.properties
+ */
 @CrossOrigin(origins = {"http://118.67.133.84:4200", "http://localhost:4200", "http://0.0.0.0:4200"})
 @RestController
 @RequestMapping("/api")
@@ -155,33 +160,49 @@ public class TutorialController {
       return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    ResponseEntity<?> re1 = getFileFromWebsite(website, prev);
-    ResponseEntity<?> re2 = getFileFromWebsite(website, next);
+    HttpHeaders headers = new HttpHeaders();
+    String filetype = tutorial1.getContentType().split(";")[0];
+    headers.set("content-type", filetype + "; charset=UTF-8");
 
-    InputStream is1 = new ByteArrayInputStream((byte[]) Objects.requireNonNull(re1.getBody()));
-    InputStream is2 = new ByteArrayInputStream((byte[]) Objects.requireNonNull(re2.getBody()));
+    InputStream is1 = getInputStream(tutorial1);
+    String file1 = getTextFile(is1, tutorial1);
+    InputStream is2 = getInputStream(tutorial2);
+    String file2 = getTextFile(is2, tutorial1);
 
+    InputStream target1 = new ByteArrayInputStream(file1.getBytes());
+    InputStream target2 = new ByteArrayInputStream(file2.getBytes());
     InputStream is3 = getInputStream(tutorial1);
 
-    String result = compareStreams(is1, is2);
+    String result = compareStreams(target1, target2);
+    Document rep = Jsoup.parse(result);
+    Element rephead = rep.head();
+
     String tf1 = getTextFile(is3, tutorial1);
     tf1 = ParseMain.parseFile(tf1, tutorial1, prev);
+    result = ParseMain.parseFile(result, tutorial1, prev);
 
     Document doc = Jsoup.parse(tf1);
-    Document rep = Jsoup.parse(result);
+    rep = Jsoup.parse(result);
     doc.body().replaceWith(rep.body());
 //
-    Element rephead = rep.head();
+
     Elements css = rephead.select("link[href]");
     for (Element cssHold: css) {
       String diff = css.attr("href");
       cssHold.attr("href", "http://localhost:8082/" + diff);
       cssHold.appendTo(doc.head());
     }
-
-    return new ResponseEntity<>(doc.toString(), re1.getHeaders(), HttpStatus.OK);
+    byte[] byteArray = doc.toString().getBytes();
+    return new ResponseEntity<>(byteArray, headers, HttpStatus.OK);
   }
 
+
+  /**
+   * Main API call to retrieve a parsed website.
+   * @param website a given absolute path
+   * @param date date of retrieval, will give closest date - optional
+   * @return a response entity containing a body and header for browser to interpret
+   */
   @GetMapping("/websites")
   public ResponseEntity<?> getFileFromWebsite(@RequestParam("web") String website, @RequestParam(name = "date",
           required = false) String date) throws IOException, URISyntaxException, JSONException {
@@ -230,6 +251,11 @@ public class TutorialController {
     return new ResponseEntity<>(byteArray, headers, HttpStatus.OK);
   }
 
+  /**
+   * From a given metadata structure, retrieves an input stream from another api call
+   * @param tutorial information about website
+   * @return an input stream for the given metadata
+   */
   public static InputStream getInputStream (Tutorial tutorial) throws IOException {
     URL url;
     try {
@@ -244,6 +270,12 @@ public class TutorialController {
     return con.getInputStream();
   }
 
+  /**
+   * retrieves metadata about website
+   * @param website website full absolute path
+   * @param dt date is optional
+   * @return a full tutorial - metadata structure.
+   */
   public Tutorial getTutorial(String website, String dt) throws IOException {
 
     website = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
@@ -289,6 +321,7 @@ public class TutorialController {
    * @return decoded content of text style file
    * @throws IOException if badly build input stream or tutorial is inputed
    */
+
   public static String getTextFile(InputStream inputstream, Tutorial tutorial) throws IOException {
 
     BufferedReader in = new BufferedReader(
@@ -302,6 +335,11 @@ public class TutorialController {
     return content.toString();
   }
 
+  /**
+   * Function to help crawling - by calling post this will crawl the given website from the link
+   * @param website - gives website link.
+   * @return HTTP OK if works
+   */
   @PostMapping("/websites")
   public ResponseEntity<?> postFileFromWebsite(@RequestParam("web") String website) throws IOException, JSONException, URISyntaxException {
     CrawlMain.run(website);
@@ -309,6 +347,12 @@ public class TutorialController {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
+
+  /**
+   * gets dates from db for a given website.
+   * @param website given link for a website
+   * @return a response entity containing an arraylist of all of the dates for this website.
+   */
   @GetMapping("/websites/dates")
   public ResponseEntity<?> getDatesFromWebsite(@RequestParam("web") String website) {
     List<String> tutorials = new ArrayList<>();
@@ -322,13 +366,6 @@ public class TutorialController {
       }
     }
     return new ResponseEntity<>(tutorials, HttpStatus.OK);
-  }
-
-  public static void main (String[] args) throws IOException, URISyntaxException, JSONException {
-    LocalDate t = LocalDate.parse("20111203", DateTimeFormatter.BASIC_ISO_DATE);
-    LocalDateTime ti = LocalDateTime.of(t, LocalTime.MIDNIGHT);
-    LocalDateTime t2 = LocalDateTime.parse("2007-12-03T10:15:30");
-    System.out.print(Math.abs((int) ti.until(t2, HOURS)));
   }
 }
 
