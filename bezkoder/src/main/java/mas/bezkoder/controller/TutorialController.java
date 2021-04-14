@@ -171,14 +171,14 @@ public class TutorialController {
 
     Document rep = Jsoup.parse(result);
     doc.body().replaceWith(rep.body());
-
-    Element rephead = rep.head();
-    Elements css = rephead.select("link[href]");
-    for (Element cssHold: css) {
-      String diff = css.attr("href");
-      cssHold.attr("href", "http://localhost:8082/" + diff);
-      cssHold.appendTo(doc.head());
-    }
+//
+//    Element rephead = rep.head();
+//    Elements css = rephead.select("link[href]");
+//    for (Element cssHold: css) {
+//      String diff = css.attr("href");
+//      cssHold.attr("href", "http://localhost:8082/" + diff);
+//      cssHold.appendTo(doc.head());
+//    }
 
     return new ResponseEntity<>(doc.toString(), HttpStatus.OK);
   }
