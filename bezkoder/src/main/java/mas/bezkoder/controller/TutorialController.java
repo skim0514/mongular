@@ -160,11 +160,15 @@ public class TutorialController {
     headers.set("content-type", filetype + "; charset=UTF-8");
 
     InputStream is1 = getInputStream(tutorial1);
+    String file1 = getTextFile(is1, tutorial1);
     InputStream is2 = getInputStream(tutorial2);
+    String file2 = getTextFile(is2, tutorial1);
 
+    InputStream target1 = new ByteArrayInputStream(file1.getBytes());
+    InputStream target2 = new ByteArrayInputStream(file2.getBytes());
     InputStream is3 = getInputStream(tutorial1);
 
-    String result = compareStreams(is1, is2);
+    String result = compareStreams(target1, target2);
     String tf1 = getTextFile(is3, tutorial1);
     tf1 = ParseMain.parseFile(tf1, tutorial1, prev);
     result = ParseMain.parseFile(result, tutorial1, prev);
