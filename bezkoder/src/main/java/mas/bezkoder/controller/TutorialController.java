@@ -168,6 +168,8 @@ public class TutorialController {
 
     String tf1 = IOUtils.toString(is1, StandardCharsets.UTF_8.name());
 
+    System.out.println(tf1);
+
     Document doc = Jsoup.parse(tf1);
 
 
