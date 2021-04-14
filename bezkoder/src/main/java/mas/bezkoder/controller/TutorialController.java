@@ -182,7 +182,7 @@ public class TutorialController {
       cssHold.appendTo(doc.head());
     }
 
-    return new ResponseEntity<>(doc.toString(), re1.getHeaders(), HttpStatus.OK);
+    return new ResponseEntity<>(doc.toString(), HttpStatus.OK);
   }
 
   @GetMapping("/websites")
