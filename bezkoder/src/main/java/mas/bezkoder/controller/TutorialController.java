@@ -169,15 +169,18 @@ public class TutorialController {
     InputStream is3 = getInputStream(tutorial1);
 
     String result = compareStreams(target1, target2);
+    Document rep = Jsoup.parse(result);
+    Element rephead = rep.head();
+
     String tf1 = getTextFile(is3, tutorial1);
     tf1 = ParseMain.parseFile(tf1, tutorial1, prev);
     result = ParseMain.parseFile(result, tutorial1, prev);
 
     Document doc = Jsoup.parse(tf1);
-    Document rep = Jsoup.parse(result);
+    rep = Jsoup.parse(result);
     doc.body().replaceWith(rep.body());
 //
-    Element rephead = rep.head();
+
     Elements css = rephead.select("link[href]");
     for (Element cssHold: css) {
       String diff = css.attr("href");
