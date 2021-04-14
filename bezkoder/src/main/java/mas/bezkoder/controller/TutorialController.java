@@ -155,6 +155,10 @@ public class TutorialController {
       return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    HttpHeaders headers = new HttpHeaders();
+    String filetype = tutorial1.getContentType().split(";")[0];
+    headers.set("content-type", filetype + "; charset=UTF-8");
+
     InputStream is1 = getInputStream(tutorial1);
     InputStream is2 = getInputStream(tutorial2);
 
@@ -176,8 +180,8 @@ public class TutorialController {
       cssHold.attr("href", "http://localhost:8082/" + diff);
       cssHold.appendTo(doc.head());
     }
-
-    return new ResponseEntity<>(doc.toString(), HttpStatus.OK);
+    byte[] byteArray = doc.toString().getBytes();
+    return new ResponseEntity<>(byteArray, headers, HttpStatus.OK);
   }
 
   @GetMapping("/websites")
