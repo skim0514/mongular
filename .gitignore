@@ -151,6 +151,9 @@ front/out-tsc
 front/bazel-out
 
 # dependencies
+front/node_modules
+/front/node_modules
+
 # profiling files
 chrome-profiler-events*.json
 speed-measure-plugin*.json
@@ -188,3 +191,4 @@ Thumbs.db
 
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij,git,maven
+/front/node_modules/
