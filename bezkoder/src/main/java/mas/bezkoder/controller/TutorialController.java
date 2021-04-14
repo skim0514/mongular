@@ -166,23 +166,21 @@ public class TutorialController {
     InputStream is2 = new ByteArrayInputStream((byte[]) Objects.requireNonNull(re2.getBody()));
     String result = main2(is1, is2);
 
-    String tf1 = getTextFile(is1, tutorial1);
+    String tf1 = IOUtils.toString(is1, StandardCharsets.UTF_8.name());
 
     Document doc = Jsoup.parse(tf1);
-    System.out.println(tf1);
-
 
 
     Document rep = Jsoup.parse(result);
     doc.body().replaceWith(rep.body());
 //
-//    Element rephead = rep.head();
-//    Elements css = rephead.select("link[href]");
-//    for (Element cssHold: css) {
-//      String diff = css.attr("href");
-//      cssHold.attr("href", "http://localhost:8082/" + diff);
-//      cssHold.appendTo(doc.head());
-//    }
+    Element rephead = rep.head();
+    Elements css = rephead.select("link[href]");
+    for (Element cssHold: css) {
+      String diff = css.attr("href");
+      cssHold.attr("href", "http://localhost:8082/" + diff);
+      cssHold.appendTo(doc.head());
+    }
 
     return new ResponseEntity<>(doc.toString(), re1.getHeaders(), HttpStatus.OK);
   }
