@@ -15,8 +15,9 @@
  */
 package org.outerj.daisy.diff.helper;
 
-import com.springsource.org.cyberneko.html;
+//import com.springsource.org.cyberneko.html;
 
+import org.cyberneko.html.parsers.SAXParser;
 import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
