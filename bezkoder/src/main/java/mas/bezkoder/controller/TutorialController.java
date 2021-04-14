@@ -171,10 +171,7 @@ public class TutorialController {
 
     Document rep = Jsoup.parse(result);
     doc.body().replaceWith(rep.body());
-    String rs = doc.toString();
-    rs = ParseMain.parseFile(rs, tutorial2, next);
 
-    doc = Jsoup.parse(rs);
     Element rephead = rep.head();
     Elements css = rephead.select("link[href]");
     for (Element cssHold: css) {
