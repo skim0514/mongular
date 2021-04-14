@@ -159,10 +159,9 @@ public class TutorialController {
       return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    InputStream is1 = getInputStream(tutorial1);
-    InputStream is2 = getInputStream(tutorial2);
+    InputStream is1 = new ByteArrayInputStream((byte[]) Objects.requireNonNull(getFileFromWebsite(website, prev).getBody()));
+    InputStream is2 = new ByteArrayInputStream((byte[]) Objects.requireNonNull(getFileFromWebsite(website, next).getBody()));
     String result = main2(is1, is2);
-
 
     String tf1 = getTextFile(is1, tutorial1);
 
