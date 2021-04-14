@@ -169,7 +169,7 @@ public class TutorialController {
     String tf1 = getTextFile(is1, tutorial1);
 
     Document doc = Jsoup.parse(tf1);
-    System.out.println(doc.head());
+    System.out.println(tf1);
 
 
 
