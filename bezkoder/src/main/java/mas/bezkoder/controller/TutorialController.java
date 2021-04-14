@@ -164,19 +164,14 @@ public class TutorialController {
 
     InputStream is1 = new ByteArrayInputStream((byte[]) Objects.requireNonNull(re1.getBody()));
     InputStream is2 = new ByteArrayInputStream((byte[]) Objects.requireNonNull(re2.getBody()));
-
-    InputStream is3 = getInputStream(tutorial1);
-    InputStream is4 = getInputStream(tutorial2);
-
     String result = main2(is1, is2);
 
-    String tf1 = IOUtils.toString(is3, StandardCharsets.UTF_8.name());
+    InputStream filestream = getInputStream(tutorial1);
 
-    System.out.println(tf1);
+    String tf1 = getTextFile(filestream, tutorial1);
+    tf1 = ParseMain.parseFile(tf1, tutorial1, prev);
 
     Document doc = Jsoup.parse(tf1);
-
-
     Document rep = Jsoup.parse(result);
     doc.body().replaceWith(rep.body());
 //
