@@ -2,17 +2,13 @@ package mas.bezkoder.controller;
 
 import java.io.*;
 import java.net.*;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import mas.bezkoder.compare.CompareHTML;
 import mas.bezkoder.crawler.CrawlMain;
 import mas.bezkoder.parser.ParseMain;
 
@@ -32,9 +28,9 @@ import mas.bezkoder.model.Tutorial;
 import mas.bezkoder.repository.TutorialRepository;
 
 import static java.lang.Math.abs;
-import static java.nio.file.Files.deleteIfExists;
 import static java.time.temporal.ChronoUnit.HOURS;
-import static org.outerj.daisy.diff.Main.main2;
+import static org.outerj.daisy.diff.Main.compareStreams;
+
 
 
 @CrossOrigin(origins = {"http://118.67.133.84:4200", "http://localhost:4200", "http://0.0.0.0:4200"})
@@ -167,7 +163,7 @@ public class TutorialController {
 
     InputStream is3 = getInputStream(tutorial1);
 
-    String result = main2(is1, is2);
+    String result = compareStreams(is1, is2);
     String tf1 = getTextFile(is3, tutorial1);
     tf1 = ParseMain.parseFile(tf1, tutorial1, prev);
 

@@ -21,15 +21,7 @@ import java.util.Locale;
 
 public class Main {
   static boolean quietMode = false;
-
-  public static void main(String[] args) throws URISyntaxException, IOException {
-
-      InputStream is1 = new FileInputStream("/Users/skim/s2w/mongular/bezkoder/firstFile.html");
-      InputStream is2 = new FileInputStream("/Users/skim/s2w/mongular/bezkoder/secondFile.html");
-      System.out.println(main2(is1, is2));
-  }
-
-    public static String main2(InputStream is1, InputStream is2) throws URISyntaxException, IOException {
+    public static String compareStreams(InputStream is1, InputStream is2) throws URISyntaxException, IOException {
         File outputFile = null;
 
         boolean htmlDiff = true;
