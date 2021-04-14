@@ -159,11 +159,8 @@ public class TutorialController {
       return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    ResponseEntity<?> re1 = getFileFromWebsite(website, prev);
-    ResponseEntity<?> re2 = getFileFromWebsite(website, next);
-
-    InputStream is1 = new ByteArrayInputStream((byte[]) Objects.requireNonNull(re1.getBody()));
-    InputStream is2 = new ByteArrayInputStream((byte[]) Objects.requireNonNull(re2.getBody()));
+    InputStream is1 = getInputStream(tutorial1);
+    InputStream is2 = getInputStream(tutorial2);
     String result = main2(is1, is2);
 
     String tf1 = IOUtils.toString(is1, StandardCharsets.UTF_8.name());
@@ -184,7 +181,7 @@ public class TutorialController {
       cssHold.appendTo(doc.head());
     }
 
-    return new ResponseEntity<>(doc.toString(), re1.getHeaders(), HttpStatus.OK);
+    return new ResponseEntity<>(doc.toString(), HttpStatus.OK);
   }
 
   @GetMapping("/websites")
