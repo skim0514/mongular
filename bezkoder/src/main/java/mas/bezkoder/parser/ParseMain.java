@@ -15,19 +15,20 @@ public class ParseMain {
      * overall file parsing function
      * @param input string input of file
      * @param tutorial file information
+     * @param date date to search for
      * @return String of parsed file
      * @throws URISyntaxException if helper take incorrect urls
      * @throws IOException if information is missing
      */
 
-    public static String parseFile(String input, Tutorial tutorial) throws URISyntaxException, IOException, JSONException {
+    public static String parseFile(String input, Tutorial tutorial, String date) throws URISyntaxException, IOException, JSONException {
         switch (tutorial.getFiletype()) {
             case "html":
-                return parseHtml(input, tutorial);
+                return parseHtml(input, tutorial, date);
             case "css":
-                return parseCSS(input, tutorial);
+                return parseCSS(input, tutorial, date);
             case "js":
-                return parseJs(input, tutorial);
+                return parseJs(input, tutorial, date);
         }
         return input;
     }

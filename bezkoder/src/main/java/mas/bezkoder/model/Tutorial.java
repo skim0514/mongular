@@ -2,6 +2,8 @@ package mas.bezkoder.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.io.InputStream;
 import java.time.LocalDateTime; // import the LocalDateTime class
 
 
@@ -9,6 +11,7 @@ import java.time.LocalDateTime; // import the LocalDateTime class
 public class Tutorial {
     @Id
     private String id;
+    private String sha256;
     private String title;
     private String description;
     private String domain;
@@ -27,10 +30,11 @@ public class Tutorial {
      * @param contentEncoding http request encoding
      */
 
-    public Tutorial(String title, String description, String domain, String filetype, String contentType, String contentEncoding) {
+    public Tutorial(String title, String description, String sha256, String domain, String filetype, String contentType, String contentEncoding) {
         this.title = title;
         this.description = description;
         this.filetype = filetype;
+        this.sha256 = sha256;
         this.domain = domain;
         this.dateTime = LocalDateTime.now();
         this.contentType = contentType;
@@ -100,5 +104,13 @@ public class Tutorial {
 
     public void setContentEncoding(String contentEncoding) {
         this.contentEncoding = contentEncoding;
+    }
+
+    public String getSha() {
+        return sha256;
+    }
+
+    public void setSha(String sha256) {
+        this.sha256 = sha256;
     }
 }

@@ -15,6 +15,8 @@ public abstract class CSSExtractor {
     private static final String otherRegex = "https?://([^{}<>\"'\\s)]*)";
     private static final String CSSRegex = "url\\((.*?)\\)";
     private String url;
+    protected String date;
+    protected String client = "http://118.67.133.84:8085/api/websites?web=";
     private HashSet<String> urls;
     private Tutorial tutorial;
     private String input;
@@ -25,9 +27,13 @@ public abstract class CSSExtractor {
         this.urls = hs;
     }
 
-    public CSSExtractor(String input, Tutorial tutorial) {
+    public CSSExtractor(String input, Tutorial tutorial, String date) {
         this.tutorial = tutorial;
         this.input = input;
+        this.date = date;
+        if (date != null) {
+            client = "http://118.67.133.84:8085/api/websites?date=" + date + "&web=";
+        }
     }
 
     public void extractCSS() throws IOException, URISyntaxException, JSONException {

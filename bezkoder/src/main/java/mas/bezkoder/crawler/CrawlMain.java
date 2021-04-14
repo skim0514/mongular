@@ -1,47 +1,65 @@
 package mas.bezkoder.crawler;
 
+import com.mongodb.MongoWriteException;
+import mas.bezkoder.controller.TutorialController;
+import mas.bezkoder.model.Tutorial;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.ByteArrayBody;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import java.io.*;
 import java.net.*;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static mas.bezkoder.LinkExtractor.HTMLExtractor.replaceUrl;
+import static mas.bezkoder.controller.TutorialController.getTextFile;
 import static mas.bezkoder.crawler.CrawlCSS.crawlCSS;
 import static mas.bezkoder.crawler.CrawlHTML.getPageLinks;
 
 public class CrawlMain {
-    private static final String CSSRegex = "url\\((.*?)\\)";
     private static final String otherRegex = "https?://([^{}<>\"'\\s)]*)";
-    private static final Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
 
     public static void run(String link) throws IOException, JSONException, URISyntaxException {
-        crawlSite(link);
+        try {
+            crawlSite(link);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * main caller function
-     * @param url url of website to start at
+     * @param website url of website to start at
      * @throws JSONException issues building tutorials
      * @throws URISyntaxException badly built url
      * @throws IOException issues with url
      */
-    public static void crawlSite(String url) throws JSONException, URISyntaxException, IOException {
+    public static void crawlSite(String website) throws JSONException, URISyntaxException, IOException, NoSuchAlgorithmException {
+        String url;
+        while (true) {
+            url = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
+            if (url.equals(website)) break;
+            else website = url;
+        }
         String startDomain = new URL(url).getHost();
-        HashSet<String> hs = getPageLinks(url, startDomain, 0);
+        HashSet<String> visited = new HashSet<>();
+        HashSet<String> checksums = new HashSet<>();
+        HashSet<String> hs = getPageLinks(url, startDomain, 0, visited, checksums);
         HashSet<String> otherLinks = new HashSet<>();
         int count = 1;
         if (hs == null) return;
@@ -66,31 +84,34 @@ public class CrawlMain {
                 filetype = contentType.split(";")[0];
                 extension = MimeTypes.getDefaultExt(filetype);
             }
-            String id;
+            Tutorial tut;
+            String success;
             try {
-                id = addTutorial(string, extension, extension, contentType);
+                success = downloadFile(string);
+                if (success == null) continue;
+
             } catch (IOException | IllegalArgumentException e) {
                 continue;
             }
+            tut = addTutorial(string, extension, success, extension, contentType);
             if (count % 10 == 0) System.out.println("Done with " + count + "/" + hs.size());
             count++;
-            boolean success = downloadFile(string, "files/" + id);
-            if (!success) {
-                System.out.println("fail " + string);
+            String content;
+            try {
+                InputStream is = TutorialController.getInputStream(tut);
+                content = getTextFile(is, tut);
+            } catch (Exception ex) {
+                ex.printStackTrace();
                 continue;
             }
 
             if (extension.equals("css")) {
                 try {
-                    Path cssFile = Path.of("files/" + id);
-                    String content = Files.readString(cssFile);
                     otherLinks.addAll(crawlCSS(content, string));
                 } catch (IOException | URISyntaxException ignored) {
                 }
             } else if (extension.equals("js")) {
                 try {
-                    Path jsFile = Path.of("files/" + id);
-                    String content = Files.readString(jsFile);
                     HashSet<String> jsLinks = searchJs(content, string);
                     otherLinks.addAll(jsLinks);
                 } catch (IOException ignored) {
@@ -120,16 +141,20 @@ public class CrawlMain {
                 extension = MimeTypes.getDefaultExt(filetype);
             }
 
-            String id;
             try {
-                id = addTutorial(string, extension, extension, contentType);
+                String success = downloadFile(string);
+                if (success == null) {
+                    System.out.println("fail " + string);
+                    continue;
+                }
+                addTutorial(string, extension, success, extension, contentType);
             } catch (Exception e) {
                 continue;
             }
             if (count % 10 == 0) System.out.println("Done with " + count + "/" + otherLinks.size());
             count++;
-            boolean success = downloadFile(string, "files/" + id);
-            if (!success) System.out.println("fail " + string);
+
+
         }
     }
 
@@ -148,32 +173,48 @@ public class CrawlMain {
     /**
      * downloads file with given URL
      * @param url url of file to download
-     * @param fileName filename with location to download to
      * @return success or not success
      * @throws IOException for issues in url or fileName
      */
-    public static boolean downloadFile(String url, String fileName) throws IOException {
+    public static String downloadFile(String url) throws IOException, NoSuchAlgorithmException {
         if (url.startsWith("https://href.li/?")) url = url.replace("https://href.li/?", "");
+        System.setProperty("http.proxyHost", "127.0.0.1");
+        System.setProperty("http.proxyPort", "8123");
         HttpURLConnection webProxyConnection
-                = (HttpURLConnection) new URL(url).openConnection(webProxy);
+                = (HttpURLConnection) new URL(url).openConnection();
 
-        ReadableByteChannel readChannel;
-//        try {
-//            readChannel = Channels.newChannel(new URL(url).openStream());
-//        } catch (IOException e) {
-//            return false;
-//        }
+        InputStream is = null;
         try {
-            readChannel = Channels.newChannel(webProxyConnection.getInputStream());
+            is = webProxyConnection.getInputStream();
+
         } catch (IOException | RuntimeException e) {
-            return false;
+            e.printStackTrace();
+            return null;
         }
 
-        FileOutputStream fileOS = new FileOutputStream(fileName);
-        FileChannel writeChannel = fileOS.getChannel();
-        writeChannel
-                .transferFrom(readChannel, 0, Long.MAX_VALUE);
-        return true;
+        byte[] bytes = IOUtils.toByteArray(is);
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] sha256Hash = digest.digest(bytes);
+        String checksum = bytesToHex(sha256Hash);
+        try {
+            addDownload(checksum, bytes);
+        } catch (Throwable ex) {
+            System.out.println("File Already Exists");
+            return checksum;
+        }
+        return checksum;
+    }
+
+    private static String bytesToHex(byte[] hash) {
+        StringBuilder hexString = new StringBuilder(2 * hash.length);
+        for (int i = 0; i < hash.length; i++) {
+            String hex = Integer.toHexString(0xff & hash[i]);
+            if(hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
     }
 
     /**
@@ -186,19 +227,22 @@ public class CrawlMain {
      * @throws IOException issues with links
      * @throws JSONException issues with building our db entry
      */
-    public static String addTutorial(String link, String filetype, String description, String contentType) throws IOException, JSONException {
+    public static Tutorial addTutorial(String link, String filetype, String sha256, String description, String contentType) throws IOException, JSONException {
         URL url = new URL("http://localhost:8085/api/tutorials");
         URLConnection con = url.openConnection();
         HttpURLConnection http = (HttpURLConnection)con;
         http.setRequestMethod("POST"); // PUT is another valid option
         http.setDoOutput(true);
         Map<String,String> arguments = new HashMap<>();
+        String domain = new URL(link).getHost();
+        String encoding = getEncoding(contentType);
         arguments.put("title", link);
-        arguments.put("domain", new URL(link).getHost());
+        arguments.put("domain", domain);
+        arguments.put("sha256", sha256);
         arguments.put("filetype", filetype);
         arguments.put("description", description);
         arguments.put("contentType", contentType);
-        arguments.put("contentEncoding", getEncoding(contentType));
+        arguments.put("contentEncoding", encoding);
         JSONObject js = new JSONObject(arguments);
         byte[] out = js.toString().getBytes(StandardCharsets.UTF_8);
         int length = out.length;
@@ -222,7 +266,21 @@ public class CrawlMain {
         String id = json.getString("id");
         http.disconnect();
         System.out.println("New Tutorial " + link);
-        return id;
+        return new Tutorial(link, description, sha256, domain, filetype, contentType, encoding);
+    }
+
+    public static void addDownload(String sha256, byte[] bytes) throws IOException, MongoWriteException {
+        HttpPost httppost = new HttpPost("http://localhost:8085/api/file/add");
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        MultipartEntityBuilder multipartEntity = MultipartEntityBuilder.create()
+                .setMode(HttpMultipartMode.BROWSER_COMPATIBLE)
+                .addTextBody("title", sha256)
+                .addPart("file", new ByteArrayBody(bytes, ""));
+        httppost.setEntity(multipartEntity.build());
+        CloseableHttpResponse response = httpClient.execute(httppost);
+        HttpEntity entity = response.getEntity();
+        httpClient.close();
+        response.close();
     }
 
     /**
@@ -231,6 +289,9 @@ public class CrawlMain {
      * @return content type information
      */
     public static String getContentType(String link) {
+        System.setProperty("http.proxyHost", "127.0.0.1");
+        System.setProperty("http.proxyPort", "8123");
+
         if (link.startsWith("https://href.li/?")) link = link.replace("https://href.li/?", "");
         URL url;
         try {
@@ -242,8 +303,7 @@ public class CrawlMain {
         }
         HttpURLConnection connection;
         try {
-//            connection = (HttpURLConnection) url.openConnection();
-            connection = (HttpURLConnection) url.openConnection(webProxy);
+            connection = (HttpURLConnection) url.openConnection();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -309,47 +369,47 @@ public class CrawlMain {
         return false;
     }
 
-//    /**
-//     * searches css for urls
-//     * @param input input css string
-//     * @param string our given domain for our website
-//     * @return hashset of urls that are in the css
-//     * @throws IOException issues with our url information.
-//     * @throws URISyntaxException badly built url
-//     * @throws JSONException issues building tutorial of website link
-//     */
-//    public static HashSet<String> searchCss(String input, String string) throws IOException, URISyntaxException, JSONException {
-//        HashSet<String> hs = new HashSet<>();
-//        Pattern pattern = Pattern.compile(CSSRegex);
-//        Matcher matcher = pattern.matcher(input);
-//        while (matcher.find()) {
-//            String group = matcher.group(1);
-//            group = group.replaceAll("\"", "");
-//            group = group.replaceAll("'", "");
-//            if (group.startsWith("data:")) continue;
-//            String newUrl = replaceUrl(group, string);
-//            hs.add(newUrl);
-//        }
-//        pattern = Pattern.compile(otherRegex);
-//        matcher = pattern.matcher(input);
-//        while (matcher.find()) {
-//            String group = matcher.group(0);
-//            if (group.startsWith("data:")) continue;
-//            String newUrl = replaceUrl(group, string);
-//            hs.add(newUrl);
-//        }
-//        return hs;
-//    }
 
-    public static void main(String[] args) throws IOException {
-        String url = "https://exploit.in/";
-        String startDomain = new URL(url).getHost();
-        HashSet<String> hs = getPageLinks(url, startDomain, 0);
-        HashSet<String> otherLinks = new HashSet<>();
-        if (hs == null) return;
-        for (String string: hs) {
-            System.out.println(string);
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException, URISyntaxException {
+        System.setProperty("http.proxyHost", "127.0.0.1");
+        System.setProperty("http.proxyPort", "8123");
+//        Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
+        String url = "https://bitcointalk.org/";
+        HttpURLConnection webProxyConnection
+                = (HttpURLConnection) new URL(url).openConnection();
+        InputStream is = webProxyConnection.getInputStream();
+        byte[] bytes = IOUtils.toByteArray(is);
+
+        InputStream targetStream = new ByteArrayInputStream(bytes);
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(targetStream, "ISO-8859-1"));
+
+        String inputLine;
+        StringBuffer content = new StringBuffer();
+        while ((inputLine = in.readLine()) != null) {
+            content.append(inputLine);
         }
+        in.close();
+        System.out.println(content.toString());
+
+
+
+//        String second = "http://abasdfasdfw2eerqweg";
+//        System.out.println(replaceUrl(website, second));
+//        URL url = new URL(website);
+
+//        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+//        connection.setRequestMethod("HEAD");
+//        if (isRedirect(connection.getResponseCode())) {
+//            String newUrl = connection.getHeaderField("Location"); // get redirect url from "location" header field
+////            logger.warn("Original request URL: '{}' redirected to: '{}'", urlString, newUrl);
+//            System.out.println(getContentType(newUrl));
+//        }
+//        String contentType = connection.getContentType();
+//        System.out.println(contentType);
+
+//        System.out.println(iterate.size());
+
     }
 
 }
