@@ -81,79 +81,26 @@ public class TutorialController {
     }
   }
 
-  @PutMapping("/tutorials/{id}")
-  public ResponseEntity<Tutorial> updateTutorial(@PathVariable("id") String id, @RequestBody Tutorial tutorial) {
-    Optional<Tutorial> tutorialData = tutorialRepository.findById(id);
-
-    if (tutorialData.isPresent()) {
-      Tutorial _tutorial = tutorialData.get();
-      _tutorial.setTitle(tutorial.getTitle());
-      _tutorial.setDescription(tutorial.getDescription());
-      _tutorial.setFiletype(tutorial.getFiletype());
-      return new ResponseEntity<>(tutorialRepository.save(_tutorial), HttpStatus.OK);
-    } else {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-  }
-
-  @DeleteMapping("/tutorials/{id}")
-  public ResponseEntity<HttpStatus> deleteTutorial(@PathVariable("id") String id) {
-    try {
-      tutorialRepository.deleteById(id);
-      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    } catch (Exception e) {
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  @DeleteMapping("/websites")
-  public ResponseEntity<HttpStatus> deleteWebsite(@RequestParam("web") String website) {
-    try {
-      String url;
-      while (true) {
-          url = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
-          if (url.equals(website)) break;
-          else website = url;
-      }
-      List<Tutorial> tutorials = new ArrayList<>();
-      tutorialRepository.findByTitleContaining(website).forEach(tutorials::add);
-      for (Tutorial tutorial: tutorials) {
-        deleteTutorial(tutorial.getId());
-      }
-      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    } catch (Exception e) {
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  @DeleteMapping("/tutorials")
-  public ResponseEntity<HttpStatus> deleteAllTutorials() {
-    try {
-      tutorialRepository.deleteAll();
-      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    } catch (Exception e) {
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-
+  /**
+   * Comparison function comparing website prev from current or next
+   * @param website website to compare two dates
+   * @param prev date we are comparing to
+   * @param next Optional date we are comparing with
+   * @return response entity containing bits and header of html file already parsed
+   */
   @GetMapping("/comparison")
   public ResponseEntity<?> getComparison(@RequestParam("web") String website, @RequestParam("prev") String prev,
                                          @RequestParam(name = "next", required = false) String next) throws JSONException, IOException, URISyntaxException {
-    String url = "";
     try {
-      while (true) {
-        url = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
-        if (url.equals(website)) break;
-        else website = url;
-      }
+      website = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
     } catch (UnsupportedEncodingException e) {
       // not going to happen - value came from JDK's own StandardCharsets
     }
     Tutorial tutorial1;
     Tutorial tutorial2;
     try {
-      tutorial1 = getTutorial(url, prev);
-      tutorial2 = getTutorial(url, next);
+      tutorial1 = getTutorial(website, prev);
+      tutorial2 = getTutorial(website, next);
       if (tutorial1 == null || tutorial2 == null) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     } catch (Exception e) {
       e.printStackTrace();
@@ -206,20 +153,14 @@ public class TutorialController {
   @GetMapping("/websites")
   public ResponseEntity<?> getFileFromWebsite(@RequestParam("web") String website, @RequestParam(name = "date",
           required = false) String date) throws IOException, URISyntaxException, JSONException {
-    String url = "";
     try {
-      while (true) {
-        url = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
-        if (url.equals(website)) break;
-        else website = url;
-      }
-
+        website = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
     } catch (UnsupportedEncodingException e) {
       // not going to happen - value came from JDK's own StandardCharsets
     }
     Tutorial tutorial;
     try {
-      tutorial = getTutorial(url, date);
+      tutorial = getTutorial(website, date);
       if (tutorial == null) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     } catch (Exception e) {
       e.printStackTrace();
@@ -366,6 +307,56 @@ public class TutorialController {
       }
     }
     return new ResponseEntity<>(tutorials, HttpStatus.OK);
+  }
+
+  @PutMapping("/tutorials/{id}")
+  public ResponseEntity<Tutorial> updateTutorial(@PathVariable("id") String id, @RequestBody Tutorial tutorial) {
+    Optional<Tutorial> tutorialData = tutorialRepository.findById(id);
+
+    if (tutorialData.isPresent()) {
+      Tutorial _tutorial = tutorialData.get();
+      _tutorial.setTitle(tutorial.getTitle());
+      _tutorial.setDescription(tutorial.getDescription());
+      _tutorial.setFiletype(tutorial.getFiletype());
+      return new ResponseEntity<>(tutorialRepository.save(_tutorial), HttpStatus.OK);
+    } else {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+  }
+
+  @DeleteMapping("/tutorials/{id}")
+  public ResponseEntity<HttpStatus> deleteTutorial(@PathVariable("id") String id) {
+    try {
+      tutorialRepository.deleteById(id);
+      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    } catch (Exception e) {
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @DeleteMapping("/websites")
+  public ResponseEntity<HttpStatus> deleteWebsite(@RequestParam("web") String website) {
+    try {
+      website = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
+      List<Tutorial> tutorials = new ArrayList<>();
+      tutorialRepository.findByTitleContaining(website).forEach(tutorials::add);
+      for (Tutorial tutorial: tutorials) {
+        deleteTutorial(tutorial.getId());
+      }
+      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    } catch (Exception e) {
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @DeleteMapping("/tutorials")
+  public ResponseEntity<HttpStatus> deleteAllTutorials() {
+    try {
+      tutorialRepository.deleteAll();
+      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    } catch (Exception e) {
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }
 

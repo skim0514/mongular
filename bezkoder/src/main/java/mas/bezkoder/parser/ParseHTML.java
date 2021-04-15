@@ -42,6 +42,13 @@ public class ParseHTML extends HTMLExtractor {
         return parser.getInput();
     }
 
+    /**
+     * Helper function for srcset - splits and parses
+     * @param hold holds initial strings
+     * @param client our client url
+     * @param tutorial metadata for our code
+     * @return new src set style html attribute
+     */
     public static String setHelp(String hold, String client, Tutorial tutorial) throws UnsupportedEncodingException {
         String rs = hold;
         String[] strings;
