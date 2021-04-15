@@ -10,7 +10,7 @@ It allows users to build a database of websites and offline browse these website
 
 **Dependencies**: 
 <li>Database: MongoDB</li>
-<li>FrontEnd: AngularJS</li>
+<li>FrontEnd: Angular</li>
 <li>BackEnd: Java Spring</li>
 
 ___
