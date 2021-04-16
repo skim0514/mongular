@@ -97,9 +97,8 @@ public class ParseHTML extends HTMLExtractor {
      * @param date date to search for
      * @return parsed string javascript document
      * @throws UnsupportedEncodingException if encoding is not functional
-     * @throws URISyntaxException if urls to parse is unusual
      */
-    public static String parseJs(String input, Tutorial tutorial, String date) throws UnsupportedEncodingException, URISyntaxException, MalformedURLException {
+    public static String parseJs(String input, Tutorial tutorial, String date) throws UnsupportedEncodingException {
         String client = "http://118.67.133.84:8085/api/websites?web=";
         if (date != null) client = "http://118.67.133.84:8085/api/websites?date=" + date + "&web=";
         return otherRegex(input, client, tutorial);
@@ -109,10 +108,8 @@ public class ParseHTML extends HTMLExtractor {
      * implementation of LinkExtractor abstract func
      * @param srcSets elements to replace
      * @throws UnsupportedEncodingException if encoding is unusual
-     * @throws MalformedURLException if url is unusual
-     * @throws URISyntaxException incorrectly built url
      */
-    public void parseSrcSet(Elements srcSets) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+    public void parseSrcSet(Elements srcSets) throws UnsupportedEncodingException {
         if (srcSets == null) return;
         for (Element srcset : srcSets) {
             String hold = srcset.attr("srcset");
@@ -140,7 +137,6 @@ public class ParseHTML extends HTMLExtractor {
 
         }
     }
-
 
     /**
      * implementation of parse data-src for LinkExtractor
@@ -181,12 +177,6 @@ public class ParseHTML extends HTMLExtractor {
                     }
                 }
             }
-//            String hold = src.attr("data-src");
-//            if (!hold.startsWith("data:image") && !hold.startsWith(this.client)) {
-//                String newUrl = replaceUrl(hold, getTutorial().getTitle());
-//                if (newUrl == null) continue;
-//                src.attr("data-src", this.client + java.net.URLEncoder.encode(newUrl, StandardCharsets.UTF_8.name()));
-
         }
     }
 
@@ -272,44 +262,5 @@ public class ParseHTML extends HTMLExtractor {
             input = input.replace(matcher.group(0), group);
         }
         setInput(input);
-    }
-
-
-    public static void main (String[] args) throws IOException, URISyntaxException, JSONException {
-        System.setProperty("http.proxyHost", "127.0.0.1");
-        System.setProperty("http.proxyPort", "8123");
-//        Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
-//        String url = "This is a url http://abcdefg.com";
-//        url = replaceUrl("http://abc.com", url);
-        String website = "http://3dell3phmthpcqw3w4lw5fbabrqpxh4ur5pnopspwx4ifeynufaynxid.onion/product/%ea%b7%b8%eb%a6%ac%ec%8a%a4%eb%aa%bd%ed%82%a4/";
-        String url;
-        while (true) {
-            url = URLDecoder.decode(website, StandardCharsets.UTF_8.name());
-            if (url.equals(website)) break;
-            else website = url;
-        }
-
-        System.out.println(url);
-
-
-        Document document = Jsoup.connect(website).timeout(0).get();
-//        System.out.println(document.toString());
-
-        Tutorial tutorial = new Tutorial(website, "html", "123456", "http://3dell3phmthpcqw3w4lw5fbabrqpxh4ur5pnopspwx4ifeynufaynxid.onion/", "html", "text/html", "UTF-8");
-//        String newHtml = parseHtml(document.toString(), tutorial, null);
-
-        Elements dsrc = document.select("*");
-        for (Element dsr: dsrc) {
-//            String a = dsr.attr("style");
-            if (dsr.children().size() == 0) {
-                System.out.println(dsr);
-            }
-//            System.out.println(dsr);
-        }
-//        System.out.println(document.toString());
-//        System.out.println(newHtml);
-//        Document document = Jsoup.connect(url).proxy(webProxy).get();
-//
-
     }
 }
