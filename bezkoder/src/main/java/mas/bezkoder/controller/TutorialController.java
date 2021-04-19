@@ -44,6 +44,9 @@ import static org.outerj.daisy.diff.Main.compareStreams;
 public class TutorialController {
 
 
+  /**
+   * use setBlackListArray to edit blacklist array
+   */
   private String[] blacklistArray  = {"www.youtube.com"};
   private final HashSet<String> blacklist = new HashSet<>(Arrays.asList(blacklistArray));
 

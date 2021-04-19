@@ -24,7 +24,7 @@ public class ParseHTML extends HTMLExtractor {
     private static final String regex = "https?://([^{}<>\"'\\s)]*)";
 
     /**
-     * Add BlackList Urls to this array
+     * use setBlackListArray to edit Array when necessary
      */
     private String[] blacklistArray  = {};
     private final HashSet<String> blacklist = new HashSet<>(Arrays.asList(blacklistArray));
