@@ -65,6 +65,8 @@ public class ParseHTML extends HTMLExtractor {
         for (String string: strings) {
             String[] urls = string.split(" ");
             String url = urls[0];
+            if (url.startsWith("data:"))
+                continue;
             rs = rs.replace(url, client + java.net.URLEncoder.encode(replaceUrl(url, tutorial.getTitle()), StandardCharsets.UTF_8.name()));
         }
         return rs;
@@ -138,7 +140,7 @@ public class ParseHTML extends HTMLExtractor {
         if (srcs == null) return;
         for (Element src : srcs) {
             String hold = src.attr("src");
-            if (!hold.startsWith("data:image") && !hold.startsWith(this.client)){
+            if (!hold.startsWith("data:") && !hold.startsWith(this.client)){
                 String newUrl = replaceUrl(hold, getTutorial().getTitle());
                 if (newUrl == null) continue;
                 src.attr("src", this.client + java.net.URLEncoder.encode(newUrl, StandardCharsets.UTF_8.name()));
