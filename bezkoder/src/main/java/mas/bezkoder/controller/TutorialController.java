@@ -180,7 +180,6 @@ public class TutorialController {
       String file;
       try {
         file = getTextFile(is, tutorial);
-        System.out.println(file);
       } catch (IOException e) {
         e.printStackTrace();
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
