@@ -265,15 +265,7 @@ public class TutorialController {
 
   public static String getTextFile(InputStream inputstream, Tutorial tutorial) throws IOException {
 
-    BufferedReader in = new BufferedReader(
-            new InputStreamReader(inputstream, tutorial.getContentEncoding().toUpperCase()));
-    String inputLine;
-    StringBuffer content = new StringBuffer();
-    while ((inputLine = in.readLine()) != null) {
-      content.append(inputLine);
-    }
-    in.close();
-    return content.toString();
+    return IOUtils.toString(inputstream, tutorial.getContentEncoding().toUpperCase());
   }
 
   /**
