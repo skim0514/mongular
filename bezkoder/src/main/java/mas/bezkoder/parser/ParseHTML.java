@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,6 +22,13 @@ import static mas.bezkoder.parser.ParseCSS.parseCSS;
 
 public class ParseHTML extends HTMLExtractor {
     private static final String regex = "https?://([^{}<>\"'\\s)]*)";
+
+    /**
+     * use setBlackListArray to edit Array when necessary
+     */
+    private String[] blacklistArray  = {};
+    private final HashSet<String> blacklist = new HashSet<>(Arrays.asList(blacklistArray));
+
 
     public ParseHTML(Document document, Tutorial tutorial, String date) {
         super(document, tutorial, date);
@@ -219,11 +228,15 @@ public class ParseHTML extends HTMLExtractor {
      * @param hrefs elements to replace
      * @throws UnsupportedEncodingException if encoding is unusal not thrown
      */
-    public void parseALink(Elements hrefs) throws UnsupportedEncodingException {
+    public void parseALink(Elements hrefs) throws UnsupportedEncodingException, URISyntaxException {
         if (hrefs == null) return;
         for (Element href : hrefs) {
             String hold = href.attr("href");
             if (hold.startsWith(this.client)) continue;
+            URI uri = new URI(hold);
+            String domain = uri.getHost();
+            if (blacklist.contains(domain)) continue;
+
             String newUrl = replaceUrl(hold, getTutorial().getTitle());
             if (newUrl == null) continue;
             href.attr("href", this.client + java.net.URLEncoder.encode(newUrl, StandardCharsets.UTF_8.name()));
@@ -262,5 +275,9 @@ public class ParseHTML extends HTMLExtractor {
             input = input.replace("'" + matcher.group(0) + "'", "\"" + group + "\"");
         }
         setInput(input);
+    }
+
+    public void setBlacklistArray(String[] blacklistArray) {
+        this.blacklistArray = blacklistArray;
     }
 }

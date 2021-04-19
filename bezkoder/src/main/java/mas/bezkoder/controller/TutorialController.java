@@ -43,6 +43,14 @@ import static org.outerj.daisy.diff.Main.compareStreams;
 @RequestMapping("/api")
 public class TutorialController {
 
+
+  /**
+   * use setBlackListArray to edit blacklist array
+   */
+  private String[] blacklistArray  = {"www.youtube.com"};
+  private final HashSet<String> blacklist = new HashSet<>(Arrays.asList(blacklistArray));
+
+
   @Autowired
   TutorialRepository tutorialRepository;
 
@@ -157,6 +165,11 @@ public class TutorialController {
         website = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
     } catch (UnsupportedEncodingException e) {
       // not going to happen - value came from JDK's own StandardCharsets
+    }
+    URI uri = new URI(website);
+    String domain = uri.getHost();
+    if (blacklist.contains(domain)) {
+      return ResponseEntity.status(HttpStatus.TEMPORARY_REDIRECT).header(HttpHeaders.LOCATION, website).build();
     }
     Tutorial tutorial;
     try {
@@ -349,6 +362,10 @@ public class TutorialController {
     } catch (Exception e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  public void setBlacklistArray(String[] blacklistArray) {
+    this.blacklistArray = blacklistArray;
   }
 }
 
