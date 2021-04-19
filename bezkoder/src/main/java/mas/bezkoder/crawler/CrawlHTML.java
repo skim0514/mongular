@@ -25,7 +25,7 @@ import static mas.bezkoder.crawler.CrawlMain.addTutorial;
 import static mas.bezkoder.crawler.CrawlMain.downloadFile;
 
 public class CrawlHTML extends HTMLExtractor {
-    private static final int MAX_DEPTH = 2;
+    private static final int MAX_DEPTH = 1;
     private String domain;
 
 
