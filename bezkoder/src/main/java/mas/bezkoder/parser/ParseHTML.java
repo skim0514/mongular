@@ -181,10 +181,20 @@ public class ParseHTML extends HTMLExtractor {
             for (Attribute att : d.attributes().asList()) {
                 if (att.getKey().contains("data-") && !att.getKey().equals("data-src")) {
                     String curr = att.getValue();
-                    if (Pattern.compile(regex).matcher(curr).find() && !curr.startsWith(this.client)) {
-                        String newUrl = replaceUrl(curr, getTutorial().getTitle());
-                        if (newUrl != null)
-                            att.setValue(this.client + java.net.URLEncoder.encode(newUrl, StandardCharsets.UTF_8.name()));
+                    if (!curr.startsWith(this.client)) {
+                        Pattern pattern = Pattern.compile(regex);
+                        Matcher matcher = pattern.matcher(curr);
+                        while (matcher.find()) {
+                            String group = matcher.group(0);
+                            if (group.startsWith(clientStart)) continue;
+                            if (group.startsWith("data:")) continue;
+                            String newUrl = this.client + java.net.URLEncoder.encode(group, StandardCharsets.UTF_8.name());
+                            try {
+                                curr = curr.replace(group, newUrl);
+                            } catch (Exception ignored) {
+                            }
+                        }
+                        att.setValue(curr);
                     }
                 }
             }
