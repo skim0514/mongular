@@ -17,7 +17,6 @@ import java.util.regex.Pattern;
 public abstract class HTMLExtractor {
     protected static final String clientStart = "http://118.67.133.84:8085/api/websites?";
     protected String client = "http://118.67.133.84:8085/api/websites?web=";
-    private static final String otherRegex = "https?://([^{}<>\"'\\s)]*)";
     private static final String style ="<style([\\s\\S]+?)</style>";
     private String url;
     private HashSet<String> urls;

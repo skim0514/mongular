@@ -32,14 +32,15 @@ public class ParseCSS extends CSSExtractor {
         String input = getInput();
         Tutorial tutorial = getTutorial();
         while (matcher.find()) {
+            String original = matcher.group(0);
             String group = matcher.group(1);
             group = group.replaceAll("\"", "");
             group = group.replaceAll("'", "");
             if (group.startsWith("data:")) continue;
             if (group.contains(clientStart)) continue;
             String newUrl = this.client + java.net.URLEncoder.encode(replaceUrl(group, tutorial.getTitle()), StandardCharsets.UTF_8.name());
-            input = input.replace("'" + group + "'", "'" + newUrl + "'");
-            input = input.replace("\"" + group + "\"", "\"" + newUrl + "\"");
+            newUrl = original.replace(group, newUrl);
+            input = input.replace(original, newUrl);
         }
         setInput(input);
     }
