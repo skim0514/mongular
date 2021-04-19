@@ -82,8 +82,8 @@ public class ParseHTML extends HTMLExtractor {
             if (replacement == null) continue;
             String newUrl = client + java.net.URLEncoder.encode(replacement, StandardCharsets.UTF_8.name());
             try {
-                input = input.replace("'" + group, "'" + newUrl);
-                input = input.replace("\"" + group, "\"" + newUrl);
+                input = input.replace("'" + group + "'", "'" + newUrl + "'");
+                input = input.replace("\"" + group + "\"", "\"" + newUrl + "\"");
             } catch (Exception ignored) {
             }
         }
@@ -259,7 +259,7 @@ public class ParseHTML extends HTMLExtractor {
         while (matcher.find()) {
             String group = matcher.group(0);
             group = parseCSS(group, getTutorial(), this.date);
-            input = input.replace(matcher.group(0), group);
+            input = input.replace("'" + matcher.group(0) + "'", "\"" + group + "\"");
         }
         setInput(input);
     }

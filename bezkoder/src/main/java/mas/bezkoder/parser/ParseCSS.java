@@ -53,8 +53,8 @@ public class ParseCSS extends CSSExtractor {
             if (group.startsWith("data:")) continue;
             String newUrl = this.client + java.net.URLEncoder.encode(replaceUrl(group, tutorial.getTitle()), StandardCharsets.UTF_8.name());
             try {
-                input = input.replace("'" + group, "'" + newUrl);
-                input = input.replace("\"" + group, "\"" + newUrl);
+                input = input.replace("'" + group + "'", "'" + newUrl + "'");
+                input = input.replace("\"" + group + "\"", "\"" + newUrl + "\"");
             } catch (Exception ignored) {
             }
         }
