@@ -28,7 +28,7 @@ public class ParseHTML extends HTMLExtractor {
      */
     private String[] blacklistArray  = {};
     private final HashSet<String> blacklist = new HashSet<>(Arrays.asList(blacklistArray));
-    private final String[] aLinkBlackList = {"magnet:"};
+    private final String[] aLinkBlackList = {"magnet:", "bitcoin:"};
 
 
     public ParseHTML(Document document, Tutorial tutorial, String date) {
