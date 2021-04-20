@@ -252,10 +252,10 @@ public class ParseHTML extends HTMLExtractor {
             if (hold.startsWith(this.client)) continue;
             //Include other link filetypes that should be included - or create a blacklist for file starters
             String newUrl = replaceUrl(hold, getTutorial().getTitle());
+            if (newUrl == null) continue;
             URI uri = new URI(hold);
             String domain = uri.getHost();
             if (blacklist.contains(domain)) continue;
-            if (newUrl == null) continue;
             href.attr("href", this.client + java.net.URLEncoder.encode(newUrl, StandardCharsets.UTF_8.name()));
         }
     }
