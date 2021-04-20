@@ -28,7 +28,6 @@ public class ParseHTML extends HTMLExtractor {
      */
     private String[] blacklistArray  = {};
     private final HashSet<String> blacklist = new HashSet<>(Arrays.asList(blacklistArray));
-    private final String[] aLinkBlackList = {"magnet:", "bitcoin:"};
 
 
     public ParseHTML(Document document, Tutorial tutorial, String date) {
@@ -252,18 +251,10 @@ public class ParseHTML extends HTMLExtractor {
             String hold = href.attr("href");
             if (hold.startsWith(this.client)) continue;
             //Include other link filetypes that should be included - or create a blacklist for file starters
-            boolean badStart = false;
-            for (String start : aLinkBlackList) {
-                if (hold.startsWith(start)) {
-                    badStart = true;
-                    break;
-                }
-            }
-            if (badStart) continue;
+            String newUrl = replaceUrl(hold, getTutorial().getTitle());
             URI uri = new URI(hold);
             String domain = uri.getHost();
             if (blacklist.contains(domain)) continue;
-            String newUrl = replaceUrl(hold, getTutorial().getTitle());
             if (newUrl == null) continue;
             href.attr("href", this.client + java.net.URLEncoder.encode(newUrl, StandardCharsets.UTF_8.name()));
         }

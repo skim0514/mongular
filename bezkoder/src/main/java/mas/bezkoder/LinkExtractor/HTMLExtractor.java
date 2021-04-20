@@ -11,6 +11,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -130,14 +131,13 @@ public abstract class HTMLExtractor {
 
     /**
      * helper function to take url and accordingly change based on file info
-     * @param url input url
-     * @param string full url
      * @return new url
      */
 
-    public static String replaceUrl(String url, String string) {
-        if (url.contains(clientStart)) return url;
-        return getAbsoluteURL(string, url);
+    public static String replaceUrl(String string, String baseURL) {
+        if (string.contains(clientStart)) return string;
+        String replace = getAbsoluteURL(baseURL, string);
+        return Objects.requireNonNullElse(replace, string);
     }
 
     private static String removeDots(String url) {
