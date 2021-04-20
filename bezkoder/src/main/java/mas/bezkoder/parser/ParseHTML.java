@@ -65,6 +65,8 @@ public class ParseHTML extends HTMLExtractor {
         for (String string: strings) {
             String[] urls = string.split(" ");
             String url = urls[0];
+            if (url.startsWith("data:"))
+                continue;
             rs = rs.replace(url, client + java.net.URLEncoder.encode(replaceUrl(url, tutorial.getTitle()), StandardCharsets.UTF_8.name()));
         }
         return rs;
@@ -138,7 +140,7 @@ public class ParseHTML extends HTMLExtractor {
         if (srcs == null) return;
         for (Element src : srcs) {
             String hold = src.attr("src");
-            if (!hold.startsWith("data:image") && !hold.startsWith(this.client)){
+            if (!hold.startsWith("data:") && !hold.startsWith(this.client)){
                 String newUrl = replaceUrl(hold, getTutorial().getTitle());
                 if (newUrl == null) continue;
                 src.attr("src", this.client + java.net.URLEncoder.encode(newUrl, StandardCharsets.UTF_8.name()));
@@ -177,12 +179,27 @@ public class ParseHTML extends HTMLExtractor {
         if (data == null) return;
         for (Element d : data) {
             for (Attribute att : d.attributes().asList()) {
-                if (att.getKey().contains("data-") && !att.getKey().equals("data-src")) {
+                if (att.getKey().contains("srcset")) {
+                    String hold = att.getValue();
+                    String replace = setHelp(hold, this.client, getTutorial());
+                    att.setValue(replace);
+                }
+                else if (att.getKey().contains("data-") && !att.getKey().equals("data-src")) {
                     String curr = att.getValue();
-                    if (Pattern.compile(regex).matcher(curr).find() && !curr.startsWith(this.client)) {
-                        String newUrl = replaceUrl(curr, getTutorial().getTitle());
-                        if (newUrl != null)
-                            att.setValue(this.client + java.net.URLEncoder.encode(newUrl, StandardCharsets.UTF_8.name()));
+                    if (!curr.startsWith(this.client)) {
+                        Pattern pattern = Pattern.compile(regex);
+                        Matcher matcher = pattern.matcher(curr);
+                        while (matcher.find()) {
+                            String group = matcher.group(0);
+                            if (group.startsWith(clientStart)) continue;
+                            if (group.startsWith("data:")) continue;
+                            String newUrl = this.client + java.net.URLEncoder.encode(group, StandardCharsets.UTF_8.name());
+                            try {
+                                curr = curr.replace(group, newUrl);
+                            } catch (Exception ignored) {
+                            }
+                        }
+                        att.setValue(curr);
                     }
                 }
             }
