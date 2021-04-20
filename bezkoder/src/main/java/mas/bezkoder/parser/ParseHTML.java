@@ -179,7 +179,12 @@ public class ParseHTML extends HTMLExtractor {
         if (data == null) return;
         for (Element d : data) {
             for (Attribute att : d.attributes().asList()) {
-                if (att.getKey().contains("data-") && !att.getKey().equals("data-src")) {
+                if (att.getKey().contains("srcset")) {
+                    String hold = att.getValue();
+                    String replace = setHelp(hold, this.client, getTutorial());
+                    att.setValue(replace);
+                }
+                else if (att.getKey().contains("data-") && !att.getKey().equals("data-src")) {
                     String curr = att.getValue();
                     if (!curr.startsWith(this.client)) {
                         Pattern pattern = Pattern.compile(regex);
