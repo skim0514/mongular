@@ -289,7 +289,7 @@ public class ParseHTML extends HTMLExtractor {
         while (matcher.find()) {
             String group = matcher.group(0);
             group = parseCSS(group, getTutorial(), this.date);
-            input = input.replace("'" + matcher.group(0) + "'", "\"" + group + "\"");
+            input = input.replace(matcher.group(0), group);
         }
         setInput(input);
     }
