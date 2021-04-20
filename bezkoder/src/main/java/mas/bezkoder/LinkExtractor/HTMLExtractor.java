@@ -131,15 +131,13 @@ public abstract class HTMLExtractor {
 
     /**
      * helper function to take url and accordingly change based on file info
-     * @param url input url
-     * @param string full url
      * @return new url
      */
 
-    public static String replaceUrl(String url, String string) {
-        if (url.contains(clientStart)) return url;
-        String replace = getAbsoluteURL(string, url);
-        return Objects.requireNonNullElse(replace, url);
+    public static String replaceUrl(String string, String baseURL) {
+        if (string.contains(clientStart)) return string;
+        String replace = getAbsoluteURL(baseURL, string);
+        return Objects.requireNonNullElse(replace, string);
     }
 
     private static String removeDots(String url) {
