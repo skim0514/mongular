@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.*;
 import mas.bezkoder.model.Tutorial;
 import mas.bezkoder.repository.TutorialRepository;
 
+import javax.servlet.http.HttpServletRequest;
+
 import static java.lang.Math.abs;
 import static java.time.temporal.ChronoUnit.HOURS;
 import static org.outerj.daisy.diff.Main.compareStreams;
@@ -53,6 +55,12 @@ public class TutorialController {
 
   @Autowired
   TutorialRepository tutorialRepository;
+
+  @GetMapping("**")
+  public ResponseEntity<?> getRandom(HttpServletRequest request) {
+    System.out.println(request.getRequestURI());
+    return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+  }
 
   @GetMapping("/tutorials")
   public ResponseEntity<List<Tutorial>> getAllTutorials(@RequestParam(required = false) String title) {
