@@ -5,7 +5,13 @@ import mas.bezkoder.repository.TutorialRepository;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 
+import org.apache.http.StatusLine;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -50,20 +56,15 @@ public class WildCardController {
         if (link == null) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
         String requestString = "http://118.67.133.84:8085/api/websites?date=" + date + "&web=" + link;
         System.out.println("getURL " + requestString);
-        HttpURLConnection con = (HttpURLConnection) new URL(requestString).openConnection();
-        con.setRequestProperty("User-Agent", USER_AGENT);
-        int responseCode = con.getResponseCode();
-        if (responseCode != 200) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
-        System.out.println("responseCode is " + responseCode);
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(con.getInputStream()));
-        String inputLine;
-        StringBuilder response = new StringBuilder();
-        while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
-            response.append("\n");
-        }
-        in.close();
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        HttpGet httpGet = new HttpGet(requestString);
+//        HttpURLConnection con = (HttpURLConnection) new URL(requestString).openConnection();
+        CloseableHttpClient client = HttpClients.createDefault();
+        CloseableHttpResponse response = client.execute(httpGet);
+        HttpEntity entity = response.getEntity();
+        String result = EntityUtils.toString(entity);
+        StatusLine sl = response.getStatusLine();
+        if (sl.getStatusCode() > 299) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+        client.close();
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }
