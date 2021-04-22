@@ -42,7 +42,7 @@ import static org.outerj.daisy.diff.Main.compareStreams;
  */
 @CrossOrigin(origins = {"http://118.67.133.84:4200", "http://localhost:4200", "http://0.0.0.0:4200"})
 @RestController
-
+@RequestMapping("/api")
 public class TutorialController {
 
 
@@ -56,15 +56,6 @@ public class TutorialController {
   @Autowired
   TutorialRepository tutorialRepository;
 
-
-  @GetMapping("**")
-  public ResponseEntity<?> getRandom(HttpServletRequest request) {
-    System.out.println(request.getRequestURI());
-    return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
-
-  }
-
-  @RequestMapping("/api")
   @GetMapping("/tutorials")
   public ResponseEntity<List<Tutorial>> getAllTutorials(@RequestParam(required = false) String title) {
     try {
@@ -82,7 +73,6 @@ public class TutorialController {
     }
   }
 
-  @RequestMapping("/api")
   @GetMapping("/tutorials/id/{id}")
   public ResponseEntity<Tutorial> getTutorialById(@PathVariable("id") String id) {
     Optional<Tutorial> tutorialData = tutorialRepository.findById(id);
@@ -90,7 +80,6 @@ public class TutorialController {
             .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
   }
 
-  @RequestMapping("/api")
   @PostMapping("/tutorials")
   public ResponseEntity<Tutorial> createTutorial(@RequestBody Tutorial tutorial) {
     try {
@@ -109,7 +98,6 @@ public class TutorialController {
    * @param next Optional date we are comparing with
    * @return response entity containing bits and header of html file already parsed
    */
-  @RequestMapping("/api")
   @GetMapping("/comparison")
   public ResponseEntity<?> getComparison(@RequestParam("web") String website, @RequestParam("prev") String prev,
                                          @RequestParam(name = "next", required = false) String next) throws JSONException, IOException, URISyntaxException {
@@ -172,7 +160,6 @@ public class TutorialController {
    * @param date date of retrieval, will give closest date - optional
    * @return a response entity containing a body and header for browser to interpret
    */
-  @RequestMapping("/api")
   @GetMapping("/websites")
   public ResponseEntity<?> getFileFromWebsite(@RequestParam("web") String website, @RequestParam(name = "date",
           required = false) String date) throws IOException, URISyntaxException, JSONException {
@@ -301,7 +288,6 @@ public class TutorialController {
    * @param website - gives website link.
    * @return HTTP OK if works
    */
-  @RequestMapping("/api")
   @PostMapping("/websites")
   public ResponseEntity<?> postFileFromWebsite(@RequestParam("web") String website) throws IOException, JSONException, URISyntaxException {
     CrawlMain.run(website);
@@ -330,7 +316,6 @@ public class TutorialController {
     return new ResponseEntity<>(tutorials, HttpStatus.OK);
   }
 
-  @RequestMapping("/api")
   @PutMapping("/tutorials/{id}")
   public ResponseEntity<Tutorial> updateTutorial(@PathVariable("id") String id, @RequestBody Tutorial tutorial) {
     Optional<Tutorial> tutorialData = tutorialRepository.findById(id);
@@ -346,7 +331,6 @@ public class TutorialController {
     }
   }
 
-  @RequestMapping("/api")
   @DeleteMapping("/tutorials/{id}")
   public ResponseEntity<HttpStatus> deleteTutorial(@PathVariable("id") String id) {
     try {
@@ -357,7 +341,6 @@ public class TutorialController {
     }
   }
 
-  @RequestMapping("/api")
   @DeleteMapping("/websites")
   public ResponseEntity<HttpStatus> deleteWebsite(@RequestParam("web") String website) {
     try {
@@ -373,7 +356,6 @@ public class TutorialController {
     }
   }
 
-  @RequestMapping("/api")
   @DeleteMapping("/tutorials")
   public ResponseEntity<HttpStatus> deleteAllTutorials() {
     try {
