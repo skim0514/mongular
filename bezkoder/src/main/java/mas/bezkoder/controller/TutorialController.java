@@ -56,7 +56,7 @@ public class TutorialController {
   @Autowired
   TutorialRepository tutorialRepository;
 
-  @GetMapping("**")
+  @GetMapping("../**")
   public ResponseEntity<?> getRandom(HttpServletRequest request) {
     System.out.println(request.getRequestURI());
     return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
