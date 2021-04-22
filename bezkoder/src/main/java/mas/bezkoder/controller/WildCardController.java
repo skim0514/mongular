@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Enumeration;
 
 @RestController
 public class WildCardController {
@@ -18,7 +19,7 @@ public class WildCardController {
     public ResponseEntity<?> getRandom(HttpServletRequest request) {
         System.out.println(request.getRequestURI());
         System.out.println(request.getServletPath());
-        System.out.println(request.getHeaderNames());
+        Enumeration<String> names = request.getHeaderNames()
         return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
 
     }
