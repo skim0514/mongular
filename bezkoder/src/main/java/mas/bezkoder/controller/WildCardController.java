@@ -60,7 +60,8 @@ public class WildCardController {
         System.out.println("getURL " + requestString);
         HttpGet httpGet = new HttpGet(requestString);
         for (String headerName : headerNames) {
-            httpGet.addHeader(headerName, request.getHeader(headerName));
+            if (headerName.equals(HttpHeaders.REFERER)) httpGet.addHeader(HttpHeaders.REFERER, referer);
+            else httpGet.addHeader(headerName, request.getHeader(headerName));
         }
         CloseableHttpClient client = HttpClients.createDefault();
         System.out.println("client");
