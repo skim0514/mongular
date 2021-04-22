@@ -68,6 +68,7 @@ public class WildCardController {
         CloseableHttpResponse response = client.execute(httpGet);
         System.out.println("response");
         HttpEntity entity = response.getEntity();
+        if (entity == null) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);;
         HttpHeaders httpheaders = new HttpHeaders();
         for(Header header : response.getAllHeaders()) {
             httpheaders.add(header.getName(), header.getValue());
