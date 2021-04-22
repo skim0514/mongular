@@ -59,8 +59,12 @@ public class WildCardController {
         HttpGet httpGet = new HttpGet(requestString);
 //        HttpURLConnection con = (HttpURLConnection) new URL(requestString).openConnection();
         CloseableHttpClient client = HttpClients.createDefault();
+        System.out.println("client");
         CloseableHttpResponse response = client.execute(httpGet);
+        System.out.println("response");
         HttpEntity entity = response.getEntity();
+
+        System.out.println("entity");
         String result = EntityUtils.toString(entity);
         StatusLine sl = response.getStatusLine();
         if (sl.getStatusCode() > 299) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
