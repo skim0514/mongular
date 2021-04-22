@@ -56,7 +56,7 @@ public class WildCardController {
         if (base == null || date == null) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
         String link = HTMLExtractor.replaceUrl(requestURL, base);
         if (link == null) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
-        String requestString = "http://118.67.133.84:8085/api/websites?date=" + date + "&web=" + java.net.URLEncoder.encode(link, StandardCharsets.UTF_8.name());
+        String requestString = "http://localhost:8085/api/websites?date=" + date + "&web=" + java.net.URLEncoder.encode(link, StandardCharsets.UTF_8.name());
         System.out.println("getURL " + requestString);
         HttpGet httpGet = new HttpGet(requestString);
         for (String headerName : headerNames) {
