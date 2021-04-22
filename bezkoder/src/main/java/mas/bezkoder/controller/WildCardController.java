@@ -19,7 +19,11 @@ public class WildCardController {
     public ResponseEntity<?> getRandom(HttpServletRequest request) {
         System.out.println(request.getRequestURI());
         System.out.println(request.getServletPath());
-        Enumeration<String> names = request.getHeaderNames()
+        Enumeration<String> names = request.getHeaderNames();
+        while (names.hasMoreElements()) {
+            String param = names.nextElement();
+            System.out.println(param);
+        }
         return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
 
     }
