@@ -2,6 +2,7 @@ package mas.bezkoder.controller;
 
 import mas.bezkoder.LinkExtractor.HTMLExtractor;
 import mas.bezkoder.repository.TutorialRepository;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -39,7 +41,7 @@ public class WildCardController {
     public ResponseEntity<?> getRandom(HttpServletRequest request) throws URISyntaxException, IOException {
         String requestURL = request.getRequestURI();
         String referer = request.getHeader(HttpHeaders.REFERER);
-
+        final List<String> headerNames = Collections.list(request.getHeaderNames());
         if (requestURL.startsWith("/api")) requestURL = requestURL.replace("/api/", "");
         if (referer == null) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
         System.out.println("getReferer");
@@ -57,18 +59,23 @@ public class WildCardController {
         String requestString = "http://118.67.133.84:8085/api/websites?date=" + date + "&web=" + java.net.URLEncoder.encode(link, StandardCharsets.UTF_8.name());
         System.out.println("getURL " + requestString);
         HttpGet httpGet = new HttpGet(requestString);
-//        HttpURLConnection con = (HttpURLConnection) new URL(requestString).openConnection();
+        for (String headerName : headerNames) {
+            httpGet.addHeader(headerName, request.getHeader(headerName));
+        }
         CloseableHttpClient client = HttpClients.createDefault();
         System.out.println("client");
         CloseableHttpResponse response = client.execute(httpGet);
         System.out.println("response");
         HttpEntity entity = response.getEntity();
-
+        HttpHeaders httpheaders = new HttpHeaders();
+        for(Header header : response.getAllHeaders()) {
+            httpheaders.add(header.getName(), header.getValue());
+        }
         System.out.println("entity");
         String result = EntityUtils.toString(entity);
         StatusLine sl = response.getStatusLine();
         if (sl.getStatusCode() > 299) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
         client.close();
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(result, httpheaders, HttpStatus.OK);
     }
 }
