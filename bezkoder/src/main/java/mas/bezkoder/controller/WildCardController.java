@@ -33,8 +33,10 @@ public class WildCardController {
     public ResponseEntity<?> getRandom(HttpServletRequest request) throws URISyntaxException, IOException {
         String requestURL = request.getRequestURI();
         String referer = request.getHeader(HttpHeaders.REFERER);
+
         if (requestURL.startsWith("/api")) requestURL = requestURL.replace("/api/", "");
         if (referer == null) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+        System.out.println("getReferer");
         URI url = new URI(referer);
         List<NameValuePair> params = URLEncodedUtils.parse(url, StandardCharsets.UTF_8);
         String base = null;
@@ -47,6 +49,7 @@ public class WildCardController {
         String link = HTMLExtractor.replaceUrl(requestURL, base);
         if (link == null) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
         String requestString = "http://118.67.133.84:8085/api/websites?date=" + date + "&web=" + link;
+        System.out.println("getURL");
         HttpURLConnection con = (HttpURLConnection) new URL(requestString).openConnection();
         con.setRequestProperty("User-Agent", USER_AGENT);
         int responseCode = con.getResponseCode();
