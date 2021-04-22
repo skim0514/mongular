@@ -49,7 +49,7 @@ public class WildCardController {
         String link = HTMLExtractor.replaceUrl(requestURL, base);
         if (link == null) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
         String requestString = "http://118.67.133.84:8085/api/websites?date=" + date + "&web=" + link;
-        System.out.println("getURL");
+        System.out.println("getURL " + requestString);
         HttpURLConnection con = (HttpURLConnection) new URL(requestString).openConnection();
         con.setRequestProperty("User-Agent", USER_AGENT);
         int responseCode = con.getResponseCode();
