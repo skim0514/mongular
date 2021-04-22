@@ -42,7 +42,7 @@ import static org.outerj.daisy.diff.Main.compareStreams;
  */
 @CrossOrigin(origins = {"http://118.67.133.84:4200", "http://localhost:4200", "http://0.0.0.0:4200"})
 @RestController
-@RequestMapping("/api")
+
 public class TutorialController {
 
 
@@ -56,12 +56,15 @@ public class TutorialController {
   @Autowired
   TutorialRepository tutorialRepository;
 
-  @GetMapping("../**")
+
+  @GetMapping("**")
   public ResponseEntity<?> getRandom(HttpServletRequest request) {
     System.out.println(request.getRequestURI());
     return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+
   }
 
+  @RequestMapping("/api")
   @GetMapping("/tutorials")
   public ResponseEntity<List<Tutorial>> getAllTutorials(@RequestParam(required = false) String title) {
     try {
