@@ -17,6 +17,8 @@ public class WildCardController {
     @GetMapping("**")
     public ResponseEntity<?> getRandom(HttpServletRequest request) {
         System.out.println(request.getRequestURI());
+        System.out.println(request.getServletPath());
+        System.out.println(request.getRequestURL());
         return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
 
     }
