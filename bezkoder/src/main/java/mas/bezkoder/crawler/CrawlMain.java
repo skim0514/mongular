@@ -5,8 +5,10 @@ import mas.bezkoder.controller.TutorialController;
 import mas.bezkoder.model.Tutorial;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.ByteArrayBody;
@@ -19,6 +21,7 @@ import org.jsoup.nodes.Document;
 
 import java.io.*;
 import java.net.*;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -371,26 +374,11 @@ public class CrawlMain {
 
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException, URISyntaxException {
-        System.setProperty("http.proxyHost", "127.0.0.1");
-        System.setProperty("http.proxyPort", "8123");
-//        Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
-        String url = "https://bitcointalk.org/";
-        HttpURLConnection webProxyConnection
-                = (HttpURLConnection) new URL(url).openConnection();
-        InputStream is = webProxyConnection.getInputStream();
-        byte[] bytes = IOUtils.toByteArray(is);
-
-        InputStream targetStream = new ByteArrayInputStream(bytes);
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(targetStream, "ISO-8859-1"));
-
-        String inputLine;
-        StringBuffer content = new StringBuffer();
-        while ((inputLine = in.readLine()) != null) {
-            content.append(inputLine);
+        URI url = new URI("http://118.67.133.84:8085/api/websites?date=12345456576&web=https%3A%2F%2Fnsnw.ca%2F");
+        List<NameValuePair> params = URLEncodedUtils.parse(url, StandardCharsets.UTF_8);
+        for (NameValuePair param : params) {
+            System.out.println(param.getName() + " : " + param.getValue());
         }
-        in.close();
-        System.out.println(content.toString());
 
 
 
