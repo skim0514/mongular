@@ -54,6 +54,7 @@ public class WildCardController {
         con.setRequestProperty("User-Agent", USER_AGENT);
         int responseCode = con.getResponseCode();
         if (responseCode != 200) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+        System.out.println("responseCode is " + responseCode);
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(con.getInputStream()));
         String inputLine;
