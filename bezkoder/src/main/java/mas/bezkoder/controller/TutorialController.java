@@ -191,7 +191,7 @@ public class TutorialController {
       return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 
-    if (tutorial.getFiletype().equals("html") || tutorial.getFiletype().equals("css") || tutorial.getFiletype().equals("js")) {
+    if (tutorial.getFiletype().equals("html") || tutorial.getFiletype().equals("css") || tutorial.getFiletype().equals("js") || tutorial.getContentType().contains("text")) {
       String file;
       try {
         file = getTextFile(is, tutorial);
