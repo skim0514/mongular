@@ -2,6 +2,7 @@ package mas.bezkoder.controller;
 
 import mas.bezkoder.repository.TutorialRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,11 +20,7 @@ public class WildCardController {
     public ResponseEntity<?> getRandom(HttpServletRequest request) {
         System.out.println(request.getRequestURI());
         System.out.println(request.getServletPath());
-        Enumeration<String> names = request.getHeaderNames();
-        while (names.hasMoreElements()) {
-            String param = names.nextElement();
-            System.out.println(param);
-        }
+        System.out.println(request.getHeader(HttpHeaders.REFERER));
         return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
 
     }
