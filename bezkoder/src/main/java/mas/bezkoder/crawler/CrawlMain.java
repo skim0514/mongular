@@ -54,11 +54,7 @@ public class CrawlMain {
      */
     public static void crawlSite(String website) throws JSONException, URISyntaxException, IOException, NoSuchAlgorithmException {
         String url;
-        while (true) {
-            url = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
-            if (url.equals(website)) break;
-            else website = url;
-        }
+        url = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
         String startDomain = new URL(url).getHost();
         HashSet<String> visited = new HashSet<>();
         HashSet<String> checksums = new HashSet<>();
@@ -181,8 +177,8 @@ public class CrawlMain {
      */
     public static String downloadFile(String url) throws IOException, NoSuchAlgorithmException {
         if (url.startsWith("https://href.li/?")) url = url.replace("https://href.li/?", "");
-        System.setProperty("http.proxyHost", "127.0.0.1");
-        System.setProperty("http.proxyPort", "8123");
+//        System.setProperty("http.proxyHost", "127.0.0.1");
+//        System.setProperty("http.proxyPort", "8123");
         HttpURLConnection webProxyConnection
                 = (HttpURLConnection) new URL(url).openConnection();
 
@@ -292,8 +288,8 @@ public class CrawlMain {
      * @return content type information
      */
     public static String getContentType(String link) {
-        System.setProperty("http.proxyHost", "127.0.0.1");
-        System.setProperty("http.proxyPort", "8123");
+//        System.setProperty("http.proxyHost", "127.0.0.1");
+//        System.setProperty("http.proxyPort", "8123");
 
         if (link.startsWith("https://href.li/?")) link = link.replace("https://href.li/?", "");
         URL url;

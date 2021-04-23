@@ -176,8 +176,8 @@ public class CrawlHTML extends HTMLExtractor {
     }
 
     public static HashSet<String> getPageLinks(String URL, String domain, int depth, HashSet<String> visited, HashSet<String> checksums) {
-        System.setProperty("http.proxyHost", "127.0.0.1");
-        System.setProperty("http.proxyPort", "8123");
+//        System.setProperty("http.proxyHost", "127.0.0.1");
+//        System.setProperty("http.proxyPort", "8123");
 
         if (depth == MAX_DEPTH) return null;
         if (!URL.startsWith("http")) {
