@@ -26,6 +26,8 @@ import org.springframework.web.bind.annotation.*;
 
 import mas.bezkoder.model.Tutorial;
 import mas.bezkoder.repository.TutorialRepository;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -43,7 +45,7 @@ import static org.outerj.daisy.diff.Main.compareStreams;
 @CrossOrigin(origins = {"http://118.67.133.84:4200", "http://localhost:4200", "http://0.0.0.0:4200"})
 @RestController
 @RequestMapping("/api")
-public class TutorialController {
+public class TutorialController implements WebMvcConfigurer {
 
 
   /**
@@ -52,6 +54,10 @@ public class TutorialController {
   private String[] blacklistArray  = {"www.youtube.com"};
   private final HashSet<String> blacklist = new HashSet<>(Arrays.asList(blacklistArray));
 
+  @Override
+  public void addInterceptors(InterceptorRegistry registry) {
+    registry.addInterceptor(new CustomInterceptor());
+  }
 
   @Autowired
   TutorialRepository tutorialRepository;
