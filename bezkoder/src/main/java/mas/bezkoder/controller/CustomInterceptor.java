@@ -38,6 +38,18 @@ public class CustomInterceptor implements HandlerInterceptor {
         return true;
     }
 
+    @Override
+    public boolean postHandle(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Object handler) throws Exception {
+        System.out.println("posthandle");
+
+
+        System.out.println(request.getRequestURI());
+        return true;
+    }
+
     public static ResponseEntity<?> getRandom(HttpServletRequest request) throws URISyntaxException, IOException {
         System.out.println("random");
         String requestURL = request.getRequestURI();
