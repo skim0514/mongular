@@ -31,6 +31,7 @@ public class CustomInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         System.out.println("start prehandle");
         String referer = request.getHeader(HttpHeaders.REFERER);
+        if (referer == null) return true;
         String requestURI = request.getRequestURI();
         System.out.println("referer is " + referer);
         if (referer.contains("http://118.67.133.84:8085/api/websites")) {
