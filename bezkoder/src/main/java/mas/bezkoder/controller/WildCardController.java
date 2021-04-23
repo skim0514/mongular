@@ -19,8 +19,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -29,16 +31,29 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.logging.Handler;
 
 import static org.apache.http.protocol.HTTP.USER_AGENT;
 
 @RestController
-public class WildCardController {
+public class WildCardController implements HandlerInterceptor {
     @Autowired
     TutorialRepository tutorialRepository;
 
+    @Override
+    public boolean preHandle(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Object handler) throws Exception {
+        System.out.println("prehandle");
+        System.out.println(request.getRequestURI());
+
+        return true;
+    }
+
     @GetMapping("**")
     public ResponseEntity<?> getRandom(HttpServletRequest request) throws URISyntaxException, IOException {
+        System.out.println("random");
         String requestURL = request.getRequestURI();
         String referer = request.getHeader(HttpHeaders.REFERER);
         final List<String> headerNames = Collections.list(request.getHeaderNames());
