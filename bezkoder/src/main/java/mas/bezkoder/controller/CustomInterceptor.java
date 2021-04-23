@@ -11,7 +11,6 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +26,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class CustomInterceptor implements HandlerInterceptor {
-    @Autowired
-    TutorialController Controller;
 
     @Override
     public boolean preHandle(

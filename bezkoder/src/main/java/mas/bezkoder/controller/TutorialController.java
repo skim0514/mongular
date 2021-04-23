@@ -56,6 +56,9 @@ public class TutorialController {
   @Autowired
   TutorialRepository tutorialRepository;
 
+  @Autowired
+  WildCardController wildCardController;
+
   @GetMapping("/tutorials")
   public ResponseEntity<List<Tutorial>> getAllTutorials(@RequestParam(required = false) String title) {
     try {
