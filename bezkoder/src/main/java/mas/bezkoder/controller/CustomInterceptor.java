@@ -33,7 +33,8 @@ public class CustomInterceptor implements HandlerInterceptor {
             HttpServletResponse response,
             Object handler) throws Exception {
         System.out.println("prehandle");
-
+        String referer = request.getHeader(HttpHeaders.REFERER);
+        System.out.println(referer);
         System.out.println(request.getRequestURI());
         return true;
     }
