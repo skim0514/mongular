@@ -39,12 +39,12 @@ import java.util.logging.Handler;
 
 import static org.apache.http.protocol.HTTP.USER_AGENT;
 
-@Configuration
-public class WildCardController implements WebMvcConfigurer {
-
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new CustomInterceptor());
-    }
-
-}
+//@Configuration
+//public class WildCardController implements WebMvcConfigurer {
+//
+//    @Override
+//    public void addInterceptors(InterceptorRegistry registry) {
+//        registry.addInterceptor(new CustomInterceptor());
+//    }
+//
+//}

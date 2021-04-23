@@ -39,6 +39,7 @@ public class CustomInterceptor implements HandlerInterceptor {
     }
 
 
+
     public static ResponseEntity<?> getRandom(HttpServletRequest request) throws URISyntaxException, IOException {
         System.out.println("random");
         String requestURL = request.getRequestURI();
