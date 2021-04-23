@@ -1,10 +1,8 @@
 package mas.bezkoder.controller;
 
 import mas.bezkoder.LinkExtractor.HTMLExtractor;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
-import org.apache.http.StatusLine;
+import org.apache.http.*;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -37,7 +35,7 @@ public class CustomInterceptor implements HandlerInterceptor {
         if (referer.contains("http://118.67.133.84:8085/api/websites")) {
             if (requestURI.equals("/api/websites")) return true;
             else {
-                CloseableHttpResponse proxyResponse = getRandom(request);
+                HttpResponse proxyResponse = getRandom(request);
                 if (proxyResponse == null) {
                     response.setStatus(HttpServletResponse.SC_NO_CONTENT);
                     return false;
@@ -65,7 +63,7 @@ public class CustomInterceptor implements HandlerInterceptor {
 
 
 
-    public CloseableHttpResponse getRandom(HttpServletRequest request) throws URISyntaxException, IOException {
+    public HttpResponse getRandom(HttpServletRequest request) throws URISyntaxException, IOException {
         System.out.println("random");
         String requestURL = request.getRequestURI();
         String referer = request.getHeader(HttpHeaders.REFERER);
@@ -91,9 +89,9 @@ public class CustomInterceptor implements HandlerInterceptor {
             if (headerName.equals(HttpHeaders.REFERER)) httpGet.addHeader(HttpHeaders.REFERER, referer);
             else httpGet.addHeader(headerName, request.getHeader(headerName));
         }
-        CloseableHttpClient client = HttpClients.createDefault();
+        HttpClient client = HttpClients.createDefault();
         System.out.println("client");
-        CloseableHttpResponse response = client.execute(httpGet);
+        HttpResponse response = client.execute(httpGet);
         return response;
     }
 }
