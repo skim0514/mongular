@@ -370,11 +370,21 @@ public class CrawlMain {
 
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException, URISyntaxException {
-        URI url = new URI("http://118.67.133.84:8085/api/websites?date=12345456576&web=https%3A%2F%2Fnsnw.ca%2F");
-        List<NameValuePair> params = URLEncodedUtils.parse(url, StandardCharsets.UTF_8);
-        for (NameValuePair param : params) {
-            System.out.println(param.getName() + " : " + param.getValue());
+        String url = "https://www.webhostingsecretrevealed.net/blog/security/dark-web-websites-onion-links/";
+        System.out.println(CrawlMain.getContentType(url));
+
+        HttpURLConnection webProxyConnection
+                = (HttpURLConnection) new URL(url).openConnection();
+
+        InputStream is = null;
+        try {
+            is = webProxyConnection.getInputStream();
+        } catch (IOException | RuntimeException e) {
+            e.printStackTrace();
         }
+        assert is != null;
+        System.out.println(IOUtils.toString(is, StandardCharsets.UTF_8));
+
 
 
 
