@@ -290,7 +290,8 @@ public class TutorialController {
    * @return HTTP OK if works
    */
   @PostMapping("/websites")
-  public ResponseEntity<?> postFileFromWebsite(@RequestParam("web") String website) throws IOException, JSONException, URISyntaxException {
+  public ResponseEntity<?> postFileFromWebsite(@RequestParam("web") String website, @RequestParam(name = "date",
+          required = false) String date) throws IOException, JSONException, URISyntaxException {
     CrawlMain.run(website);
     System.out.println("done");
     return new ResponseEntity<>(HttpStatus.OK);
