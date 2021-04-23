@@ -1,6 +1,7 @@
 package mas.bezkoder.controller;
 
 import mas.bezkoder.LinkExtractor.HTMLExtractor;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.*;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -14,9 +15,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -51,11 +54,12 @@ public class CustomInterceptor implements HandlerInterceptor {
                     response.setHeader(header.getName(), header.getValue());
                 }
                 System.out.println("entity");
-                String result = EntityUtils.toString(entity);
+                InputStream result = entity.getContent();
                 StatusLine sl = proxyResponse.getStatusLine();
                 response.setStatus(sl.getStatusCode());
-                response.getWriter().write(result);
-                response.getWriter().flush();
+                ServletOutputStream out = response.getOutputStream();
+                IOUtils.copy(result, out);
+                out.flush();
                 return false;
             }
         }
