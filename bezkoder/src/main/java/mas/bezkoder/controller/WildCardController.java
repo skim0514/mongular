@@ -14,12 +14,16 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,19 +39,14 @@ import java.util.logging.Handler;
 
 import static org.apache.http.protocol.HTTP.USER_AGENT;
 
-@RestController
-public class WildCardController{
+@Configuration
+public class WildCardController implements WebMvcConfigurer {
 
-//    @Override
-//    public boolean preHandle(
-//            HttpServletRequest request,
-//            HttpServletResponse response,
-//            Object handler) throws Exception {
-//        System.out.println("prehandle");
-//        System.out.println(request.getRequestURI());
-//
-//        return true;
-//    }
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new CustomInterceptor());
+    }
+
 
     @GetMapping("**")
     public static ResponseEntity<?> getRandom(HttpServletRequest request) throws URISyntaxException, IOException {
