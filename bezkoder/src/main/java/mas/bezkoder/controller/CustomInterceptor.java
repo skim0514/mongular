@@ -35,6 +35,8 @@ public class CustomInterceptor implements HandlerInterceptor {
         System.out.println("prehandle");
         String referer = request.getHeader(HttpHeaders.REFERER);
         System.out.println(referer);
+        if (referer == null)
+            System.out.println("referer null");
         System.out.println(request.getRequestURI());
         return true;
     }
