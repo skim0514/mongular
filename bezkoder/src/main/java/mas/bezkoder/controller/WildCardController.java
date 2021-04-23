@@ -41,7 +41,9 @@ import static org.apache.http.protocol.HTTP.USER_AGENT;
 
 @Configuration
 public class WildCardController implements WebMvcConfigurer {
+
     @Autowired
+    TutorialController Controller;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
