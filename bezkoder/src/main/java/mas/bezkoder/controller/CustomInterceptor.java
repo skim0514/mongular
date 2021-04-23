@@ -33,7 +33,6 @@ public class CustomInterceptor implements HandlerInterceptor {
             Object handler) throws Exception {
         System.out.println("prehandle");
 
-
         System.out.println(request.getRequestURI());
         return true;
     }
