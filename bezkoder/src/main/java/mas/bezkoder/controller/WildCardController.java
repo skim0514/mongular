@@ -36,23 +36,21 @@ import java.util.logging.Handler;
 import static org.apache.http.protocol.HTTP.USER_AGENT;
 
 @RestController
-public class WildCardController implements HandlerInterceptor {
-    @Autowired
-    TutorialRepository tutorialRepository;
+public class WildCardController{
 
-    @Override
-    public boolean preHandle(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            Object handler) throws Exception {
-        System.out.println("prehandle");
-        System.out.println(request.getRequestURI());
-
-        return true;
-    }
+//    @Override
+//    public boolean preHandle(
+//            HttpServletRequest request,
+//            HttpServletResponse response,
+//            Object handler) throws Exception {
+//        System.out.println("prehandle");
+//        System.out.println(request.getRequestURI());
+//
+//        return true;
+//    }
 
     @GetMapping("**")
-    public ResponseEntity<?> getRandom(HttpServletRequest request) throws URISyntaxException, IOException {
+    public static ResponseEntity<?> getRandom(HttpServletRequest request) throws URISyntaxException, IOException {
         System.out.println("random");
         String requestURL = request.getRequestURI();
         String referer = request.getHeader(HttpHeaders.REFERER);
