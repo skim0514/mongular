@@ -36,34 +36,32 @@ public class CustomInterceptor implements HandlerInterceptor {
         String referer = request.getHeader(HttpHeaders.REFERER);
         if (referer == null) return true;
         String requestURI = request.getRequestURI();
+        if (requestURI.equals("/api/websites")) return true;
         System.out.println("request is" + requestURI);
         System.out.println("referer is " + referer);
         if (referer.contains("http://118.67.133.84:8085/api/websites")) {
-            if (requestURI.equals("/api/websites")) return true;
-            else {
-                HttpResponse proxyResponse = getRandom(request);
-                if (proxyResponse == null) {
-                    response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-                    return false;
-                }
-                System.out.println("response");
-                HttpEntity entity = proxyResponse.getEntity();
-                if (entity == null) {
-                    response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-                    return false;
-                }
-                for (Header header : proxyResponse.getAllHeaders()) {
-                    response.setHeader(header.getName(), header.getValue());
-                }
-                System.out.println("entity");
-                InputStream result = entity.getContent();
-                StatusLine sl = proxyResponse.getStatusLine();
-                response.setStatus(sl.getStatusCode());
-                ServletOutputStream out = response.getOutputStream();
-                IOUtils.copy(result, out);
-                out.flush();
+            HttpResponse proxyResponse = getRandom(request);
+            if (proxyResponse == null) {
+                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
                 return false;
             }
+            System.out.println("response");
+            HttpEntity entity = proxyResponse.getEntity();
+            if (entity == null) {
+                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                return false;
+            }
+            for (Header header : proxyResponse.getAllHeaders()) {
+                response.setHeader(header.getName(), header.getValue());
+            }
+            System.out.println("entity");
+            InputStream result = entity.getContent();
+            StatusLine sl = proxyResponse.getStatusLine();
+            response.setStatus(sl.getStatusCode());
+            ServletOutputStream out = response.getOutputStream();
+            IOUtils.copy(result, out);
+            out.flush();
+            return false;
         }
         return true;
     }
