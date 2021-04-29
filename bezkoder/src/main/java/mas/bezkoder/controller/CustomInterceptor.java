@@ -40,6 +40,7 @@ public class CustomInterceptor implements HandlerInterceptor {
         System.out.println("request is" + requestURI);
         System.out.println("referer is " + referer);
         if (referer.contains("http://118.67.133.84:8085/api/websites")) {
+
             HttpResponse proxyResponse = getRandom(request);
             if (proxyResponse == null) {
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);
@@ -47,10 +48,6 @@ public class CustomInterceptor implements HandlerInterceptor {
             }
             System.out.println("response");
             HttpEntity entity = proxyResponse.getEntity();
-            if (entity == null) {
-                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-                return false;
-            }
             for (Header header : proxyResponse.getAllHeaders()) {
                 response.setHeader(header.getName(), header.getValue());
             }
@@ -69,14 +66,29 @@ public class CustomInterceptor implements HandlerInterceptor {
 
 
     public HttpResponse getRandom(HttpServletRequest request) throws URISyntaxException, IOException {
+        String[] paths = {"/api/"};
         System.out.println("random");
         String requestURL = request.getRequestURI();
         String referer = request.getHeader(HttpHeaders.REFERER);
         final List<String> headerNames = Collections.list(request.getHeaderNames());
         if (requestURL.startsWith("/api")) requestURL = requestURL.replace("/api/", "");
         if (referer == null) return null;
-        System.out.println("getPathInfo " + request.getPathInfo());
-        System.out.println("getservletpath " + request.getServletPath());
+        for (String path : paths) {
+            HttpResponse response = getHttpResponse(request, requestURL, referer, headerNames);
+            if (response == null || response.getEntity() == null) {
+                requestURL = requestURL.replaceFirst(path, "");
+                response = getHttpResponse(request, requestURL, referer, headerNames);
+                if (response == null || response.getEntity() == null) continue;
+                else return response;
+            }
+            else {
+                return response;
+            }
+        }
+        return null;
+    }
+
+    private HttpResponse getHttpResponse(HttpServletRequest request, String requestURL, String referer, List<String> headerNames) throws URISyntaxException, IOException {
         URI url = new URI(referer);
         List<NameValuePair> params = URLEncodedUtils.parse(url, StandardCharsets.UTF_8);
         String base = null;
