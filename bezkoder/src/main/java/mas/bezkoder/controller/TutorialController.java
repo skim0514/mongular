@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.*;
 import mas.bezkoder.model.Tutorial;
 import mas.bezkoder.repository.TutorialRepository;
 
+import javax.script.ScriptException;
+
 import static java.lang.Math.abs;
 import static java.time.temporal.ChronoUnit.HOURS;
 import static org.outerj.daisy.diff.Main.compareStreams;
@@ -53,6 +55,7 @@ public class TutorialController {
 
   @Autowired
   TutorialRepository tutorialRepository;
+
 
   @GetMapping("/tutorials")
   public ResponseEntity<List<Tutorial>> getAllTutorials(@RequestParam(required = false) String title) {
@@ -98,7 +101,7 @@ public class TutorialController {
    */
   @GetMapping("/comparison")
   public ResponseEntity<?> getComparison(@RequestParam("web") String website, @RequestParam("prev") String prev,
-                                         @RequestParam(name = "next", required = false) String next) throws JSONException, IOException, URISyntaxException {
+                                         @RequestParam(name = "next", required = false) String next) throws JSONException, IOException, URISyntaxException, ScriptException, NoSuchMethodException {
     try {
       website = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
     } catch (UnsupportedEncodingException e) {
@@ -160,7 +163,7 @@ public class TutorialController {
    */
   @GetMapping("/websites")
   public ResponseEntity<?> getFileFromWebsite(@RequestParam("web") String website, @RequestParam(name = "date",
-          required = false) String date) throws IOException, URISyntaxException, JSONException {
+          required = false) String date) throws IOException, URISyntaxException, JSONException, ScriptException, NoSuchMethodException {
     try {
         website = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
     } catch (UnsupportedEncodingException e) {
@@ -189,7 +192,7 @@ public class TutorialController {
       return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 
-    if (tutorial.getFiletype().equals("html") || tutorial.getFiletype().equals("css") || tutorial.getFiletype().equals("js")) {
+    if (tutorial.getFiletype().equals("html") || tutorial.getFiletype().equals("css") || tutorial.getFiletype().equals("js") || tutorial.getContentType().contains("text")) {
       String file;
       try {
         file = getTextFile(is, tutorial);
@@ -287,7 +290,8 @@ public class TutorialController {
    * @return HTTP OK if works
    */
   @PostMapping("/websites")
-  public ResponseEntity<?> postFileFromWebsite(@RequestParam("web") String website) throws IOException, JSONException, URISyntaxException {
+  public ResponseEntity<?> postFileFromWebsite(@RequestParam("web") String website, @RequestParam(name = "date",
+          required = false) String date) throws IOException, JSONException, URISyntaxException {
     CrawlMain.run(website);
     System.out.println("done");
     return new ResponseEntity<>(HttpStatus.OK);

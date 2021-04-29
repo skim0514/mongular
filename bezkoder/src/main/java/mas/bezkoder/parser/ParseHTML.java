@@ -9,6 +9,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import javax.script.ScriptException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
@@ -33,6 +34,8 @@ public class ParseHTML extends HTMLExtractor {
     public ParseHTML(Document document, Tutorial tutorial, String date) {
         super(document, tutorial, date);
     }
+
+
 
     /**
      * function to parse if document is html
@@ -93,7 +96,8 @@ public class ParseHTML extends HTMLExtractor {
             if (replacement == null) continue;
             String newUrl = client + java.net.URLEncoder.encode(replacement, StandardCharsets.UTF_8.name());
             try {
-                input = input.replace("'" + group + "'", "'" + newUrl + "'");
+                input = input.replace("(" + group + ")", "(" + newUrl + ")");
+                input = input.replace("'"  +group + "'", "'" + newUrl + "'");
                 input = input.replace("\"" + group + "\"", "\"" + newUrl + "\"");
             } catch (Exception ignored) {
             }
@@ -115,6 +119,16 @@ public class ParseHTML extends HTMLExtractor {
         return otherRegex(input, client, tutorial);
     }
 
+    public void parseBase(Elements base) throws UnsupportedEncodingException {
+        if (base == null) return;
+        for (Element b : base) {
+            String hold = b.attr("href");
+            String newUrl = replaceUrl(hold, getTutorial().getTitle());
+            if (newUrl == null) continue;
+            b.attr("src", this.client + java.net.URLEncoder.encode(newUrl, StandardCharsets.UTF_8.name()));
+        }
+    }
+
     /**
      * implementation of LinkExtractor abstract func
      * @param srcSets elements to replace
@@ -133,10 +147,8 @@ public class ParseHTML extends HTMLExtractor {
      * implementation of parseSrc for LinkExtractor
      * @param srcs src elements to replace
      * @throws UnsupportedEncodingException if encoding is unusual
-     * @throws MalformedURLException if url is unusual
-     * @throws URISyntaxException incorrectly built url
      */
-    public void parseSrc(Elements srcs) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+    public void parseSrc(Elements srcs) throws UnsupportedEncodingException{
         if (srcs == null) return;
         for (Element src : srcs) {
             String hold = src.attr("src");
@@ -153,10 +165,8 @@ public class ParseHTML extends HTMLExtractor {
      * implementation of parse data-src for LinkExtractor
      * @param srcs types of data-src elements to replace
      * @throws UnsupportedEncodingException will not be thrown
-     * @throws MalformedURLException badly build url
-     * @throws URISyntaxException problems in syntax
      */
-    public void parsedsrc(Elements srcs) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+    public void parsedsrc(Elements srcs) throws UnsupportedEncodingException{
         if (srcs == null) return;
         for (Element src : srcs) {
             String hold = src.attr("data-src");
@@ -172,10 +182,8 @@ public class ParseHTML extends HTMLExtractor {
      * implementation of parse data-src for LinkExtractor
      * @param data types of data- elements to replace
      * @throws UnsupportedEncodingException will not be thrown
-     * @throws MalformedURLException badly build url
-     * @throws URISyntaxException problems in syntax
      */
-    public void parseData(Elements data) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+    public void parseData(Elements data) throws UnsupportedEncodingException {
         if (data == null) return;
         for (Element d : data) {
             for (Attribute att : d.attributes().asList()) {
@@ -227,9 +235,8 @@ public class ParseHTML extends HTMLExtractor {
      * implementation of parseHref for LinkExtractor
      * @param hrefs href elements to replace
      * @throws UnsupportedEncodingException if encoding is unusual
-     * @throws MalformedURLException if url is unusual
      */
-    public void parseLinkLink(Elements hrefs) throws UnsupportedEncodingException, MalformedURLException {
+    public void parseLinkLink(Elements hrefs) throws UnsupportedEncodingException {
         if (hrefs == null) return;
         for (Element href : hrefs) {
             String hold = href.attr("href");
@@ -252,10 +259,10 @@ public class ParseHTML extends HTMLExtractor {
             if (hold.startsWith(this.client)) continue;
             //Include other link filetypes that should be included - or create a blacklist for file starters
             String newUrl = replaceUrl(hold, getTutorial().getTitle());
+            if (newUrl == null) continue;
             URI uri = new URI(hold);
             String domain = uri.getHost();
             if (blacklist.contains(domain)) continue;
-            if (newUrl == null) continue;
             href.attr("href", this.client + java.net.URLEncoder.encode(newUrl, StandardCharsets.UTF_8.name()));
         }
     }
@@ -289,7 +296,7 @@ public class ParseHTML extends HTMLExtractor {
         while (matcher.find()) {
             String group = matcher.group(0);
             group = parseCSS(group, getTutorial(), this.date);
-            input = input.replace("'" + matcher.group(0) + "'", "\"" + group + "\"");
+            input = input.replace(matcher.group(0), group);
         }
         setInput(input);
     }

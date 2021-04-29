@@ -5,8 +5,10 @@ import mas.bezkoder.controller.TutorialController;
 import mas.bezkoder.model.Tutorial;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.ByteArrayBody;
@@ -19,6 +21,7 @@ import org.jsoup.nodes.Document;
 
 import java.io.*;
 import java.net.*;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -51,11 +54,7 @@ public class CrawlMain {
      */
     public static void crawlSite(String website) throws JSONException, URISyntaxException, IOException, NoSuchAlgorithmException {
         String url;
-        while (true) {
-            url = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
-            if (url.equals(website)) break;
-            else website = url;
-        }
+        url = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
         String startDomain = new URL(url).getHost();
         HashSet<String> visited = new HashSet<>();
         HashSet<String> checksums = new HashSet<>();
@@ -371,26 +370,21 @@ public class CrawlMain {
 
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException, URISyntaxException {
-        System.setProperty("http.proxyHost", "127.0.0.1");
-        System.setProperty("http.proxyPort", "8123");
-//        Proxy webProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8123));
-        String url = "https://bitcointalk.org/";
+        String url = "https://www.webhostingsecretrevealed.net/blog/security/dark-web-websites-onion-links/";
+        System.out.println(CrawlMain.getContentType(url));
+
         HttpURLConnection webProxyConnection
                 = (HttpURLConnection) new URL(url).openConnection();
-        InputStream is = webProxyConnection.getInputStream();
-        byte[] bytes = IOUtils.toByteArray(is);
 
-        InputStream targetStream = new ByteArrayInputStream(bytes);
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(targetStream, "ISO-8859-1"));
-
-        String inputLine;
-        StringBuffer content = new StringBuffer();
-        while ((inputLine = in.readLine()) != null) {
-            content.append(inputLine);
+        InputStream is = null;
+        try {
+            is = webProxyConnection.getInputStream();
+        } catch (IOException | RuntimeException e) {
+            e.printStackTrace();
         }
-        in.close();
-        System.out.println(content.toString());
+        assert is != null;
+        System.out.println(IOUtils.toString(is, StandardCharsets.UTF_8));
+
 
 
 

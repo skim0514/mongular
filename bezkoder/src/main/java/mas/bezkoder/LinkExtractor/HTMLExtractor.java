@@ -11,7 +11,6 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,6 +47,10 @@ public abstract class HTMLExtractor {
 
     public void extractHtml() throws IOException, URISyntaxException, JSONException {
 
+        Elements base = document.select("base");
+        parseBase(base);
+
+
         Elements srcsets = document.select("[srcset]");
         parseSrcSet(srcsets);
 
@@ -79,6 +82,8 @@ public abstract class HTMLExtractor {
         Matcher matcher = pattern.matcher(this.input);
         parseOtherStyle(matcher);
     }
+
+    public abstract void parseBase(Elements base) throws UnsupportedEncodingException;
 
     public abstract void parseData(Elements dsrc) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException;
 
@@ -131,13 +136,14 @@ public abstract class HTMLExtractor {
 
     /**
      * helper function to take url and accordingly change based on file info
+     * @param relative input url
+     * @param full full url
      * @return new url
      */
 
-    public static String replaceUrl(String string, String baseURL) {
-        if (string.contains(clientStart)) return string;
-        String replace = getAbsoluteURL(baseURL, string);
-        return Objects.requireNonNullElse(replace, string);
+    public static String replaceUrl(String relative, String full) {
+        if (relative.contains(clientStart)) return relative;
+        return getAbsoluteURL(full, relative);
     }
 
     private static String removeDots(String url) {

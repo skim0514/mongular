@@ -69,7 +69,11 @@ public class CrawlHTML extends HTMLExtractor {
     }
 
     @Override
-    public void parseData(Elements data) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+    public void parseBase(Elements base) {
+    }
+
+    @Override
+    public void parseData(Elements data) {
         HashSet<String> links = getUrls();
         String current = getUrl();
         for (Element d : data) {

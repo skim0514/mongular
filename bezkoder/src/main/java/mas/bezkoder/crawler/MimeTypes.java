@@ -487,10 +487,6 @@ public class MimeTypes {
     }
     
     public static void main(String[] args) {
-        Document doc = Jsoup.parse("https://40aprons.com/15-minute-spicy-ramen/");
-        Elements elements = doc.select("[src]");
-        for (Element element: elements) {
-            System.out.println(element.toString());
-        }
+        System.out.println("helloas dflasdjflaksdfjlaksnbvlaksnvlkasdjfasdf");
     }
 }
