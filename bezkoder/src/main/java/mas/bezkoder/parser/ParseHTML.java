@@ -34,6 +34,8 @@ public class ParseHTML extends HTMLExtractor {
         super(document, tutorial, date);
     }
 
+
+
     /**
      * function to parse if document is html
      * @param input String input of entire document
@@ -114,6 +116,16 @@ public class ParseHTML extends HTMLExtractor {
         String client = "http://118.67.133.84:8085/api/websites?web=";
         if (date != null) client = "http://118.67.133.84:8085/api/websites?date=" + date + "&web=";
         return otherRegex(input, client, tutorial);
+    }
+
+    public void parseBase(Elements base) throws UnsupportedEncodingException {
+        if (base == null) return;
+        for (Element b : base) {
+            String hold = b.attr("href");
+            String newUrl = replaceUrl(hold, getTutorial().getTitle());
+            if (newUrl == null) continue;
+            b.attr("src", this.client + java.net.URLEncoder.encode(newUrl, StandardCharsets.UTF_8.name()));
+        }
     }
 
     /**

@@ -47,6 +47,10 @@ public abstract class HTMLExtractor {
 
     public void extractHtml() throws IOException, URISyntaxException, JSONException {
 
+        Elements base = document.select("base");
+        parseBase(base);
+
+
         Elements srcsets = document.select("[srcset]");
         parseSrcSet(srcsets);
 
@@ -78,6 +82,8 @@ public abstract class HTMLExtractor {
         Matcher matcher = pattern.matcher(this.input);
         parseOtherStyle(matcher);
     }
+
+    public abstract void parseBase(Elements base) throws UnsupportedEncodingException;
 
     public abstract void parseData(Elements dsrc) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException;
 
