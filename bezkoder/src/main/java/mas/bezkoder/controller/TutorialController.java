@@ -28,7 +28,6 @@ import mas.bezkoder.model.Tutorial;
 import mas.bezkoder.repository.TutorialRepository;
 
 import javax.script.ScriptException;
-import javax.servlet.http.HttpServletRequest;
 
 import static java.lang.Math.abs;
 import static java.time.temporal.ChronoUnit.HOURS;

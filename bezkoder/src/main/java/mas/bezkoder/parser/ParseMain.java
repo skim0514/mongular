@@ -27,10 +27,8 @@ public class ParseMain {
                 return parseHtml(input, tutorial, date);
             case "css":
                 return parseCSS(input, tutorial, date);
-            case "js":
-                return parseJs(input, tutorial, date);
             default:
-                return parseText(input, tutorial, date);
+                return parseJs(input, tutorial, date);
 
         }
     }

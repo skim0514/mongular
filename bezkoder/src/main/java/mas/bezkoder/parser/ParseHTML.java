@@ -1,7 +1,6 @@
 package mas.bezkoder.parser;
 
 import mas.bezkoder.LinkExtractor.HTMLExtractor;
-import mas.bezkoder.LinkExtractor.JavascriptBeautifierForJava;
 import mas.bezkoder.model.Tutorial;
 import org.json.JSONException;
 import org.jsoup.Jsoup;
@@ -114,19 +113,7 @@ public class ParseHTML extends HTMLExtractor {
      * @return parsed string javascript document
      * @throws UnsupportedEncodingException if encoding is not functional
      */
-    public static String parseJs(String input, Tutorial tutorial, String date) throws UnsupportedEncodingException, ScriptException, NoSuchMethodException {
-        String client = "http://118.67.133.84:8085/api/websites?web=";
-        if (date != null) client = "http://118.67.133.84:8085/api/websites?date=" + date + "&web=";
-        String ret = otherRegex(input, client, tutorial);
-        return removeLines(ret);
-    }
-
-    private static String removeLines(String ret) throws ScriptException, NoSuchMethodException {
-        JavascriptBeautifierForJava javascriptBeautifierForJava = new JavascriptBeautifierForJava();
-        return (javascriptBeautifierForJava.beautify(ret));
-    }
-
-    public static String parseText(String input, Tutorial tutorial, String date) throws UnsupportedEncodingException {
+    public static String parseJs(String input, Tutorial tutorial, String date) throws UnsupportedEncodingException {
         String client = "http://118.67.133.84:8085/api/websites?web=";
         if (date != null) client = "http://118.67.133.84:8085/api/websites?date=" + date + "&web=";
         return otherRegex(input, client, tutorial);
