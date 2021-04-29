@@ -75,7 +75,8 @@ public class CustomInterceptor implements HandlerInterceptor {
         final List<String> headerNames = Collections.list(request.getHeaderNames());
         if (requestURL.startsWith("/api")) requestURL = requestURL.replace("/api/", "");
         if (referer == null) return null;
-        System.out.println("getReferer");
+        System.out.println("getPathInfo " + request.getPathInfo());
+        System.out.println("getservletpath " + request.getServletPath());
         URI url = new URI(referer);
         List<NameValuePair> params = URLEncodedUtils.parse(url, StandardCharsets.UTF_8);
         String base = null;
