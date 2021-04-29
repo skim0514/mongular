@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import mas.bezkoder.model.Tutorial;
 import mas.bezkoder.repository.TutorialRepository;
 
+import javax.script.ScriptException;
 import javax.servlet.http.HttpServletRequest;
 
 import static java.lang.Math.abs;
@@ -101,7 +102,7 @@ public class TutorialController {
    */
   @GetMapping("/comparison")
   public ResponseEntity<?> getComparison(@RequestParam("web") String website, @RequestParam("prev") String prev,
-                                         @RequestParam(name = "next", required = false) String next) throws JSONException, IOException, URISyntaxException {
+                                         @RequestParam(name = "next", required = false) String next) throws JSONException, IOException, URISyntaxException, ScriptException, NoSuchMethodException {
     try {
       website = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
     } catch (UnsupportedEncodingException e) {
@@ -163,7 +164,7 @@ public class TutorialController {
    */
   @GetMapping("/websites")
   public ResponseEntity<?> getFileFromWebsite(@RequestParam("web") String website, @RequestParam(name = "date",
-          required = false) String date) throws IOException, URISyntaxException, JSONException {
+          required = false) String date) throws IOException, URISyntaxException, JSONException, ScriptException, NoSuchMethodException {
     try {
         website = java.net.URLDecoder.decode(website, StandardCharsets.UTF_8.name());
     } catch (UnsupportedEncodingException e) {
